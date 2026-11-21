@@ -1,10 +1,7 @@
 # inkbot
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/logo_dark.png">
-    <img src="assets/logo_bright.png" alt="inkbot logo" width="160">
-  </picture>
+  <img src="assets/logo.png" alt="inkbot logo" width="160">
 </p>
 
 Browser app to drive the VigoTec VG-X4 pen plotter (writing robot) straight from Chrome or Edge. It talks to the machine's GRBL firmware over USB using the Web Serial API, so there is nothing to install and no server involved. Write text in single-line fonts, plot SVGs and images, and use AI with your own API key to invent drawings or turn photos into line art.
