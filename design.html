@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="de-CH">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Design · inkbot · Living Styleguide</title>
+		<style>
+			:root {
+				--font-body:
+					-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+				--font-display:
+					-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+				--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+				/* Steel scale */
+				--steel-50: #e3ecf1;
+				--steel-100: #b9d0dc;
+				--steel-200: #8db6c9;
+				--steel-400: #659eb4;
+				--steel-600: #3f6b8d;
+				--steel-800: #2f5573;
+				--steel-900: #23283a;
+
+				/* Brand accents */
+				--seal: #ac503a;
+				--wood: #d69b68;
+
+				/* Action layer */
+				--primary: #363d52;
+				--primary-active: #23283a;
+				--on-primary: #faf8f0;
+
+				/* Surface light */
+				--canvas: #faf8f0;
+				--surface: #faf8f0;
+				--surface-card: #f3f0da;
+				--surface-soft: #eae5ca;
+				--surface-strong: #dfd8b8;
+				--hairline: rgb(54 61 82 / 0.14);
+				--hairline-soft: rgb(54 61 82 / 0.08);
+
+				/* Surface dark */
+				--surface-dark: var(--steel-900);
+				--surface-dark-elevated: #2c3246;
+				--surface-dark-soft: #272c3f;
+				--hairline-dark: rgb(250 248 240 / 0.10);
+
+				/* Text light */
+				--ink: #363d52;
+				--ink-soft: #474d63;
+				--ink-mute: #5e6478;
+
+				/* Text dark */
+				--on-dark: #faf8f0;
+				--on-dark-soft: rgb(250 248 240 / 0.82);
+				--on-dark-mute: rgb(250 248 240 / 0.68);
+
+				/* Interaction */
+				--link: var(--steel-600);
+				--link-dark: var(--steel-200);
+				--focus-ring: var(--steel-600);
+				--focus-ring-dark: var(--steel-400);
+				--selection-bg: var(--steel-50);
+				--selection-text: var(--steel-900);
+				--scrollbar-thumb: var(--steel-400);
+				--scrollbar-hover: var(--steel-600);
+				--emphasis-hover-dark: var(--steel-100);
+
+				/* Motion */
+				--duration-instant: 100ms;
+				--duration-fast: 150ms;
+				--duration-base: 250ms;
+				--easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+				/* Semantic */
+				--success: #10b981;
+				--warning: #f59e0b;
+				--danger: var(--seal);
+				--danger-dark: #e59a86;
+
+				--shadow-card: 0 1px 2px rgb(0 0 0 / 0.05), 0 4px 12px rgb(0 0 0 / 0.08);
+			}
+
+			* { box-sizing: border-box; }
+
+			html, body {
+				margin: 0;
+				padding: 0;
+				font-family: var(--font-body);
+				background: var(--canvas);
+				color: var(--ink-soft);
+				-webkit-font-smoothing: antialiased;
+				font-size: 16px;
+				line-height: 1.5;
+			}
+
+			::selection { background: var(--selection-bg); color: var(--selection-text); }
+
+			a { color: var(--link); text-decoration: none; }
+			a:hover { text-decoration: underline; }
+
+			:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+
+			@media (prefers-reduced-motion: reduce) {
+				* {
+					transition-duration: 0ms !important;
+					animation-duration: 0ms !important;
+				}
+
+				.btn-primary:active {
+					transition-duration: var(--duration-instant) !important;
+				}
+			}
+
+			/* Scrollbar */
+			::-webkit-scrollbar { width: 10px; height: 10px; }
+			::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 6px; }
+			::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+			::-webkit-scrollbar-track { background: transparent; }
+
+			.wrap { max-width: 1180px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+
+			header.page {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-end;
+				flex-wrap: wrap;
+				gap: 1rem;
+				margin-bottom: 3rem;
+				padding-bottom: 1.5rem;
+				border-bottom: 1px solid var(--hairline);
+			}
+
+			h1 {
+				font-family: var(--font-display);
+				font-size: 4rem;
+				line-height: 1.05;
+				letter-spacing: -0.04em;
+				font-weight: 600;
+				color: var(--ink);
+				margin: 0 0 0.5rem;
+			}
+
+			.lede { font-size: 1.25rem; color: var(--ink-mute); max-width: 620px; margin: 0; }
+
+			h2 {
+				font-family: var(--font-display);
+				font-size: 2rem;
+				line-height: 1.15;
+				letter-spacing: -0.03em;
+				font-weight: 600;
+				color: var(--ink);
+				margin: 5rem 0 0.5rem;
+			}
+
+			h3 {
+				font-family: var(--font-display);
+				font-size: 1.5rem;
+				line-height: 1.2;
+				letter-spacing: -0.02em;
+				font-weight: 600;
+				color: var(--ink);
+				margin: 0 0 0.5rem;
+			}
+
+			.section-desc { color: var(--ink-mute); margin: 0 0 2rem; max-width: 720px; }
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+				gap: 1rem;
+			}
+
+			.swatch {
+				background: var(--surface);
+				border: 1px solid var(--hairline-soft);
+				border-radius: 12px;
+				overflow: hidden;
+				box-shadow: var(--shadow-card);
+				cursor: pointer;
+				transition: transform var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast) var(--easing-standard);
+			}
+
+			.swatch:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 2px 4px rgb(0 0 0 / 0.06), 0 8px 20px rgb(0 0 0 / 0.1);
+			}
+
+			.swatch:active { transform: translateY(0); }
+
+			.chip { height: 110px; border-bottom: 1px solid var(--hairline-soft); position: relative; }
+			.chip.bordered { border: 1px solid var(--hairline); }
+
+			.meta { padding: 0.875rem 1rem 1rem; }
+
+			.name {
+				font-size: 0.9375rem;
+				font-weight: 600;
+				color: var(--ink);
+				margin: 0 0 0.125rem;
+				letter-spacing: -0.01em;
+			}
+
+			.role { font-size: 0.75rem; color: var(--ink-mute); margin: 0 0 0.5rem; line-height: 1.4; }
+
+			.hex {
+				font-family: var(--font-mono);
+				font-size: 0.75rem;
+				color: var(--ink-soft);
+				background: var(--surface-card);
+				padding: 0.2rem 0.45rem;
+				border-radius: 4px;
+				display: inline-block;
+				letter-spacing: 0.02em;
+			}
+
+			/* Type Samples */
+			.type-stack > * + * { margin-top: 1.75rem; }
+
+			.type-row {
+				display: grid;
+				grid-template-columns: 200px 1fr;
+				gap: 1.5rem;
+				align-items: baseline;
+				padding-bottom: 1.25rem;
+				border-bottom: 1px solid var(--hairline-soft);
+			}
+
+			.type-row:last-child { border-bottom: none; }
+
+			.type-spec {
+				font-family: var(--font-mono);
+				font-size: 0.75rem;
+				color: var(--ink-mute);
+				line-height: 1.6;
+			}
+
+			.type-spec strong { color: var(--ink); font-weight: 600; }
+
+			.type-sample { color: var(--ink); }
+
+			.type-sample.display-xl { font-size: 4rem; line-height: 1.05; letter-spacing: -2px; font-weight: 600; font-family: var(--font-display); }
+			.type-sample.display-lg { font-size: 3rem; line-height: 1.1; letter-spacing: -1.5px; font-weight: 600; font-family: var(--font-display); }
+			.type-sample.display-md { font-size: 2.25rem; line-height: 1.15; letter-spacing: -1px; font-weight: 600; font-family: var(--font-display); }
+			.type-sample.display-sm { font-size: 1.75rem; line-height: 1.2; letter-spacing: -0.5px; font-weight: 600; font-family: var(--font-display); }
+			.type-sample.title-lg { font-size: 1.375rem; line-height: 1.3; letter-spacing: -0.3px; font-weight: 600; }
+			.type-sample.title-md { font-size: 1.125rem; line-height: 1.4; font-weight: 600; }
+			.type-sample.title-sm { font-size: 1rem; line-height: 1.4; font-weight: 600; }
+			.type-sample.body-md { font-size: 1rem; line-height: 1.5; font-weight: 400; color: var(--ink-soft); }
+			.type-sample.body-sm { font-size: 0.875rem; line-height: 1.5; font-weight: 400; color: var(--ink-soft); }
+			.type-sample.caption { font-size: 0.8125rem; line-height: 1.4; font-weight: 500; color: var(--ink-mute); }
+			.type-sample.code-sample { font-size: 0.875rem; line-height: 1.5; font-family: var(--font-mono); background: var(--surface-card); padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; }
+
+			/* Components */
+			.component-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+				gap: 1.5rem;
+			}
+
+			.component-card {
+				background: var(--canvas);
+				border: 1px solid var(--hairline);
+				border-radius: 12px;
+				padding: 1.75rem 1.5rem 1.5rem;
+			}
+
+			.component-label {
+				font-family: var(--font-mono);
+				font-size: 0.75rem;
+				color: var(--ink-mute);
+				margin-bottom: 1rem;
+			}
+
+			.component-demo {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 100px;
+				padding: 1.5rem 1rem;
+				background: var(--surface-card);
+				border-radius: 8px;
+				margin-bottom: 1rem;
+				gap: 0.75rem;
+				flex-wrap: wrap;
+			}
+
+			.btn {
+				display: inline-block;
+				font-family: var(--font-body);
+				font-size: 0.875rem;
+				font-weight: 600;
+				line-height: 1;
+				padding: 0.75rem 1.25rem;
+				border-radius: 8px;
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition: background var(--duration-instant) var(--easing-standard);
+				text-decoration: none;
+			}
+
+			.btn-primary { background: var(--primary); color: var(--on-primary); }
+			.btn-primary:hover { background: var(--primary-active); text-decoration: none; }
+
+			.btn-secondary { background: var(--canvas); color: var(--ink); border-color: var(--hairline); }
+			.btn-secondary:hover { background: var(--surface-soft); text-decoration: none; }
+
+			.btn-icon {
+				width: 36px; height: 36px; padding: 0;
+				border-radius: 9999px;
+				background: var(--canvas);
+				border: 1px solid var(--hairline);
+				color: var(--ink);
+				display: inline-flex; align-items: center; justify-content: center;
+				font-size: 1rem;
+			}
+
+			.btn-text {
+				background: transparent; color: var(--ink); padding: 0.5rem 0.25rem; border: none;
+			}
+			.btn-text:hover { text-decoration: underline; }
+
+			.btn-primary-on-dark { background: var(--canvas); color: var(--surface-dark); }
+			.btn-primary-on-dark:hover { background: var(--steel-100); }
+
+			.input {
+				width: 100%;
+				font-family: var(--font-body);
+				font-size: 1rem;
+				padding: 0.625rem 0.875rem;
+				height: 40px;
+				border-radius: 8px;
+				border: 1px solid var(--hairline);
+				background: var(--canvas);
+				color: var(--ink);
+			}
+			.input:focus { outline: none; border-color: var(--ink); }
+
+			.badge {
+				display: inline-block;
+				font-size: 0.8125rem;
+				font-weight: 500;
+				padding: 0.25rem 0.75rem;
+				border-radius: 9999px;
+				background: var(--surface-card);
+				color: var(--ink);
+			}
+			.badge.brand { background: var(--steel-200); color: var(--steel-900); }
+			.badge.success { background: rgb(16 185 129 / 0.12); color: #047857; }
+			.badge.warning { background: rgb(245 158 11 / 0.15); color: #b45309; }
+			.badge.danger { background: rgb(192 57 43 / 0.12); color: var(--danger); }
+
+			.avatar {
+				width: 36px; height: 36px;
+				border-radius: 9999px;
+				background: var(--surface-card);
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 0.8125rem;
+				font-weight: 600;
+				color: var(--ink);
+			}
+
+			.nav-pill-group {
+				display: inline-flex;
+				padding: 6px;
+				background: var(--surface-soft);
+				border-radius: 9999px;
+				gap: 4px;
+			}
+
+			.pill-tab {
+				font-size: 0.875rem;
+				font-weight: 500;
+				padding: 8px 14px;
+				border-radius: 9999px;
+				color: var(--ink-mute);
+				cursor: pointer;
+				background: transparent;
+				border: none;
+				font-family: inherit;
+			}
+
+			.pill-tab.active {
+				background: var(--canvas);
+				color: var(--ink);
+				box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+			}
+
+			/* Feature / source / preview */
+			.feature-list { display: grid; gap: 0; }
+			.feature-list .item { border-top: 1px solid var(--hairline-soft); padding: 1rem 0; }
+			.feature-list h3 { font-size: 1.125rem; margin: 0 0 0.375rem; }
+			.feature-list p { color: var(--ink-mute); margin: 0; font-size: 0.9375rem; line-height: 1.5; }
+
+			.pricing-card {
+				background: var(--canvas);
+				border: 1px solid var(--hairline);
+				border-radius: 12px;
+				padding: 2rem;
+				box-shadow: var(--shadow-card);
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.pricing-card .plan { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.3px; }
+			.pricing-card .price { font-family: var(--font-display); font-size: 2.25rem; font-weight: 600; letter-spacing: -1px; }
+			.pricing-card ul { padding-left: 1.1rem; margin: 0; color: var(--ink-mute); font-size: 0.9375rem; }
+			.pricing-card ul li + li { margin-top: 0.4rem; }
+
+			.pricing-card.featured {
+				background: var(--surface-dark);
+				border-color: transparent;
+				color: var(--on-dark);
+			}
+			.pricing-card.featured .plan,
+			.pricing-card.featured .price { color: var(--on-dark); }
+			.pricing-card.featured ul { color: var(--on-dark-soft); }
+
+			.testimonial-card {
+				background: var(--surface-card);
+				border-radius: 12px;
+				padding: 1.5rem;
+			}
+
+			.testimonial-card .row {
+				display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.875rem;
+			}
+
+			.testimonial-card .name { font-weight: 600; color: var(--ink); font-size: 0.9375rem; }
+			.testimonial-card .role-sm { font-size: 0.8125rem; color: var(--ink-mute); }
+			.testimonial-card blockquote {
+				margin: 0; font-size: 0.9375rem; color: var(--ink-soft); line-height: 1.55;
+			}
+
+			.stars { color: var(--warning); font-size: 0.9rem; letter-spacing: 0.05em; }
+
+			/* Spacing scale */
+			.spacing-row {
+				display: grid;
+				grid-template-columns: 120px 1fr 80px;
+				align-items: center;
+				gap: 1rem;
+				padding: 0.5rem 0;
+				border-bottom: 1px solid var(--hairline-soft);
+			}
+
+			.spacing-row:last-child { border-bottom: none; }
+
+			.spacing-label { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink); }
+			.spacing-bar { height: 14px; background: var(--steel-400); border-radius: 3px; }
+			.spacing-px { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-mute); text-align: right; }
+
+			/* Radius scale */
+			.radius-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+				gap: 1rem;
+			}
+
+			.radius-card {
+				background: var(--canvas);
+				border: 1px solid var(--hairline);
+				padding: 1rem;
+				text-align: center;
+				box-shadow: var(--shadow-card);
+			}
+
+			.radius-card .shape {
+				width: 64px; height: 64px;
+				background: var(--steel-400);
+				margin: 0 auto 0.75rem;
+			}
+
+			.radius-card .token {
+				font-family: var(--font-mono);
+				font-size: 0.8125rem;
+				color: var(--ink);
+				font-weight: 600;
+			}
+
+			.radius-card .px {
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				color: var(--ink-mute);
+				margin-top: 0.2rem;
+			}
+
+			/* Live composition example */
+			.composition {
+				background: var(--surface);
+				border: 1px solid var(--hairline);
+				border-radius: 16px;
+				padding: 3rem;
+				display: grid;
+				grid-template-columns: 1.2fr 1fr;
+				gap: 3rem;
+				align-items: center;
+				box-shadow: var(--shadow-card);
+			}
+
+			.composition h3.hero-h1 {
+				font-size: 3rem;
+				line-height: 1.05;
+				letter-spacing: -1.5px;
+				font-weight: 600;
+				margin: 0.75rem 0 1rem;
+				color: var(--ink);
+			}
+
+			.composition .hero-mockup {
+				background: var(--canvas);
+				border: 1px solid var(--hairline);
+				border-radius: 16px;
+				padding: 1.25rem;
+				box-shadow: var(--shadow-card);
+			}
+
+			.composition .slot {
+				display: flex; justify-content: space-between; align-items: center;
+				padding: 0.6rem 0.875rem;
+				border: 1px solid var(--hairline);
+				border-radius: 8px;
+				font-size: 0.875rem;
+				color: var(--ink);
+			}
+
+			.composition .slot + .slot { margin-top: 0.5rem; }
+			.composition .slot.active { background: var(--ink); color: var(--on-primary); border-color: var(--ink); }
+
+			@media (max-width: 900px) {
+				.composition { grid-template-columns: 1fr; padding: 2rem; }
+				.composition h3.hero-h1 { font-size: 2.25rem; letter-spacing: -1px; }
+			}
+
+			.dark-block {
+				background: var(--surface-dark);
+				border-radius: 16px;
+				padding: 2.5rem 2rem;
+				margin-top: 2rem;
+				color: var(--on-dark);
+			}
+
+			.dark-block h2 { color: var(--on-dark); margin-top: 0; }
+			.dark-block .section-desc { color: var(--on-dark-mute); }
+			.dark-block .swatch { background: var(--surface-dark-elevated); border-color: var(--hairline-dark); box-shadow: none; }
+			.dark-block .name { color: var(--on-dark); }
+			.dark-block .role { color: var(--on-dark-mute); }
+			.dark-block .hex { background: rgb(255 255 255 / 0.08); color: var(--on-dark-soft); }
+			.dark-block .chip { border-bottom-color: var(--hairline-dark); }
+			.dark-block a { color: var(--link-dark); }
+
+			.toc {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+				margin-bottom: 1.5rem;
+			}
+
+			.toc a {
+				font-size: 0.8125rem;
+				color: var(--ink-mute);
+				text-decoration: none;
+				padding: 0.3rem 0.7rem;
+				border-radius: 6px;
+				border: 1px solid var(--hairline);
+			}
+
+			.toc a:hover { background: var(--surface-soft); color: var(--ink); }
+
+			.toast {
+				position: fixed;
+				bottom: 2rem;
+				left: 50%;
+				transform: translateX(-50%) translateY(150%);
+				background: var(--ink);
+				color: var(--canvas);
+				padding: 0.6rem 1.2rem;
+				border-radius: 8px;
+				font-size: 0.875rem;
+				box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+				transition: transform var(--duration-base) var(--easing-standard);
+				z-index: 100;
+			}
+
+			.toast.show { transform: translateX(-50%) translateY(0); }
+
+			footer.page {
+				background: var(--surface-dark);
+				color: var(--on-dark-soft);
+				margin-top: 6rem;
+				padding: 4rem 1.5rem;
+			}
+
+			footer.page .footer-wrap {
+				max-width: 1180px;
+				margin: 0 auto;
+				display: grid;
+				grid-template-columns: 1.5fr repeat(3, 1fr);
+				gap: 2rem;
+			}
+
+			footer.page h4 { color: var(--on-dark); margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; }
+			footer.page ul { list-style: none; padding: 0; margin: 0; }
+			footer.page ul li { margin-bottom: 0.4rem; font-size: 0.875rem; }
+			footer.page ul li a { color: var(--on-dark-soft); }
+
+			footer.page .wordmark { color: var(--on-dark); font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; letter-spacing: -0.5px; margin-bottom: 0.75rem; }
+			footer.page .tagline { color: var(--on-dark-mute); font-size: 0.875rem; max-width: 280px; }
+
+			@media (max-width: 720px) {
+				footer.page .footer-wrap { grid-template-columns: 1fr 1fr; }
+				h1 { font-size: 2.75rem; }
+				.type-row { grid-template-columns: 1fr; gap: 0.5rem; }
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrap">
+			<div class="toc">
+				<a href="#palette">Palette</a>
+				<a href="#tokens-light">Tokens Light</a>
+				<a href="#typography">Typografie</a>
+				<a href="#spacing">Spacing</a>
+				<a href="#radius">Radius</a>
+				<a href="#components">Komponenten</a>
+				<a href="#composition">Komposition</a>
+				<a href="#tokens-dark">Tokens Dark</a>
+			</div>
+
+			<header class="page">
+				<div>
+					<h1>inkbot</h1>
+					<p class="lede">
+						Living Styleguide. Warm und analog: Papier, Tinte, Blech, Siegellack. Farben aus der
+						Brand-Illustration, Buttons in Tinte, Stahlblau als Akzent. Abgeleitet aus
+						<code>DESIGN.md</code>.
+					</p>
+				</div>
+			</header>
+
+			<h2 id="palette">Markenpalette · Steel</h2>
+			<p class="section-desc">
+				Stahlblau aus dem Blech des Roboters. Steel-600 trägt Links und Focus-Ring auf hellen
+				Flächen, Steel-400 ist dekorativ (Scrollbar, Focus-Ring auf Dark), Steel-200 übernimmt Links
+				auf Dark, Steel-900 (Nachttinte) ist Dark-Theme-Canvas und Footer. Mid-Stops 300/500/700 sind
+				bewusst nicht definiert.
+			</p>
+			<div class="grid">
+				<div class="swatch">
+					<div class="chip" style="background: var(--steel-50)"></div>
+					<div class="meta">
+						<p class="name">steel-50</p>
+						<p class="role">Selection-BG</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--steel-100)"></div>
+					<div class="meta">
+						<p class="name">steel-100</p>
+						<p class="role">Dark-Theme Emphasis-Hover</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--steel-200)"></div>
+					<div class="meta">
+						<p class="name">steel-200</p>
+						<p class="role">Link (Dark) · Brand-Pill-BG · Akzentflächen</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--steel-400)"></div>
+					<div class="meta">
+						<p class="name">steel-400</p>
+						<p class="role">Blech · Scrollbar · Focus-Ring (Dark)</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--steel-600)"></div>
+					<div class="meta">
+						<p class="name">steel-600</p>
+						<p class="role">Primärer Akzent · Link · Focus-Ring (Light)</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--steel-800)"></div>
+					<div class="meta">
+						<p class="name">steel-800</p>
+						<p class="role">Link-Hover · Tiefe Akzentflächen</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--steel-900)"></div>
+					<div class="meta">
+						<p class="name">steel-900</p>
+						<p class="role">Nachttinte · Dark-Canvas · Footer</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+			</div>
+
+			<h2 id="tokens-light">Semantische Tokens · Light</h2>
+			<p class="section-desc">
+				Was tatsächlich im UI verwendet wird. Action-Layer ist Tinte (nicht Steel). Steel lebt
+				ausschliesslich am Akzent-Layer.
+			</p>
+			<div class="grid">
+				<div class="swatch">
+					<div class="chip bordered" style="background: var(--canvas)"></div>
+					<div class="meta">
+						<p class="name">canvas</p>
+						<p class="role">Seiten-Hintergrund</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip bordered" style="background: var(--surface-card)"></div>
+					<div class="meta">
+						<p class="name">surface-card</p>
+						<p class="role">Papier · Vorschau-Karten · Einstellungsgruppen</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip bordered" style="background: var(--surface-soft)"></div>
+					<div class="meta">
+						<p class="name">surface-soft</p>
+						<p class="role">Nav-Pill-Group-BG · Tabellenkopf</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip bordered" style="background: var(--surface-strong)"></div>
+					<div class="meta">
+						<p class="name">surface-strong</p>
+						<p class="role">Disabled-Button-BG</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--primary)"></div>
+					<div class="meta">
+						<p class="name">primary · ink</p>
+						<p class="role">CTA-Button · Headlines</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--primary-active)"></div>
+					<div class="meta">
+						<p class="name">primary-active</p>
+						<p class="role">Press-State für Primary-Button</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--ink-soft)"></div>
+					<div class="meta">
+						<p class="name">ink-soft</p>
+						<p class="role">Standard-Body-Text</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--ink-mute)"></div>
+					<div class="meta">
+						<p class="name">ink-mute</p>
+						<p class="role">Captions · Meta · Fine-Print</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip bordered" style="background: var(--hairline)"></div>
+					<div class="meta">
+						<p class="name">hairline</p>
+						<p class="role">Input-Border · Card-Outline</p>
+						<span class="hex" data-keep>ink / 14%</span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip bordered" style="background: var(--hairline-soft)"></div>
+					<div class="meta">
+						<p class="name">hairline-soft</p>
+						<p class="role">Innere Card-Trenner</p>
+						<span class="hex" data-keep>ink / 8%</span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--success)"></div>
+					<div class="meta">
+						<p class="name">success</p>
+						<p class="role">Confirmations · Success-Badges</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--warning)"></div>
+					<div class="meta">
+						<p class="name">warning</p>
+						<p class="role">Warn-Callouts · Pause</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--danger)"></div>
+					<div class="meta">
+						<p class="name">danger</p>
+						<p class="role">Validation · Destructive · Maschinen-Alarm</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+				<div class="swatch">
+					<div class="chip" style="background: var(--danger-dark)"></div>
+					<div class="meta">
+						<p class="name">danger-dark</p>
+						<p class="role">Danger auf dunklen Flächen</p>
+						<span class="hex"></span>
+					</div>
+				</div>
+			</div>
+
+			<h2 id="typography">Typografie</h2>
+			<p class="section-desc">
+				System-Schrift in zwei Rollen, kein Webfont: Display (600 mit negativem Letter-Spacing) für
+				Headlines, Body (400-600) für Text, Buttons und Navigation. Auf Apple-Geräten SF Pro, auf
+				Windows Segoe UI, auf Android Roboto. Display-Weight bleibt 600 quer durch alle Grössen, niemals
+				700. Wer eine Markenschrift will (z.B. Inter, Manrope, Geist), hostet sie selbst und tauscht
+				sie projektspezifisch ein, behält aber Weight und Tracking-Signatur.
+			</p>
+			<div class="type-stack">
+				<div class="type-row">
+					<div class="type-spec"><strong>display-xl</strong><br>64 / 1.05 / -2px<br>Display 600</div>
+					<div class="type-sample display-xl">Handschrift aus dem Browser</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>display-lg</strong><br>48 / 1.1 / -1.5px<br>Display 600</div>
+					<div class="type-sample display-lg">Dein Schreibroboter für den VG-X4</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>display-md</strong><br>36 / 1.15 / -1px<br>Display 600</div>
+					<div class="type-sample display-md">Text setzen</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>display-sm</strong><br>28 / 1.2 / -0.5px<br>Display 600</div>
+					<div class="type-sample display-sm">Grusskarte · A6 quer</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>title-lg</strong><br>22 / 1.3 / -0.3px<br>Body 600</div>
+					<div class="type-sample title-lg">Papierformat</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>title-md</strong><br>18 / 1.4 / 0<br>Body 600</div>
+					<div class="type-sample title-md">Stift hoch, Stift runter</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>title-sm</strong><br>16 / 1.4 / 0<br>Body 600</div>
+					<div class="type-sample title-sm">Ränder und Ausrichtung</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>body-md</strong><br>16 / 1.5 / 0<br>Body 400</div>
+					<div class="type-sample body-md">Standard Body Copy. System-Schrift im Regular-Weight. Dieser Text steht in <code>{colors.ink-soft}</code>, alle Headlines darüber in <code>{colors.ink}</code>. Inline-Links wie <a href="#">dieser hier</a> nehmen <code>{colors.link}</code> (Steel-600) als Akzent.</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>body-sm</strong><br>14 / 1.5 / 0<br>Body 400</div>
+					<div class="type-sample body-sm">Footer-Body und Fine-Print laufen auf body-sm. Etwas schmaler als body-md, gleicher Weight.</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>caption</strong><br>13 / 1.4 / 0<br>Body 500</div>
+					<div class="type-sample caption">Badge-Label · Caption · Meta-Info</div>
+				</div>
+				<div class="type-row">
+					<div class="type-spec"><strong>code</strong><br>14 / 1.5 / 0<br>System-Mono (SF Mono, Menlo, Consolas)</div>
+					<div class="type-sample"><span class="code-sample">G1 X10 Y10 F3000</span></div>
+				</div>
+			</div>
+
+			<h2 id="spacing">Spacing</h2>
+			<p class="section-desc">
+				4px-Base. Section-Padding ist 96px (universelle vertikale Rhythmus zwischen Editorial-Bands).
+				Card-Padding meist 32px (Feature) oder 24px (Vorschau-Karte).
+			</p>
+			<div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.xxs</div>
+					<div><div class="spacing-bar" style="width: 4px"></div></div>
+					<div class="spacing-px">4px</div>
+				</div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.xs</div>
+					<div><div class="spacing-bar" style="width: 8px"></div></div>
+					<div class="spacing-px">8px</div>
+				</div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.sm</div>
+					<div><div class="spacing-bar" style="width: 12px"></div></div>
+					<div class="spacing-px">12px</div>
+				</div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.md</div>
+					<div><div class="spacing-bar" style="width: 16px"></div></div>
+					<div class="spacing-px">16px</div>
+				</div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.lg</div>
+					<div><div class="spacing-bar" style="width: 24px"></div></div>
+					<div class="spacing-px">24px</div>
+				</div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.xl</div>
+					<div><div class="spacing-bar" style="width: 32px"></div></div>
+					<div class="spacing-px">32px</div>
+				</div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.xxl</div>
+					<div><div class="spacing-bar" style="width: 48px"></div></div>
+					<div class="spacing-px">48px</div>
+				</div>
+				<div class="spacing-row">
+					<div class="spacing-label">spacing.section</div>
+					<div><div class="spacing-bar" style="width: 96px"></div></div>
+					<div class="spacing-px">96px</div>
+				</div>
+			</div>
+
+			<h2 id="radius">Border Radius</h2>
+			<p class="section-desc">
+				Hierarchisch: 8px für Buttons + Inputs, 12px für Content-Cards, 16px für Hero, Pill für
+				Nav-Group + Badges, Full für Icon-Buttons.
+			</p>
+			<div class="radius-grid">
+				<div class="radius-card">
+					<div class="shape" style="border-radius: 4px"></div>
+					<div class="token">rounded.xs</div>
+					<div class="px">4px</div>
+				</div>
+				<div class="radius-card">
+					<div class="shape" style="border-radius: 6px"></div>
+					<div class="token">rounded.sm</div>
+					<div class="px">6px</div>
+				</div>
+				<div class="radius-card">
+					<div class="shape" style="border-radius: 8px"></div>
+					<div class="token">rounded.md</div>
+					<div class="px">8px · Buttons</div>
+				</div>
+				<div class="radius-card">
+					<div class="shape" style="border-radius: 12px"></div>
+					<div class="token">rounded.lg</div>
+					<div class="px">12px · Cards</div>
+				</div>
+				<div class="radius-card">
+					<div class="shape" style="border-radius: 16px"></div>
+					<div class="token">rounded.xl</div>
+					<div class="px">16px · Hero</div>
+				</div>
+				<div class="radius-card">
+					<div class="shape" style="border-radius: 9999px; height: 40px; width: 100px"></div>
+					<div class="token">rounded.pill</div>
+					<div class="px">Badges · Nav</div>
+				</div>
+				<div class="radius-card">
+					<div class="shape" style="border-radius: 50%"></div>
+					<div class="token">rounded.full</div>
+					<div class="px">Icon-Buttons</div>
+				</div>
+			</div>
+
+			<h2 id="components">Komponenten</h2>
+			<p class="section-desc">
+				Die Komponenten-Grammatik von inkbot. Alle Buttons, Inputs, Badges und Cards beziehen sich
+				ausschliesslich auf Token-Referenzen.
+			</p>
+			<div class="component-grid">
+				<div class="component-card">
+					<div class="component-label">button-primary · button-secondary</div>
+					<div class="component-demo">
+						<button class="btn btn-primary">Plotter verbinden</button>
+						<button class="btn btn-secondary">Vorschau</button>
+					</div>
+					<p class="role">Primary CTA in <code>{colors.primary}</code>, Secondary mit Hairline-Border.</p>
+				</div>
+
+				<div class="component-card">
+					<div class="component-label">button-icon · button-text</div>
+					<div class="component-demo">
+						<button class="btn btn-icon" aria-label="Teilen">↗</button>
+						<button class="btn btn-icon" aria-label="Mehr">⋯</button>
+						<button class="btn btn-text">Hilfe</button>
+					</div>
+					<p class="role">36 × 36 Icon-Buttons, Text-Link für Top-Nav.</p>
+				</div>
+
+				<div class="component-card">
+					<div class="component-label">text-input</div>
+					<div class="component-demo" style="flex-direction: column; align-items: stretch">
+						<input class="input" type="text" placeholder="Dein Text, z.B. Alles Gute!" />
+					</div>
+					<p class="role">40px Höhe, 8px Radius, Hairline-Border, Focus auf Ink.</p>
+				</div>
+
+				<div class="component-card">
+					<div class="component-label">badge-pill</div>
+					<div class="component-demo">
+						<span class="badge">Getrennt</span>
+						<span class="badge brand">Verbunden</span>
+						<span class="badge success">Fertig</span>
+						<span class="badge warning">Pausiert</span>
+						<span class="badge danger">Alarm</span>
+					</div>
+					<p class="role">Caption-Type (13/500), Pill-Radius, Default oder Brand-/Semantic-Variante.</p>
+				</div>
+
+				<div class="component-card">
+					<div class="component-label">nav-pill-group</div>
+					<div class="component-demo">
+						<div class="nav-pill-group">
+							<button class="pill-tab active">Text</button>
+							<button class="pill-tab">SVG</button>
+							<button class="pill-tab">Bild</button>
+						</div>
+					</div>
+					<p class="role">Pill-in-Pill: aktives Segment in <code>{colors.canvas}</code> mit Soft-Shadow.</p>
+				</div>
+
+				<div class="component-card">
+					<div class="component-label">feature-list</div>
+					<div class="feature-list">
+						<div class="item">
+							<h3>Text in Handschrift</h3>
+							<p>Single-Line-Fonts mit Grösse, Zeilenabstand und Rändern.</p>
+						</div>
+						<div class="item">
+							<h3>SVG importieren</h3>
+							<p>Skalieren, positionieren und vor dem Zeichnen ansehen.</p>
+						</div>
+					</div>
+					<p class="role">Default für Feature-Aussagen: direkt auf dem Canvas, Hairline statt Card.</p>
+				</div>
+
+				<div class="component-card">
+					<div class="component-label">preview-card</div>
+					<div class="testimonial-card">
+						<div class="row">
+							<span class="avatar">A6</span>
+							<div>
+								<div class="name">Grusskarte</div>
+								<div class="role-sm">A6 quer · Hershey Script</div>
+							</div>
+						</div>
+						<blockquote>Alles Gute zum Geburtstag und einen schönen Tag!</blockquote>
+					</div>
+				</div>
+			</div>
+
+			<h2 id="composition">Live-Komposition · Hero</h2>
+			<p class="section-desc">
+				So setzen sich die Tokens im echten UI-Kontext zusammen. Hero-Band mit 7/5-Split: Headline +
+				Sub-Headline + Button-Row links, App-Mockup-Card rechts.
+			</p>
+			<div class="composition">
+				<div>
+					<h3 class="hero-h1">Dein Plotter, direkt im Browser.</h3>
+					<p class="lede" style="margin-bottom: 1.75rem">
+						Text, SVGs und Bilder auf den VigoTec VG-X4 bringen. Ohne Installation, ohne
+						Server, alles läuft im Browser.
+					</p>
+					<div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
+						<a class="btn btn-primary" href="#">Plotter verbinden</a>
+						<a class="btn btn-secondary" href="#">Ohne Plotter testen</a>
+					</div>
+				</div>
+				<div class="hero-mockup">
+					<div style="font-size: 0.8125rem; color: var(--ink-mute); margin-bottom: 0.75rem">
+						Auftrag · Grusskarte A6
+					</div>
+					<div class="slot">Papier <span>A6 quer</span></div>
+					<div class="slot active">Text <span>3 Zeilen</span></div>
+					<div class="slot">Nullpunkt <span>gesetzt</span></div>
+					<div class="slot">Laufzeit <span>ca. 2 min</span></div>
+					<button class="btn btn-primary" style="width: 100%; margin-top: 0.875rem; text-align: center">Zeichnen starten</button>
+				</div>
+			</div>
+
+			<h2 id="pricing-row">Quellen · Featured Card</h2>
+			<p class="section-desc">
+				Der einzige Ort ausser dem Footer, an dem die Dark-Surface erscheint. Die Inversion IST das
+				Featured-Signal, kein Badge nötig.
+			</p>
+			<div class="component-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+				<div class="pricing-card">
+					<div class="plan">Text</div>
+					<div class="price">V1</div>
+					<ul>
+						<li>Single-Line-Fonts</li>
+						<li>Papierformate A4 bis A6</li>
+						<li>Couverts C6 und DL</li>
+					</ul>
+					<a class="btn btn-secondary" style="text-align: center" href="#">Text schreiben</a>
+				</div>
+				<div class="pricing-card featured">
+					<div class="plan">SVG</div>
+					<div class="price">V1</div>
+					<ul>
+						<li>Import und Skalieren</li>
+						<li>Pfadoptimierung</li>
+						<li>Vorschau mit Laufzeit</li>
+						<li>Live-Tempo</li>
+					</ul>
+					<a class="btn btn-primary-on-dark" style="text-align: center" href="#">SVG laden</a>
+				</div>
+				<div class="pricing-card">
+					<div class="plan">Bild und KI</div>
+					<div class="price">V2</div>
+					<ul>
+						<li>Foto zu Strichzeichnung</li>
+						<li>Prompt zu Zeichnung</li>
+						<li>Eigener API-Key</li>
+					</ul>
+					<a class="btn btn-secondary" style="text-align: center" href="#">Bald verfügbar</a>
+				</div>
+			</div>
+
+			<div class="dark-block">
+				<h2 id="tokens-dark">Semantische Tokens · Dark</h2>
+				<p class="section-desc">
+					Im Dark-Theme kippt das Canvas auf Steel-900, das Emphasis-Paar invertiert (CTA wird
+					Papier, Hover wird Steel-100).
+				</p>
+				<div class="grid">
+					<div class="swatch">
+						<div class="chip" style="background: var(--surface-dark)"></div>
+						<div class="meta">
+							<p class="name">canvas-dark</p>
+							<p class="role">Dark-Theme-Hintergrund (= steel-900)</p>
+							<span class="hex"></span>
+						</div>
+					</div>
+					<div class="swatch">
+						<div class="chip" style="background: var(--surface-dark-elevated)"></div>
+						<div class="meta">
+							<p class="name">surface-dark-elevated</p>
+							<p class="role">Cards im Dark-Canvas</p>
+							<span class="hex"></span>
+						</div>
+					</div>
+					<div class="swatch">
+						<div class="chip" style="background: var(--surface-dark-soft)"></div>
+						<div class="meta">
+							<p class="name">surface-dark-soft</p>
+							<p class="role">Sekundäre Flächen</p>
+							<span class="hex"></span>
+						</div>
+					</div>
+					<div class="swatch">
+						<div class="chip" style="background: var(--on-dark)"></div>
+						<div class="meta">
+							<p class="name">on-dark</p>
+							<p class="role">Headlines · Emphasis-Button</p>
+							<span class="hex"></span>
+						</div>
+					</div>
+					<div class="swatch">
+						<div class="chip" style="background: var(--on-dark-soft)"></div>
+						<div class="meta">
+							<p class="name">on-dark-soft</p>
+							<p class="role">Body-Text auf Dark</p>
+							<span class="hex" data-keep>Papier / 82%</span>
+						</div>
+					</div>
+					<div class="swatch">
+						<div class="chip" style="background: var(--on-dark-mute)"></div>
+						<div class="meta">
+							<p class="name">on-dark-mute</p>
+							<p class="role">Sekundär-Text auf Dark</p>
+							<span class="hex" data-keep>Papier / 68%</span>
+						</div>
+					</div>
+					<div class="swatch">
+						<div class="chip" style="background: var(--emphasis-hover-dark)"></div>
+						<div class="meta">
+							<p class="name">emphasis-hover-dark</p>
+							<p class="role">Button-Hover auf Dark (= steel-100)</p>
+							<span class="hex"></span>
+						</div>
+					</div>
+					<div class="swatch">
+						<div class="chip" style="background: var(--link-dark)"></div>
+						<div class="meta">
+							<p class="name">link-dark</p>
+							<p class="role">Inline-Links auf Dark (= steel-200)</p>
+							<span class="hex"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<footer class="page">
+			<div class="footer-wrap">
+				<div>
+					<div class="wordmark">inkbot</div>
+					<p class="tagline">
+						Schreibroboter im Browser für den VigoTec VG-X4. Open Source, ohne Installation,
+						ohne Server. Nicht mit VigoTec verbunden.
+					</p>
+				</div>
+				<div>
+					<h4>App</h4>
+					<ul>
+						<li><a href="#">Verbinden</a></li>
+						<li><a href="#">Text</a></li>
+						<li><a href="#">SVG</a></li>
+						<li><a href="#">Vorschau</a></li>
+					</ul>
+				</div>
+				<div>
+					<h4>Hilfe</h4>
+					<ul>
+						<li><a href="#">Erste Schritte</a></li>
+						<li><a href="#">Hardware</a></li>
+						<li><a href="#">GRBL-Notizen</a></li>
+					</ul>
+				</div>
+				<div>
+					<h4>Projekt</h4>
+					<ul>
+						<li><a href="#">GitHub</a></li>
+						<li><a href="#">Roadmap</a></li>
+					</ul>
+				</div>
+			</div>
+		</footer>
+
+		<div class="toast" id="toast">Kopiert</div>
+
+		<script>
+			const toast = document.getElementById('toast');
+			let timer;
+
+			const cssValue = (rgb) => {
+				const n = rgb.match(/[\d.]+/g);
+				if (!n) return rgb;
+				const [r, g, b, a] = n.map(Number);
+				if (a !== undefined && a < 1) return `rgb(${r} ${g} ${b} / ${a})`;
+				return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('');
+			};
+
+			document.querySelectorAll('.swatch').forEach((el) => {
+				const chip = el.querySelector('.chip');
+				if (!chip) return;
+				el.dataset.hex = cssValue(getComputedStyle(chip).backgroundColor);
+				const label = el.querySelector('.hex');
+				if (label && label.dataset.keep === undefined) label.textContent = el.dataset.hex;
+			});
+
+			document.querySelectorAll('.swatch').forEach((el) => {
+				el.addEventListener('click', () => {
+					const hex = el.dataset.hex;
+					navigator.clipboard?.writeText(hex);
+					toast.textContent = hex + ' kopiert';
+					toast.classList.add('show');
+					clearTimeout(timer);
+					timer = setTimeout(() => toast.classList.remove('show'), 1400);
+				});
+			});
+		</script>
+	</body>
+</html>
