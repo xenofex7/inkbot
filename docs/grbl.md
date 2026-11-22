@@ -45,14 +45,15 @@ Status-Poll alle ~200 ms mit `?` für Position und Vorschau-Cursor.
 
 ## Stift (Servo) **[prüfen]**
 
-Bei GRBL-Plottern mit Servo üblich:
-- `M3 S<wert>` Stift runter, `M5` (oder `M3 S0`) Stift hoch, danach kurze Pause
-  `G4 P0.15`, damit der Servo ankommt
-- Alternative bei manchen Firmwares: Servo über Z-Achse (`G0 Z5` / `G1 Z0`)
+Beide Community-Projekte (`references.md`) steuern den Stift über die Spindel-PWM:
+- `M5` Stift hoch, `M3 S905` Stift runter (Wert S905 laut beiden Projekten am Gerät
+  bestätigt, Bereich S0-S1000), danach Pause `G4 P0.3` (100-600 ms), damit der Servo ankommt.
+- Beide nennen +X = rechts, +Y = unten, Nullpunkt oben links per `G92 X0 Y0`.
 
-Was VigoWriter tatsächlich sendet, lässt sich herausfinden, indem man in VigoWriter
-einen G-Code exportiert oder die Befehle der Community-Projekte (`references.md`)
-nachliest.
+Test am eigenen Gerät (22.11.2026): `M5`, dann `M3 S0`, `S250`, `S500`, `S750`, `S1000`
+je 4 s, ausserdem `G0 Z5` / `Z0` / `Z-5`. Alle Befehle mit `ok` quittiert, der Stift hat
+sich aber **nicht bewegt**. Da die Befehle laut beiden Projekten stimmen, liegt die
+Ursache vermutlich an der Hardware (Servo-Kabel, Anschluss auf C4, Servoarm). Offen.
 
 ## Ausgabe der echten Maschine
 
