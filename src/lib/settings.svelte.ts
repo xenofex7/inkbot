@@ -1,4 +1,4 @@
-import type { Orientation } from './geometry/paper';
+import { PAPER_FORMATS, sheetSize, type Orientation } from './geometry/paper';
 import { VGX4 } from './grbl/vgx4';
 
 const STORAGE_KEY = 'inkbot.settings';
@@ -34,6 +34,13 @@ class Settings {
 	formatId = $state(DEFAULTS.formatId);
 	orientation = $state<Orientation>(DEFAULTS.orientation);
 	margin = $state(DEFAULTS.margin);
+
+	sheet = $derived(
+		sheetSize(
+			PAPER_FORMATS.find((f) => f.id === this.formatId) ?? PAPER_FORMATS[0],
+			this.orientation
+		)
+	);
 
 	constructor() {
 		if (typeof localStorage === 'undefined') return;

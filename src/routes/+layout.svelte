@@ -12,7 +12,8 @@
 
 	const nav = [
 		{ href: resolve('/'), label: 'Maschine' },
-		{ href: resolve('/text'), label: 'Text' }
+		{ href: resolve('/text'), label: 'Text' },
+		{ href: resolve('/image'), label: 'Bild' }
 	];
 </script>
 
