@@ -11,10 +11,10 @@
 	let { children }: LayoutProps = $props();
 
 	const nav = [
-		{ href: resolve('/'), label: 'Maschine' },
+		{ href: resolve('/'), label: 'Machine' },
 		{ href: resolve('/text'), label: 'Text' },
-		{ href: resolve('/image'), label: 'Bild' },
-		{ href: resolve('/settings'), label: 'Einstellungen' }
+		{ href: resolve('/image'), label: 'Image' },
+		{ href: resolve('/settings'), label: 'Settings' }
 	];
 </script>
 
@@ -45,10 +45,10 @@
 				<StatusBadge />
 				{#if plotter.connection === 'disconnected'}
 					<Button variant="primary" onclick={() => plotter.connect()} disabled={!plotter.supported}>
-						Plotter verbinden
+						Connect plotter
 					</Button>
 				{:else}
-					<Button onclick={() => plotter.disconnect()}>Trennen</Button>
+					<Button onclick={() => plotter.disconnect()}>Disconnect</Button>
 				{/if}
 			</div>
 		</div>

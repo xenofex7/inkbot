@@ -7,7 +7,7 @@ export async function loadGray(source: Blob, maxSide: number): Promise<Gray> {
 	const height = Math.max(1, Math.round(bitmap.height * scale));
 	const canvas = new OffscreenCanvas(width, height);
 	const context = canvas.getContext('2d');
-	if (!context) throw new Error('Canvas wird nicht unterstützt');
+	if (!context) throw new Error('Canvas is not supported');
 	context.fillStyle = '#ffffff';
 	context.fillRect(0, 0, width, height);
 	context.drawImage(bitmap, 0, 0, width, height);

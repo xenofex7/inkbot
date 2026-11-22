@@ -4,8 +4,8 @@ export const PAPER_FORMATS: PaperFormat[] = [
 	{ id: 'a4', name: 'A4', width: 210, height: 297 },
 	{ id: 'a5', name: 'A5', width: 148, height: 210 },
 	{ id: 'a6', name: 'A6', width: 105, height: 148 },
-	{ id: 'c6', name: 'Couvert C6', width: 162, height: 114 },
-	{ id: 'dl', name: 'Couvert DL', width: 220, height: 110 }
+	{ id: 'c6', name: 'Envelope C6', width: 162, height: 114 },
+	{ id: 'dl', name: 'Envelope DL', width: 220, height: 110 }
 ];
 
 export type Orientation = 'portrait' | 'landscape';

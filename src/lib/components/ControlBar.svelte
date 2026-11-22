@@ -41,20 +41,20 @@
 				class="h-9! px-3!"
 				onclick={() => run(penUp())}
 				disabled={!canAct}
-				aria-label="Stift hoch"
+				aria-label="Pen up"
 			>
-				<ArrowUpFromLine size={16} /> Hoch
+				<ArrowUpFromLine size={16} /> Up
 			</Button>
 			<Button
 				class="h-9! px-3!"
 				onclick={() => run(penDown(settings.penDownS))}
 				disabled={!canAct}
-				aria-label="Stift runter"
+				aria-label="Pen down"
 			>
-				<ArrowDownToLine size={16} /> Runter
+				<ArrowDownToLine size={16} /> Down
 			</Button>
 			<label class="flex items-center gap-1.5 text-ink-mute" for="pen-depth">
-				Tiefe S
+				Depth S
 				<input
 					id="pen-depth"
 					type="number"
@@ -68,29 +68,29 @@
 			</label>
 		</div>
 
-		<div class="font-mono text-ink" aria-label="Stiftposition">
+		<div class="font-mono text-ink" aria-label="Pen position">
 			X {format(position?.x)} · Y {format(position?.y)} mm
 		</div>
 
 		<div class="flex items-center gap-2">
-			<label class="sr-only" for="bar-format">Papierformat</label>
+			<label class="sr-only" for="bar-format">Paper format</label>
 			<select id="bar-format" bind:value={settings.formatId} class={field}>
 				{#each PAPER_FORMATS as option (option.id)}
 					<option value={option.id}>{option.name}</option>
 				{/each}
 			</select>
-			<label class="sr-only" for="bar-orientation">Lage</label>
+			<label class="sr-only" for="bar-orientation">Orientation</label>
 			<select
 				id="bar-orientation"
 				value={settings.orientation}
 				onchange={(event) => (settings.orientation = event.currentTarget.value as Orientation)}
 				class={field}
 			>
-				<option value="portrait">Hoch</option>
-				<option value="landscape">Quer</option>
+				<option value="portrait">Portrait</option>
+				<option value="landscape">Landscape</option>
 			</select>
 			<label class="flex items-center gap-1.5 text-ink-mute" for="bar-margin">
-				Rand
+				Margin
 				<input
 					id="bar-margin"
 					type="number"
@@ -106,7 +106,7 @@
 			<div class="ml-auto flex items-center gap-2">
 				{#if plotter.status?.state === 'Hold'}
 					<Button class="h-9! px-3!" onclick={() => plotter.realtime(REALTIME.cycleStart)}>
-						<Play size={16} /> Weiter
+						<Play size={16} /> Resume
 					</Button>
 				{:else}
 					<Button class="h-9! px-3!" onclick={() => plotter.realtime(REALTIME.feedHold)}>
@@ -118,7 +118,7 @@
 					class="h-9! px-3!"
 					onclick={() => plotter.realtime(REALTIME.softReset)}
 				>
-					<OctagonX size={16} /> Stopp
+					<OctagonX size={16} /> Stop
 				</Button>
 			</div>
 		{/if}

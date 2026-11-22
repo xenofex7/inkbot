@@ -4,7 +4,7 @@
 	import { settings } from '#lib/settings.svelte.ts';
 	import { fonts, layoutText, type Align } from '#lib/text/layout.ts';
 
-	let text = $state('Alles Gute zum Geburtstag!');
+	let text = $state('Happy birthday!');
 	let fontId = $state(fonts[0].id);
 	let size = $state(8);
 	let lineHeight = $state(1.4);
@@ -28,7 +28,7 @@
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]"
 >
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
-		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Text setzen</h1>
+		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Write text</h1>
 
 		<div>
 			<label class={label} for="text">Text</label>
@@ -42,7 +42,7 @@
 
 		<div class="grid grid-cols-2 gap-4">
 			<div class="col-span-2">
-				<label class={label} for="font">Schrift</label>
+				<label class={label} for="font">Font</label>
 				<select id="font" bind:value={fontId} class={field}>
 					{#each fonts as option (option.id)}
 						<option value={option.id}>{option.name}</option>
@@ -50,7 +50,7 @@
 				</select>
 			</div>
 			<div>
-				<label class={label} for="size">Grösse (mm)</label>
+				<label class={label} for="size">Size (mm)</label>
 				<input
 					id="size"
 					type="number"
@@ -62,7 +62,7 @@
 				/>
 			</div>
 			<div>
-				<label class={label} for="line-height">Zeilenabstand</label>
+				<label class={label} for="line-height">Line height</label>
 				<input
 					id="line-height"
 					type="number"
@@ -76,9 +76,9 @@
 		</div>
 
 		<div>
-			<span class={label}>Ausrichtung</span>
+			<span class={label}>Alignment</span>
 			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-				{#each [['left', 'Links'], ['center', 'Mitte'], ['right', 'Rechts']] as [value, name] (value)}
+				{#each [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']] as [value, name] (value)}
 					<button
 						role="radio"
 						aria-checked={align === value}
@@ -95,6 +95,6 @@
 	</section>
 
 	<section class="flex flex-col gap-4">
-		<DrawPanel {polylines} {sheet} emptyHint="Schreib einen Text, die Vorschau zeigt ihn sofort." />
+		<DrawPanel {polylines} {sheet} emptyHint="Type some text, the preview shows it right away." />
 	</section>
 </main>

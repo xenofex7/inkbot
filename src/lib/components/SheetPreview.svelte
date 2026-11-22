@@ -22,7 +22,7 @@
 	viewBox="-6 -6 {width + 12} {height + 12}"
 	class="h-auto max-h-[70vh] w-full"
 	role="img"
-	aria-label="Vorschau des Blatts, {width} × {height} mm"
+	aria-label="Sheet preview, {width} × {height} mm"
 >
 	<rect
 		x="0"

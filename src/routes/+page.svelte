@@ -42,16 +42,16 @@
 		<section class="grid items-center gap-10 py-10 md:grid-cols-[7fr_5fr]">
 			<div>
 				<h1 class="font-display text-4xl font-semibold tracking-[-1px] text-ink md:text-5xl">
-					Dein Plotter, direkt im Browser.
+					Your plotter, right in the browser.
 				</h1>
 				<p class="mt-4 max-w-prose text-lg">
-					Verbinde den VigoTec VG-X4 per USB. Ohne Installation, ohne Server, alles läuft hier im
-					Browser.
+					Connect the VigoTec VG-X4 via USB. No install, no server, everything runs here in the
+					browser.
 				</p>
 				{#if !plotter.supported}
 					<p class="mt-6 rounded-lg bg-surface-card p-4 text-ink">
-						Dein Browser kann nicht mit USB-Geräten sprechen. Öffne inkbot in Chrome oder Edge am
-						Computer.
+						Your browser cannot talk to USB devices. Open inkbot in Chrome or Edge on a desktop
+						computer.
 					</p>
 				{:else}
 					<div class="mt-8 flex flex-wrap gap-3">
@@ -60,7 +60,7 @@
 							onclick={() => plotter.connect()}
 							disabled={plotter.connection === 'connecting'}
 						>
-							Plotter verbinden
+							Connect plotter
 						</Button>
 					</div>
 				{/if}
@@ -69,17 +69,17 @@
 				{/if}
 			</div>
 			<div class="rounded-xl border border-hairline bg-canvas p-6 shadow-md">
-				<h2 class="font-semibold text-ink">Vor dem Verbinden</h2>
+				<h2 class="font-semibold text-ink">Before you connect</h2>
 				<ul class="mt-3 space-y-3 text-[15px]">
 					<li class="border-t border-hairline-soft pt-3">
-						Netzteil einstecken und den <strong class="text-ink">Netzschalter</strong> auf der Platine
-						einschalten. Ohne Netzschalter antwortet der Plotter zwar, bewegt sich aber nicht.
+						Plug in the power supply and turn on the <strong class="text-ink">power switch</strong> on
+						the board. Without it the plotter still answers, but nothing moves.
 					</li>
 					<li class="border-t border-hairline-soft pt-3">
-						USB-Kabel einstecken. Im Auswahlfenster erscheint der Plotter als "USB Serial".
+						Plug in the USB cable. The plotter shows up as "USB Serial" in the port picker.
 					</li>
 					<li class="border-t border-hairline-soft pt-3">
-						Stift oben links auf dem Papier platzieren, dort ist später der Nullpunkt.
+						Place the pen at the top left of the paper. That is where the origin goes.
 					</li>
 				</ul>
 			</div>
@@ -87,18 +87,18 @@
 	{:else}
 		<div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">Maschine</h2>
+				<h2 class="font-semibold text-ink">Machine</h2>
 				<dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[15px]">
-					<dt class="text-ink-mute">Zustand</dt>
+					<dt class="text-ink-mute">State</dt>
 					<dd class="text-ink">{plotter.status?.state ?? '-'}</dd>
 					<dt class="text-ink-mute">Firmware</dt>
 					<dd class="text-ink">{plotter.greeting || '-'}</dd>
 				</dl>
 				{#if plotter.alarm !== undefined}
 					<div class="mt-4 rounded-md border border-danger p-3 text-sm text-danger" role="alert">
-						Alarm {plotter.alarm}. Die Maschine ist gesperrt.
+						Alarm {plotter.alarm}. The machine is locked.
 						<button class="ml-2 font-semibold underline" onclick={() => run(['$X'])}>
-							Entsperren
+							Unlock
 						</button>
 					</div>
 				{/if}
@@ -112,18 +112,18 @@
 						onclick={() => run(testSquare(20, settings))}
 						disabled={!canAct}
 					>
-						<Square size={16} /> Quadrat 20 mm
+						<Square size={16} /> 20 mm square
 					</Button>
 				</div>
 				<p class="mt-4 text-sm text-ink-mute">
-					Stift, Tiefe, Position und Papier sind oben in der Leiste. Dort erscheinen während einer
-					Fahrt auch Pause und Stopp.
+					Pen, depth, position and paper live in the bar at the top. Pause and stop show up there
+					while a job runs.
 				</p>
 			</section>
 
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
 				<div class="flex items-center justify-between gap-4">
-					<h2 class="font-semibold text-ink">Bewegen</h2>
+					<h2 class="font-semibold text-ink">Move</h2>
 					<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
 						{#each steps as value (value)}
 							<button
@@ -143,7 +143,7 @@
 					<span></span>
 					<Button
 						variant="icon"
-						aria-label="Nach oben"
+						aria-label="Move up"
 						onclick={() => run(jog(0, -step, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -152,7 +152,7 @@
 					<span></span>
 					<Button
 						variant="icon"
-						aria-label="Nach links"
+						aria-label="Move left"
 						onclick={() => run(jog(-step, 0, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -160,7 +160,7 @@
 					</Button>
 					<Button
 						variant="icon"
-						aria-label="Nullpunkt hier setzen"
+						aria-label="Set origin here"
 						onclick={() => run(setOrigin())}
 						disabled={!canAct}
 					>
@@ -168,7 +168,7 @@
 					</Button>
 					<Button
 						variant="icon"
-						aria-label="Nach rechts"
+						aria-label="Move right"
 						onclick={() => run(jog(step, 0, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -177,7 +177,7 @@
 					<span></span>
 					<Button
 						variant="icon"
-						aria-label="Nach unten"
+						aria-label="Move down"
 						onclick={() => run(jog(0, step, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -186,8 +186,8 @@
 					<span></span>
 				</div>
 				<p class="mt-4 text-sm text-ink-mute">
-					Das Fadenkreuz setzt den Nullpunkt an die aktuelle Stiftposition. Es gibt keine
-					Endschalter, also nicht über den Rahmen hinausfahren.
+					The crosshair sets the origin at the current pen position. There are no limit switches, so
+					do not drive past the frame.
 				</p>
 				<label class="mt-4 flex items-start gap-2.5 text-sm text-ink">
 					<input
@@ -197,17 +197,17 @@
 						onchange={(event) => settings.setInvertY(event.currentTarget.checked)}
 					/>
 					<span>
-						Y-Achse umkehren
+						Invert Y axis
 						<span class="block text-ink-mute">
-							Einschalten, wenn Text auf dem Kopf steht. Passt zum VG-X4, wenn Du von der
-							Stift-Seite her liest.
+							Turn on if text comes out upside down. Matches the VG-X4 when you read from the pen
+							side.
 						</span>
 					</span>
 				</label>
 			</section>
 
 			<section class="flex min-h-80 flex-col rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">Konsole</h2>
+				<h2 class="font-semibold text-ink">Console</h2>
 				<div
 					bind:this={logView}
 					class="mt-4 h-56 overflow-y-auto rounded-md bg-surface-card p-3 font-mono text-[13px]"
@@ -220,16 +220,16 @@
 					{/each}
 				</div>
 				<form class="mt-3 flex gap-2" onsubmit={sendConsole} novalidate>
-					<label class="sr-only" for="console-line">G-Code-Befehl</label>
+					<label class="sr-only" for="console-line">G-code command</label>
 					<input
 						id="console-line"
 						bind:value={consoleLine}
 						class="h-10 min-w-0 flex-1 rounded-md border border-hairline bg-canvas px-3.5 font-mono text-sm text-ink focus:border-ink"
-						placeholder="z.B. $$ oder G0 X10"
+						placeholder="e.g. $$ or G0 X10"
 						autocomplete="off"
 						disabled={!connected}
 					/>
-					<Button type="submit" disabled={!connected}>Senden</Button>
+					<Button type="submit" disabled={!connected}>Send</Button>
 				</form>
 				{#if actionError}
 					<p class="mt-2 text-sm text-danger" role="alert">{actionError}</p>

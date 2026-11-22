@@ -8,7 +8,7 @@ const DEFAULTS: Stored = {
 	provider: 'openai',
 	baseUrl: '',
 	apiKey: '',
-	model: 'gpt-image-1',
+	model: 'gpt-image-2',
 	size: '1024x1024',
 	promptTemplate: DEFAULT_PROMPT_TEMPLATE
 };

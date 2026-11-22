@@ -76,7 +76,7 @@ export class Plotter {
 	async disconnect() {
 		clearInterval(this.#poll);
 		this.#poll = undefined;
-		this.#rejectPending(new Error('Verbindung getrennt'));
+		this.#rejectPending(new Error('Disconnected'));
 		await this.#closePort().catch(() => undefined);
 		this.#port = undefined;
 		this.#reader = undefined;
@@ -130,7 +130,7 @@ export class Plotter {
 	}
 
 	async #write(data: string) {
-		if (!this.#writer) throw new Error('Nicht verbunden');
+		if (!this.#writer) throw new Error('Not connected');
 		await this.#writer.write(this.#encoder.encode(data));
 	}
 
@@ -141,7 +141,7 @@ export class Plotter {
 	#waitForGreeting() {
 		return new Promise<void>((resolve, reject) => {
 			const timer = setTimeout(
-				() => reject(new Error('Keine Antwort vom Plotter. Ist er eingeschaltet?')),
+				() => reject(new Error('No response from the plotter. Is it switched on?')),
 				GREETING_TIMEOUT_MS
 			);
 			this.#greetingWaiter = () => {
@@ -188,7 +188,7 @@ export class Plotter {
 			case 'greeting':
 				this.greeting = message.text;
 				this.alarm = undefined;
-				this.#rejectPending(new Error('Plotter wurde zurückgesetzt'));
+				this.#rejectPending(new Error('The plotter was reset'));
 				this.#greetingWaiter?.();
 				this.#greetingWaiter = undefined;
 				break;
@@ -226,11 +226,11 @@ export class Plotter {
 function describeRealtime(command: string) {
 	const names: Record<string, string> = {
 		[REALTIME.feedHold]: 'Pause',
-		[REALTIME.cycleStart]: 'Weiter',
-		[REALTIME.softReset]: 'Stopp',
-		[REALTIME.jogCancel]: 'Jog abbrechen'
+		[REALTIME.cycleStart]: 'Resume',
+		[REALTIME.softReset]: 'Stop',
+		[REALTIME.jogCancel]: 'Cancel jog'
 	};
-	return names[command] ?? 'Echtzeitbefehl';
+	return names[command] ?? 'Realtime command';
 }
 
 export const plotter = new Plotter();

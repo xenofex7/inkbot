@@ -9,7 +9,7 @@
 
 	const providers: [ProviderId, string][] = [
 		['openai', 'OpenAI'],
-		['compatible', 'OpenAI-kompatibel (z.B. LiteLLM)']
+		['compatible', 'OpenAI-compatible (e.g. LiteLLM)']
 	];
 
 	async function test() {
@@ -18,7 +18,7 @@
 		try {
 			models = await listModels(aiSettings.config);
 			testState = 'ok';
-			testMessage = `Verbunden, ${models.length} Modelle gefunden.`;
+			testMessage = `Connected, found ${models.length} models.`;
 		} catch (error) {
 			testState = 'error';
 			testMessage = error instanceof Error ? error.message : String(error);
@@ -32,15 +32,15 @@
 <main class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-2">
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
 		<div>
-			<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">KI-Anbieter</h1>
+			<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">AI provider</h1>
 			<p class="mt-2 text-sm text-ink-mute">
-				Der Schlüssel bleibt nur in diesem Browser gespeichert und geht direkt an den Anbieter, nie
-				an einen inkbot-Server.
+				The key is stored in this browser only and goes straight to the provider, never to an inkbot
+				server.
 			</p>
 		</div>
 
 		<div>
-			<label class={label} for="provider">Anbieter</label>
+			<label class={label} for="provider">Provider</label>
 			<select id="provider" bind:value={aiSettings.provider} class={field}>
 				{#each providers as [value, name] (value)}
 					<option {value}>{name}</option>
@@ -50,7 +50,7 @@
 
 		{#if aiSettings.provider === 'compatible'}
 			<div>
-				<label class={label} for="base-url">Basis-URL</label>
+				<label class={label} for="base-url">Base URL</label>
 				<input
 					id="base-url"
 					bind:value={aiSettings.baseUrl}
@@ -59,14 +59,14 @@
 					autocomplete="off"
 				/>
 				<p class="mt-1.5 text-[13px] text-ink-mute">
-					Der Server muss Anfragen aus dem Browser erlauben (CORS). Über LiteLLM lassen sich auch
-					andere Anbieter wie Higgsfield einbinden.
+					The server must allow requests from the browser (CORS). LiteLLM can also route to other
+					providers such as Higgsfield.
 				</p>
 			</div>
 		{/if}
 
 		<div>
-			<label class={label} for="api-key">API-Schlüssel</label>
+			<label class={label} for="api-key">API key</label>
 			<input
 				id="api-key"
 				type="password"
@@ -78,7 +78,7 @@
 
 		<div class="grid grid-cols-2 gap-4">
 			<div>
-				<label class={label} for="model">Modell</label>
+				<label class={label} for="model">Model</label>
 				<input
 					id="model"
 					bind:value={aiSettings.model}
@@ -93,17 +93,17 @@
 				</datalist>
 			</div>
 			<div>
-				<label class={label} for="size">Bildgrösse</label>
+				<label class={label} for="size">Image size</label>
 				<select id="size" bind:value={aiSettings.size} class={field}>
 					<option value="1024x1024">1024 × 1024</option>
-					<option value="1536x1024">1536 × 1024 (quer)</option>
-					<option value="1024x1536">1024 × 1536 (hoch)</option>
+					<option value="1536x1024">1536 × 1024 (landscape)</option>
+					<option value="1024x1536">1024 × 1536 (portrait)</option>
 				</select>
 			</div>
 		</div>
 
 		<div class="flex flex-wrap items-center gap-3">
-			<Button onclick={test} disabled={testState === 'testing'}>Verbindung testen</Button>
+			<Button onclick={test} disabled={testState === 'testing'}>Test connection</Button>
 			{#if testMessage}
 				<span
 					class="text-sm {testState === 'error' ? 'text-danger' : 'text-ink-mute'}"
@@ -117,17 +117,19 @@
 
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
 		<div>
-			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Prompt-Vorlage</h2>
+			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+				Prompt template
+			</h2>
 			<p class="mt-2 text-sm text-ink-mute">
-				Wird um Deine Bildidee gelegt, damit saubere Strichzeichnungen entstehen. <code
+				Wrapped around your image idea so the result is a clean line drawing. <code
 					class="font-mono"
 				>
 					{'{prompt}'}
-				</code> steht für Deine Eingabe.
+				</code> stands for your input.
 			</p>
 		</div>
 		<div>
-			<label class="sr-only" for="template">Prompt-Vorlage</label>
+			<label class="sr-only" for="template">Prompt template</label>
 			<textarea
 				id="template"
 				bind:value={aiSettings.promptTemplate}
@@ -135,6 +137,6 @@
 				class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 font-mono text-sm text-ink"
 			></textarea>
 		</div>
-		<Button onclick={() => aiSettings.resetPrompt()}>Standard wiederherstellen</Button>
+		<Button onclick={() => aiSettings.resetPrompt()}>Restore default</Button>
 	</section>
 </main>

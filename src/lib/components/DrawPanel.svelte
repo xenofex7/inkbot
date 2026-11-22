@@ -12,7 +12,7 @@
 	let {
 		polylines,
 		sheet,
-		emptyHint = 'Noch nichts zu zeichnen.'
+		emptyHint = 'Nothing to draw yet.'
 	}: {
 		polylines: Polyline[];
 		sheet: { width: number; height: number };
@@ -57,7 +57,7 @@
 	{#if running}
 		{#if plotter.status?.state === 'Hold'}
 			<Button onclick={() => plotter.realtime(REALTIME.cycleStart)}>
-				<Play size={16} /> Weiter
+				<Play size={16} /> Resume
 			</Button>
 		{:else}
 			<Button onclick={() => plotter.realtime(REALTIME.feedHold)}>
@@ -65,34 +65,32 @@
 			</Button>
 		{/if}
 		<Button variant="stop" onclick={() => plotter.realtime(REALTIME.softReset)}>
-			<OctagonX size={16} /> Stopp
+			<OctagonX size={16} /> Stop
 		</Button>
 	{:else}
 		<Button variant="primary" onclick={draw} disabled={!canDraw}>
-			<PenLine size={16} /> Zeichnen
+			<PenLine size={16} /> Draw
 		</Button>
 	{/if}
 	<span class="text-sm text-ink-mute">
-		{sheet.width} × {sheet.height} mm · {polylines.length} Striche · ca. {minutes} min
+		{sheet.width} × {sheet.height} mm · {polylines.length} strokes · approx. {minutes} min
 	</span>
 	<div class="basis-full text-sm">
 		{#if polylines.length === 0}
 			<p class="text-ink-mute">{emptyHint}</p>
 		{:else if outsideSheet}
 			<p class="text-danger" role="alert">
-				Die Zeichnung passt nicht aufs Blatt. Grösse oder Rand verkleinern.
+				The drawing does not fit on the sheet. Reduce the size or the margin.
 			</p>
 		{:else if outsideMachine}
-			<p class="text-danger" role="alert">
-				Die Zeichnung reicht über die Zeichenfläche des Plotters hinaus.
-			</p>
+			<p class="text-danger" role="alert">The drawing reaches beyond the plotter's drawing area.</p>
 		{:else if plotter.connection !== 'connected'}
-			<p class="text-ink-mute">Verbinde den Plotter, um zu zeichnen.</p>
+			<p class="text-ink-mute">Connect the plotter to draw.</p>
 		{:else}
 			<p class="text-ink-mute">
-				Der rote Punkt ist der Nullpunkt. Fahre den Stift auf der
-				<a class="text-link underline" href={resolve('/')}>Maschinen-Seite</a> an die obere linke Ecke
-				des Blatts und setze dort den Nullpunkt.
+				The red dot is the origin. On the
+				<a class="text-link underline" href={resolve('/')}>machine page</a>, move the pen to the top
+				left corner of the sheet and set the origin there.
 			</p>
 		{/if}
 		{#if drawError}

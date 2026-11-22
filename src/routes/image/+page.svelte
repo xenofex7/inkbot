@@ -13,9 +13,9 @@
 	import { settings } from '#lib/settings.svelte.ts';
 
 	const modes: [TraceMode, string, string][] = [
-		['lines', 'Linien', 'Mittellinie dunkler Striche, ideal für Strichzeichnungen'],
-		['outline', 'Umriss', 'Kontur dunkler Flächen'],
-		['hatch', 'Schraffur', 'Helligkeit als Schraffur, für Fotos']
+		['lines', 'Lines', 'Centre line of dark strokes, best for line art'],
+		['outline', 'Outline', 'Contour of dark areas'],
+		['hatch', 'Hatching', 'Brightness as hatching, for photos']
 	];
 
 	let mode = $state<TraceMode>('lines');
@@ -41,11 +41,11 @@
 				aiSettings.config,
 				buildPrompt(aiSettings.promptTemplate, idea)
 			);
-			imageSource.set(blob, `KI: ${idea}`);
+			imageSource.set(blob, `AI: ${idea}`);
 		} catch (error) {
 			generateError =
 				error instanceof TypeError
-					? 'Keine Antwort vom Anbieter. Ist die URL richtig und erlaubt der Server Anfragen aus dem Browser (CORS)?'
+					? 'No response from the provider. Is the URL correct and does the server allow browser requests (CORS)?'
 					: error instanceof Error
 						? error.message
 						: String(error);
@@ -98,7 +98,7 @@
 		const file = files?.[0];
 		if (!file) return;
 		if (!file.type.startsWith('image/')) {
-			loadError = 'Das ist keine Bilddatei.';
+			loadError = 'That is not an image file.';
 			return;
 		}
 		imageSource.set(file, file.name);
@@ -111,12 +111,12 @@
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]"
 >
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
-		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Bild zeichnen</h1>
+		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Draw an image</h1>
 
 		<div>
-			<span class={label}>Quelle</span>
+			<span class={label}>Source</span>
 			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-				{#each [['file', 'Datei'], ['ai', 'KI']] as [value, name] (value)}
+				{#each [['file', 'File'], ['ai', 'AI']] as [value, name] (value)}
 					<button
 						role="radio"
 						aria-checked={source === value}
@@ -142,30 +142,30 @@
 				/>
 				<div class="flex items-center gap-3">
 					<Button onclick={() => fileInput?.click()}>
-						<ImageUp size={16} /> Datei wählen
+						<ImageUp size={16} /> Choose file
 					</Button>
 					<span class="min-w-0 truncate text-[13px] text-ink-mute">
-						{imageSource.name || 'Keine Datei gewählt'}
+						{imageSource.name || 'No file chosen'}
 					</span>
 				</div>
 			{:else if !aiSettings.ready}
 				<p class="rounded-md bg-surface-card p-3 text-sm text-ink">
-					Hinterlege zuerst einen KI-Anbieter in den
-					<a class="text-link underline" href={resolve('/settings')}>Einstellungen</a>.
+					Set up an AI provider in the
+					<a class="text-link underline" href={resolve('/settings')}>settings</a> first.
 				</p>
 			{:else}
-				<label class={label} for="prompt">Bildidee</label>
+				<label class={label} for="prompt">Image idea</label>
 				<textarea
 					id="prompt"
 					bind:value={prompt}
 					rows="3"
-					placeholder="z.B. eine Katze, die auf einem Stapel Bücher schläft"
+					placeholder="e.g. a cat asleep on a stack of books"
 					class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"
 				></textarea>
 				<div class="mt-2 flex items-center gap-3">
 					<Button variant="primary" onclick={generate} disabled={generating || !prompt.trim()}>
 						<Sparkles size={16} />
-						{generating ? 'Generiere …' : 'Generieren'}
+						{generating ? 'Generating …' : 'Generate'}
 					</Button>
 					<span class="text-[13px] text-ink-mute">{aiSettings.model}</span>
 				</div>
@@ -176,7 +176,7 @@
 			{#if imageSource.url}
 				<img
 					src={imageSource.url}
-					alt="Gewähltes Bild"
+					alt={imageSource.name}
 					class="mt-3 max-h-40 rounded-md border border-hairline"
 				/>
 			{/if}
@@ -186,7 +186,7 @@
 		</div>
 
 		<div>
-			<span class={label}>Umwandlung</span>
+			<span class={label}>Conversion</span>
 			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
 				{#each modes as [value, name] (value)}
 					<button
@@ -207,7 +207,7 @@
 		</div>
 
 		<div>
-			<label class={label} for="threshold">Schwelle: {threshold}</label>
+			<label class={label} for="threshold">Threshold: {threshold}</label>
 			<input
 				id="threshold"
 				type="range"
@@ -219,7 +219,7 @@
 		</div>
 
 		<div>
-			<label class={label} for="size">Grösse: {sizePercent} %</label>
+			<label class={label} for="size">Size: {sizePercent} %</label>
 			<input
 				id="size"
 				type="range"
@@ -245,7 +245,7 @@
 
 		{#if mode === 'hatch'}
 			<div>
-				<label class={label} for="spacing">Linienabstand: {hatchSpacing} mm</label>
+				<label class={label} for="spacing">Line spacing: {hatchSpacing} mm</label>
 				<input
 					id="spacing"
 					type="range"
@@ -261,13 +261,13 @@
 
 	<section
 		class="flex flex-col gap-4"
-		aria-label="Vorschau"
+		aria-label="Preview"
 		ondragover={(event) => event.preventDefault()}
 		ondrop={(event) => {
 			event.preventDefault();
 			pick(event.dataTransfer?.files);
 		}}
 	>
-		<DrawPanel {polylines} {sheet} emptyHint="Wähle ein Bild oder zieh es auf die Vorschau." />
+		<DrawPanel {polylines} {sheet} emptyHint="Choose an image or drop it on the preview." />
 	</section>
 </main>

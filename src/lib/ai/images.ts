@@ -68,10 +68,10 @@ export async function generateImage(
 	if (image?.b64_json) return base64ToBlob(image.b64_json);
 	if (image?.url) {
 		const download = await fetcher(image.url);
-		if (!download.ok) throw new Error(`Bild konnte nicht geladen werden (${download.status})`);
+		if (!download.ok) throw new Error(`Could not load the image (${download.status})`);
 		return download.blob();
 	}
-	throw new Error('Die Antwort enthält kein Bild.');
+	throw new Error('The response contains no image.');
 }
 
 export async function listModels(config: ProviderConfig, fetcher: typeof fetch = fetch) {
