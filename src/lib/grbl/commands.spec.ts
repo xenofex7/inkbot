@@ -35,7 +35,7 @@ describe('testSquare', () => {
 	});
 
 	it('mirrors the Y axis when inverted', () => {
-		expect(testSquare(20, true).filter((line) => line.startsWith('G1'))).toEqual([
+		expect(testSquare(20, { invertY: true }).filter((line) => line.startsWith('G1'))).toEqual([
 			'G1 X20 F1500',
 			'G1 Y-20',
 			'G1 X-20',

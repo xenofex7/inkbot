@@ -1,21 +1,9 @@
 <script lang="ts">
-	import {
-		ArrowDown,
-		ArrowLeft,
-		ArrowRight,
-		ArrowUp,
-		Crosshair,
-		Pause,
-		Play,
-		Square,
-		OctagonX
-	} from '@lucide/svelte';
+	import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Crosshair, Square } from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
-	import { jog, penDown, penUp, setOrigin, testSquare } from '#lib/grbl/commands.ts';
-	import { REALTIME } from '#lib/grbl/vgx4.ts';
+	import { jog, setOrigin, testSquare } from '#lib/grbl/commands.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { settings } from '#lib/settings.svelte.ts';
-	import { orient } from '#lib/geometry/types.ts';
 
 	const steps = [1, 5, 10] as const;
 	let step = $state<(typeof steps)[number]>(5);
@@ -25,9 +13,6 @@
 
 	const connected = $derived(plotter.connection === 'connected');
 	const canAct = $derived(connected && !plotter.busy);
-	const position = $derived(
-		plotter.position ? orient(plotter.position, settings.invertY) : undefined
-	);
 
 	$effect(() => {
 		void plotter.log.length;
@@ -50,8 +35,6 @@
 		consoleLine = '';
 		await run([line]);
 	}
-
-	const format = (value: number | undefined) => (value ?? 0).toFixed(2);
 </script>
 
 <main class="mx-auto max-w-[1200px] px-4 py-8">
@@ -108,10 +91,6 @@
 				<dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[15px]">
 					<dt class="text-ink-mute">Zustand</dt>
 					<dd class="text-ink">{plotter.status?.state ?? '-'}</dd>
-					<dt class="text-ink-mute">Position</dt>
-					<dd class="font-mono text-ink">
-						X {format(position?.x)} · Y {format(position?.y)} mm
-					</dd>
 					<dt class="text-ink-mute">Firmware</dt>
 					<dd class="text-ink">{plotter.greeting || '-'}</dd>
 				</dl>
@@ -126,33 +105,20 @@
 			</section>
 
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">Stift</h2>
-				<div class="mt-4 flex flex-wrap gap-3">
-					<Button onclick={() => run(penUp())} disabled={!canAct}>Stift hoch</Button>
-					<Button onclick={() => run(penDown())} disabled={!canAct}>Stift runter</Button>
-				</div>
-				<h2 class="mt-6 font-semibold text-ink">Test</h2>
+				<h2 class="font-semibold text-ink">Test</h2>
 				<div class="mt-4 flex flex-wrap gap-3">
 					<Button
 						variant="primary"
-						onclick={() => run(testSquare(20, settings.invertY))}
+						onclick={() => run(testSquare(20, settings))}
 						disabled={!canAct}
 					>
 						<Square size={16} /> Quadrat 20 mm
 					</Button>
-					{#if plotter.status?.state === 'Hold'}
-						<Button onclick={() => plotter.realtime(REALTIME.cycleStart)}>
-							<Play size={16} /> Weiter
-						</Button>
-					{:else}
-						<Button onclick={() => plotter.realtime(REALTIME.feedHold)} disabled={!plotter.busy}>
-							<Pause size={16} /> Pause
-						</Button>
-					{/if}
-					<Button variant="stop" onclick={() => plotter.realtime(REALTIME.softReset)}>
-						<OctagonX size={16} /> Stopp
-					</Button>
 				</div>
+				<p class="mt-4 text-sm text-ink-mute">
+					Stift, Tiefe, Position und Papier sind oben in der Leiste. Dort erscheinen während einer
+					Fahrt auch Pause und Stopp.
+				</p>
 			</section>
 
 			<section class="rounded-lg border border-hairline bg-canvas p-6">

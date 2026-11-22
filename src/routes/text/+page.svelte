@@ -16,14 +16,14 @@
 	let size = $state(8);
 	let lineHeight = $state(1.4);
 	let align = $state<Align>('left');
-	let formatId = $state('a6');
-	let orientation = $state<Orientation>('landscape');
-	let margin = $state(10);
 	let drawError = $state('');
 
 	const font = $derived(fonts.find((f) => f.id === fontId) ?? fonts[0]);
-	const format = $derived(PAPER_FORMATS.find((f) => f.id === formatId) ?? PAPER_FORMATS[0]);
-	const sheet = $derived(sheetSize(format, orientation));
+	const format = $derived(
+		PAPER_FORMATS.find((f) => f.id === settings.formatId) ?? PAPER_FORMATS[0]
+	);
+	const sheet = $derived(sheetSize(format, settings.orientation));
+	const margin = $derived(settings.margin);
 	const polylines = $derived(
 		translate(
 			layoutText(text, { font, size, lineHeight, align, width: sheet.width - 2 * margin }),
@@ -46,7 +46,7 @@
 	async function draw() {
 		drawError = '';
 		try {
-			await plotter.sendAll(toGcode(polylines, settings.invertY));
+			await plotter.sendAll(toGcode(polylines, settings));
 		} catch (error) {
 			drawError = error instanceof Error ? error.message : String(error);
 		}
@@ -128,7 +128,7 @@
 		<div class="grid grid-cols-2 gap-4">
 			<div>
 				<label class={label} for="format">Papier</label>
-				<select id="format" bind:value={formatId} class={field}>
+				<select id="format" bind:value={settings.formatId} class={field}>
 					{#each PAPER_FORMATS as option (option.id)}
 						<option value={option.id}>{option.name}</option>
 					{/each}
@@ -142,7 +142,7 @@
 					min="0"
 					max="60"
 					step="1"
-					bind:value={margin}
+					bind:value={settings.margin}
 					class={field}
 				/>
 			</div>
@@ -152,11 +152,11 @@
 					{#each [['portrait', 'Hoch'], ['landscape', 'Quer']] as [value, name] (value)}
 						<button
 							role="radio"
-							aria-checked={orientation === value}
-							class="rounded-pill px-3.5 py-1.5 text-sm {orientation === value
+							aria-checked={settings.orientation === value}
+							class="rounded-pill px-3.5 py-1.5 text-sm {settings.orientation === value
 								? 'bg-canvas text-ink shadow-sm'
 								: 'text-ink-mute'}"
-							onclick={() => (orientation = value as Orientation)}
+							onclick={() => (settings.orientation = value as Orientation)}
 						>
 							{name}
 						</button>

@@ -6,7 +6,9 @@ const dwell = `G4 P${VGX4.penDwellSeconds}`;
 
 export const penUp = () => ['M5', dwell];
 
-export const penDown = () => [`M3 S${VGX4.penDownS}`, dwell];
+export type DrawOptions = { invertY?: boolean; penDownS?: number; feed?: number };
+
+export const penDown = (s: number = VGX4.penDownS) => [`M3 S${Math.round(s)}`, dwell];
 
 export const setOrigin = () => ['G92 X0 Y0'];
 
@@ -16,13 +18,14 @@ export function jog(dx: number, dy: number, invertY = false, feed: number = VGX4
 	return axes ? [`$J=G91 G21 ${axes} F${feed}`] : [];
 }
 
-export function testSquare(size: number, invertY = false, feed: number = VGX4.drawFeed) {
+export function testSquare(size: number, options: DrawOptions = {}) {
+	const { invertY = false, penDownS = VGX4.penDownS, feed = VGX4.drawFeed } = options;
 	const sy = invertY ? -size : size;
 	return [
 		'G21',
 		'G91',
 		...penUp(),
-		...penDown(),
+		...penDown(penDownS),
 		`G1 X${mm(size)} F${feed}`,
 		`G1 Y${mm(sy)}`,
 		`G1 X${mm(-size)}`,

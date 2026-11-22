@@ -1,5 +1,5 @@
 import { orient, pathLength, type Point, type Polyline } from '../geometry/types';
-import { penDown, penUp } from '../grbl/commands';
+import { penDown, penUp, type DrawOptions } from '../grbl/commands';
 import { VGX4 } from '../grbl/vgx4';
 
 const JOIN_TOLERANCE = 0.05;
@@ -8,7 +8,8 @@ const RAPID_FEED = 5000;
 const coord = (value: number) => (Math.round(value * 1000) / 1000).toString();
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
-export function toGcode(polylines: Polyline[], invertY = false, feed: number = VGX4.drawFeed) {
+export function toGcode(polylines: Polyline[], options: DrawOptions = {}) {
+	const { invertY = false, penDownS = VGX4.penDownS, feed = VGX4.drawFeed } = options;
 	const xy = (p: Point) => {
 		const m = orient(p, invertY);
 		return `X${coord(m.x)} Y${coord(m.y)}`;
@@ -22,7 +23,7 @@ export function toGcode(polylines: Polyline[], invertY = false, feed: number = V
 		if (!joined) {
 			if (down) lines.push(...penUp());
 			lines.push(`G0 ${xy(line[0])}`);
-			lines.push(...penDown());
+			lines.push(...penDown(penDownS));
 			down = true;
 		}
 		line.slice(1).forEach((point, index) => {
