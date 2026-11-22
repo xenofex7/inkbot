@@ -51,3 +51,7 @@ data/*.db
 
 # Claude Code project notes
 CLAUDE.md
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
