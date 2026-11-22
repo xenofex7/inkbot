@@ -38,6 +38,16 @@ Maschine bestätigen.
 - Erster Start: USB zuerst einstecken, dann Software öffnen. Key-LED blinkt langsam,
   Power-LED leuchtet.
 
+## Erfahrungen aus dem Zusammenbau (2026-11-22)
+
+- Motorstecker zeigen nach **unten**, sonst stossen sie an (Motor um 90° gedreht).
+- Riemenscheibe ca. 1 mm über dem Motor (microSD-Karte als Lehre), Höhe so, dass der
+  Riemen waagrecht zu den Umlenkrollen läuft.
+- Umlenkrollen auf S5: N6 (kurz), W2, N7 (lang), dann P2.
+- Beigelegtes doppelseitiges Klebeband (CROWN): Flachkabel flach aufs Profil kleben,
+  damit es nicht in Riemen/Riemenscheibe gerät. Am Mittelkreuz Schlaufe lassen.
+- Flachkabel: blaue Verstärkung nach oben (Kontakte unten).
+
 ## Quellen
 
 - Hardware-Manual (PDF): http://vigotec.cn/software/VG-X4_Hardware_Installation_Manual_Eng_20190417.pdf
