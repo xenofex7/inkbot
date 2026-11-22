@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { ImageUp } from '@lucide/svelte';
+	import { ImageUp, Sparkles } from '@lucide/svelte';
+	import { resolve } from '$app/paths';
+	import { buildPrompt, generateImage } from '#lib/ai/images.ts';
+	import { aiSettings } from '#lib/ai/settings.svelte.ts';
 	import Button from '#lib/components/Button.svelte';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
 	import type { Polyline } from '#lib/geometry/types.ts';
@@ -23,6 +26,33 @@
 	let gray = $state<Gray | undefined>();
 	let loadError = $state('');
 	let fileInput = $state<HTMLInputElement>();
+	let source = $state<'file' | 'ai'>('file');
+	let prompt = $state('');
+	let generating = $state(false);
+	let generateError = $state('');
+
+	async function generate() {
+		const idea = prompt.trim();
+		if (!idea) return;
+		generating = true;
+		generateError = '';
+		try {
+			const blob = await generateImage(
+				aiSettings.config,
+				buildPrompt(aiSettings.promptTemplate, idea)
+			);
+			imageSource.set(blob, `KI: ${idea}`);
+		} catch (error) {
+			generateError =
+				error instanceof TypeError
+					? 'Keine Antwort vom Anbieter. Ist die URL richtig und erlaubt der Server Anfragen aus dem Browser (CORS)?'
+					: error instanceof Error
+						? error.message
+						: String(error);
+		} finally {
+			generating = false;
+		}
+	}
 
 	const sheet = $derived(settings.sheet);
 	const printable = $derived({
@@ -84,22 +114,65 @@
 		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Bild zeichnen</h1>
 
 		<div>
-			<span class={label}>Bild</span>
-			<input
-				bind:this={fileInput}
-				type="file"
-				accept="image/*"
-				class="hidden"
-				onchange={(event) => pick(event.currentTarget.files)}
-			/>
-			<div class="flex items-center gap-3">
-				<Button onclick={() => fileInput?.click()}>
-					<ImageUp size={16} /> Datei wählen
-				</Button>
-				<span class="min-w-0 truncate text-[13px] text-ink-mute">
-					{imageSource.name || 'Keine Datei gewählt'}
-				</span>
+			<span class={label}>Quelle</span>
+			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
+				{#each [['file', 'Datei'], ['ai', 'KI']] as [value, name] (value)}
+					<button
+						role="radio"
+						aria-checked={source === value}
+						class="rounded-pill px-3.5 py-1.5 text-sm {source === value
+							? 'bg-canvas text-ink shadow-sm'
+							: 'text-ink-mute'}"
+						onclick={() => (source = value as 'file' | 'ai')}
+					>
+						{name}
+					</button>
+				{/each}
 			</div>
+		</div>
+
+		<div>
+			{#if source === 'file'}
+				<input
+					bind:this={fileInput}
+					type="file"
+					accept="image/*"
+					class="hidden"
+					onchange={(event) => pick(event.currentTarget.files)}
+				/>
+				<div class="flex items-center gap-3">
+					<Button onclick={() => fileInput?.click()}>
+						<ImageUp size={16} /> Datei wählen
+					</Button>
+					<span class="min-w-0 truncate text-[13px] text-ink-mute">
+						{imageSource.name || 'Keine Datei gewählt'}
+					</span>
+				</div>
+			{:else if !aiSettings.ready}
+				<p class="rounded-md bg-surface-card p-3 text-sm text-ink">
+					Hinterlege zuerst einen KI-Anbieter in den
+					<a class="text-link underline" href={resolve('/settings')}>Einstellungen</a>.
+				</p>
+			{:else}
+				<label class={label} for="prompt">Bildidee</label>
+				<textarea
+					id="prompt"
+					bind:value={prompt}
+					rows="3"
+					placeholder="z.B. eine Katze, die auf einem Stapel Bücher schläft"
+					class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"
+				></textarea>
+				<div class="mt-2 flex items-center gap-3">
+					<Button variant="primary" onclick={generate} disabled={generating || !prompt.trim()}>
+						<Sparkles size={16} />
+						{generating ? 'Generiere …' : 'Generieren'}
+					</Button>
+					<span class="text-[13px] text-ink-mute">{aiSettings.model}</span>
+				</div>
+				{#if generateError}
+					<p class="mt-2 text-[13px] text-danger" role="alert">{generateError}</p>
+				{/if}
+			{/if}
 			{#if imageSource.url}
 				<img
 					src={imageSource.url}
