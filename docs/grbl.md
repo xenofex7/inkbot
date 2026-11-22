@@ -1,113 +1,111 @@
-# GRBL-Notizen für den VG-X4
+# GRBL notes for the VG-X4
 
-Allgemeines GRBL-1.1-Wissen. Alles, was VG-X4-spezifisch ist, ist mit **[prüfen]**
-markiert und wird an der echten Maschine bestätigt.
+General GRBL 1.1 knowledge plus what was confirmed on the real machine. Dates are when a
+fact was checked on the device.
 
-## Verbindung
+## Connection
 
 - Web Serial: `navigator.serial.requestPort()`, `port.open({ baudRate: 115200 })`
-- Nach dem Öffnen (Reset über DTR) schickt die Maschine nach ca. 1-2 s die Begrüssung
-  `VigoWriter 1.1f ['$' for help]` (geprüft am 22.11.2026). Erkennung also über
-  `1.1f ['$' for help]`, nicht über das Wort `Grbl`.
-- USB-Seriell-Chip CH340 (USB-ID `1a86:7523`), unter macOS als `/dev/cu.usbserial-*`,
-  ohne zusätzlichen Treiber.
-- Zeilenende `\n`. Jede Zeile wird mit `ok` oder `error:N` quittiert.
+- After opening the port (reset via DTR) the machine sends its greeting after about 1-2 s:
+  `VigoWriter 1.1f ['$' for help]` (checked 22.11.2026). Detect it by
+  `1.1f ['$' for help]`, not by the word `Grbl`.
+- USB serial chip CH340 (USB ID `1a86:7523`), shows up on macOS as `/dev/cu.usbserial-*`
+  without an extra driver.
+- Line ending `\n`. Every line is acknowledged with `ok` or `error:N`.
 
 ## Streaming
 
-- **Character Counting:** RX-Puffer 128 Byte (bestätigt: `[OPT:VC,15,128]`). Zeilen senden, solange die Summe der
-  unbestätigten Zeichen < 128 ist; bei jedem `ok`/`error` die älteste Zeile abziehen.
-  Schneller und flüssiger als Send-and-wait.
-- Bei `error:N` anhalten und dem Benutzer zeigen (nicht weiterstreamen).
-- `ALARM:N` → Maschine gesperrt, `$X` zum Entsperren.
+- **Character counting:** 128 byte RX buffer (confirmed: `[OPT:VC,15,128]`). Keep sending
+  lines while the unacknowledged characters stay below 128; on every `ok`/`error` drop the
+  oldest line. Faster and smoother than send-and-wait.
+- On `error:N` stop and show it to the user, do not keep streaming.
+- `ALARM:N` locks the machine, `$X` unlocks it.
 
-## Echtzeitbefehle (einzelne Bytes, ohne Zeilenende, umgehen den Puffer)
+## Realtime commands (single bytes, no line ending, bypass the buffer)
 
-| Byte | Wirkung |
+| Byte | Effect |
 |---|---|
-| `?` | Statusbericht `<Idle|MPos:…|FS:…>` |
-| `!` | Feed Hold (Pause, Stift bleibt wo er ist) |
-| `~` | Cycle Start / Fortsetzen |
-| `0x18` | Soft Reset (Abbruch, Puffer leer) |
-| `0x90` | Vorschub-Override 100 % |
-| `0x91` / `0x92` | Vorschub +10 % / −10 % |
-| `0x93` / `0x94` | Vorschub +1 % / −1 % |
+| `?` | Status report `<Idle|MPos:...|FS:...>` |
+| `!` | Feed hold (pause, the pen stays where it is) |
+| `~` | Cycle start / resume |
+| `0x18` | Soft reset (abort, buffer cleared) |
+| `0x90` | Feed override 100 % |
+| `0x91` / `0x92` | Feed +10 % / -10 % |
+| `0x93` / `0x94` | Feed +1 % / -1 % |
 
-Status-Poll alle ~200 ms mit `?` für Position und Vorschau-Cursor.
+Poll the status every ~250 ms with `?` for position and the preview cursor.
 
-## Nützliche Befehle
+## Useful commands
 
-- `$I` Build-Info, `$$` Einstellungen, `$#` Koordinaten-Offsets, `$G` Parserzustand
-- `$X` Alarm aufheben. `$H` Homing gibt es nicht: `$22=0`, keine Endschalter konfiguriert.
-- `G21` mm, `G90` absolut, `G91` relativ
-- `G92 X0 Y0` aktuelle Position als Nullpunkt
-- `$J=G91 X10 F1000` Joggen (abbrechbar mit `0x85`)
+- `$I` build info, `$$` settings, `$#` coordinate offsets, `$G` parser state
+- `$X` clears an alarm. There is no `$H` homing: `$22=0`, no limit switches configured.
+- `G21` mm, `G90` absolute, `G91` relative
+- `G92 X0 Y0` current position becomes the origin
+- `$J=G91 X10 F1000` jogging (cancel with `0x85`)
 
-## Stift (Servo)
+## Pen (servo)
 
-Beide Community-Projekte (`references.md`) steuern den Stift über die Spindel-PWM:
-- `M5` Stift hoch, `M3 S905` Stift runter (Wert S905 laut beiden Projekten am Gerät
-  bestätigt, Bereich S0-S1000), danach Pause `G4 P0.3` (100-600 ms), damit der Servo ankommt.
-- Beide nennen +X = rechts, +Y = unten, Nullpunkt oben links per `G92 X0 Y0`.
+The pen is driven by the spindle PWM, as in both community projects (`references.md`):
+- `M5` pen up, `M3 S905` pen down (S0-S1000, both projects confirm S905), then a short
+  dwell `G4 P0.3` (100-600 ms) so the servo arrives.
+- A higher S value lowers the pen further. inkbot makes the value adjustable ("Depth S").
 
-Test am eigenen Gerät (22.11.2026): `M5` / `M3 S905` abwechselnd, je 3 s: **Stift fährt
-hoch und runter.** Bestätigt.
+Checked on the device (22.11.2026): alternating `M5` / `M3 S905`, 3 s each, moves the pen
+up and down. The Z axis (`G0 Z...`) does nothing.
 
-Stolperfalle: Die Hauptplatine C1 hat einen **Netzschalter** (Power Switch neben der
-12-V-Buchse). Ist er aus, versorgt USB nur die Steuerung: GRBL antwortet normal und
-quittiert alle Befehle mit `ok`, aber Servo und Motoren bewegen sich nicht. Ein erster
-Test mit ausgeschaltetem Schalter sah deshalb wie ein Defekt aus. Beim Einschalten hebt
-der Servo den Stift einmal an. Die App kann den Schalter nicht erkennen und sollte beim
-Verbinden darauf hinweisen.
+Pitfall: the main board C1 has a **power switch** next to the 12 V socket. When it is off,
+USB only powers the controller: GRBL answers normally and acknowledges every command with
+`ok`, but neither servo nor motors move. A first test with the switch off looked like a
+defect. Switching on lifts the pen once. The app cannot detect the switch and reminds the
+user before connecting.
 
-## Erste Bewegung
+## First moves
 
-Test am 22.11.2026 (ohne eingelegten Stift): `G92 X0 Y0`, `M3 S905`, Quadrat 20 mm mit
-`G1 … F1500`, `M5`. Die Maschine fährt das Quadrat sauber ab und meldet danach `Idle` am
-Startpunkt.
+Test on 22.11.2026 (without a pen): `G92 X0 Y0`, `M3 S905`, a 20 mm square with
+`G1 ... F1500`, `M5`. The machine draws the square cleanly and reports `Idle` back at the
+start.
 
-**Achsrichtung** (korrigiert nach dem ersten Text am 22.11.2026): Von der Stift-Seite aus
-gesehen, also so, wie man das Blatt liest, geht **+X nach rechts** und **+Y nach hinten**
-(vom Betrachter weg). Der erste Text kam dadurch auf dem Kopf und vertikal gespiegelt aufs
-Papier. Ein früherer Kreis-Quadrat-Test hatte +Y nach vorne ergeben, vermutlich von der
-anderen Seite aus beurteilt.
+**Axis directions** (corrected after the first text on 22.11.2026): seen from the pen side,
+the way you read the sheet, **+X points right** and **+Y points away from you**. The first
+text therefore came out upside down, mirrored vertically. An earlier circle and square
+test had suggested +Y towards the viewer, probably judged from the other side.
 
-Die App spiegelt deshalb standardmässig die Y-Achse (Einstellung "Y-Achse umkehren" auf der
-Maschinen-Seite). Der Nullpunkt liegt an der oberen linken Papierecke (`G92 X0 Y0`), auf dem
-Blatt nach unten heisst dann in Maschinenkoordinaten -Y.
+The app therefore mirrors the Y axis by default ("Invert Y axis" on the machine page). The
+origin sits at the top left corner of the paper (`G92 X0 Y0`); down on the sheet means -Y in
+machine coordinates.
 
-Wichtig fürs Senden:
-- Port erst schliessen, wenn wirklich alles fertig ist. Beim Öffnen und Schliessen setzt
-  der DTR-Reset die Maschine zurück und bricht eine laufende Fahrt ab.
-- Ein einzelnes `Idle` im Status reicht dafür nicht: Während einer Pause (`G4`) zwischen
-  zwei Fahrten meldet die Maschine kurz `Idle`. Ein Test brach deshalb mitten im Job ab.
-  Erst wenn jede gesendete Zeile mit `ok` quittiert ist **und** der Status mehrmals
-  hintereinander `Idle` meldet, ist der Job fertig.
+Important when sending:
+- Only close the port when everything is done. Opening and closing triggers the DTR reset,
+  which aborts a running job.
+- A single `Idle` status is not enough: during a dwell (`G4`) between two moves the machine
+  briefly reports `Idle`. One test aborted mid-job because of that. A job is done only
+  when every sent line has been acknowledged with `ok` **and** the status reports `Idle`
+  several times in a row.
 
-## Ausgabe der echten Maschine
+## Output of the real machine
 
-Ausgelesen am 22.11.2026, Maschine im Ruhezustand, nur lesende Befehle.
+Read on 22.11.2026, machine idle, read-only commands only.
 
-### Was daraus folgt
+### What it means
 
-| Thema | Wert | Bedeutung für die App |
+| Topic | Value | Meaning for the app |
 |---|---|---|
-| Firmware | `VER:1.1f.20170131` | GRBL 1.1f, Build vom 31.01.2017 |
-| Optionen | `OPT:VC,15,128` | Planner 15 Blöcke, RX-Puffer 128 Byte. `V` = variable Spindel (PWM), `C` = CoreXY (Bedeutung der Buchstaben aus dem Gedächtnis, gegen GRBL-Wiki prüfen) |
-| Achsrichtung | `$3=3` | X und Y invertiert |
-| Homing | `$22=0` | Kein Homing, Nullpunkt wird von Hand gesetzt (`G92 X0 Y0`) |
-| Limits | `$20=0`, `$21=0` | Weder Soft- noch Hard-Limits: die App muss selbst prüfen, dass nichts über die Zeichenfläche hinausfährt |
-| Laser-Modus | `$32=0` | Aus. `M3 S…` bleibt auch bei `G0` aktiv, Stift fällt bei Leerfahrten nicht automatisch hoch |
-| Spindel-PWM | `$30=1000`, `$31=0` | S-Werte von 0 bis 1000. Ob der Servo darüber läuft, ist noch offen |
-| Z-Achse | `$102=250`, `$112=500` | Z ist konfiguriert, Servo-Ansteuerung über Z also auch möglich. Offen |
-| Auflösung | `$100=160`, `$101=160` | 160 Schritte pro mm |
-| Max. Tempo | `$110=5000`, `$111=5000` | 5000 mm/min |
-| Beschleunigung | `$120=400`, `$121=400` | 400 mm/s² |
-| Motoren | `$1=25` | Motoren lassen 25 ms nach der Bewegung los, der Kopf lässt sich dann von Hand verschieben und die Position stimmt nicht mehr |
-| Max. Verfahrweg | `$130=1000`, `$131=1000` | Platzhalter, nicht die echte Fläche (Limits sind aus) |
-| Status | `$10=1` | Statusbericht mit Maschinenposition (MPos) |
+| Firmware | `VER:1.1f.20170131` | GRBL 1.1f, built 31.01.2017 |
+| Options | `OPT:VC,15,128` | Planner 15 blocks, RX buffer 128 bytes. `V` = variable spindle (PWM), `C` = CoreXY (meaning of the letters from memory, verify against the GRBL wiki) |
+| Axis direction | `$3=3` | X and Y inverted |
+| Homing | `$22=0` | No homing, the origin is set by hand (`G92 X0 Y0`) |
+| Limits | `$20=0`, `$21=0` | Neither soft nor hard limits: the app must check that nothing leaves the drawing area |
+| Laser mode | `$32=0` | Off. `M3 S...` stays active during `G0`, the pen does not lift by itself on travel moves |
+| Spindle PWM | `$30=1000`, `$31=0` | S values 0 to 1000, drives the pen servo |
+| Z axis | `$102=250`, `$112=500` | Configured but unused, the pen does not react to Z |
+| Resolution | `$100=160`, `$101=160` | 160 steps per mm |
+| Max rate | `$110=5000`, `$111=5000` | 5000 mm/min |
+| Acceleration | `$120=400`, `$121=400` | 400 mm/s² |
+| Motors | `$1=25` | Motors release 25 ms after a move; the head can then be pushed by hand and the position is lost |
+| Max travel | `$130=1000`, `$131=1000` | Placeholder, not the real area (limits are off) |
+| Status | `$10=1` | Status reports machine position (MPos) |
 
-### Rohdaten
+### Raw data
 
 ```
 VigoWriter 1.1f ['$' for help]

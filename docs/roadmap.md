@@ -1,41 +1,42 @@
 # Roadmap
 
-Stand 22.11.2026. Erledigtes ist mit [x] markiert.
+As of 22.11.2026. Done items are marked [x].
 
-## Version 1 - Grundfunktionen
-- [x] **Verbinden:** Port wählen, Firmware prüfen, Status anzeigen, Konsole
-- [x] **Maschine:** Joggen (1/5/10 mm), Stift hoch/runter mit einstellbarer Tiefe,
-  Nullpunkt setzen, Y-Achse spiegeln
-- [x] **Steuerleiste:** Stift, Tiefe, Position und Papier auf jeder Seite
-- [x] **Text:** Single-Line-Fonts (Hershey, EMS), Grösse, Zeilenabstand, Ränder,
-  Papierformat (A4, A5, A6, Couvert C6/DL), Ausrichtung
-- [x] **Vorschau & Ausführen:** Blattvorschau, Laufzeit, Start / Pause / Stopp
-- [ ] **SVG:** Import, Skalieren, Positionieren
-- [ ] **Live-Tempo** per Vorschub-Override
-- [ ] **GitHub Pages:** inkbot online stellen, nutzbar ohne lokalen Server
+## Version 1 - Basics
+- [x] **Connect:** choose port, check firmware, show status, console
+- [x] **Machine:** jogging (1/5/10 mm), pen up/down with adjustable depth, set origin,
+  invert Y axis
+- [x] **Control bar:** pen, depth, position and paper on every page
+- [x] **Text:** single-line fonts (Hershey, EMS), size, line height, margins, paper format
+  (A4, A5, A6, envelopes C6/DL), alignment
+- [x] **Preview & run:** sheet preview, run time, start / pause / stop
+- [x] **Save:** drawing as SVG, source image as file
+- [ ] **SVG:** import, scale, position
+- [ ] **Live speed** via feed override
+- [ ] **GitHub Pages:** put inkbot online, usable without a local server
 
-## Version 2 - Bilder & KI
-- [x] **Bild → Linien:** Mittellinie, Umriss, Schraffur nach Helligkeit,
-  Strichreihenfolge gegen Leerfahrten
-- [x] **KI erfindet:** Prompt → Bild-KI im Line-Art-Stil → Linien. Anbieter OpenAI
-  oder OpenAI-kompatibel (z.B. LiteLLM, darüber auch Higgsfield), Prompt-Vorlage
-  einstellbar
-- [x] BYOK: API-Key nur im Browser
-- [ ] **KI zeichnet direkt:** Prompt → Sprachmodell liefert SVG mit Einzellinien,
-  ohne Umwandlung (Karten, Muster, Deko)
-- [ ] **KI baut um:** Foto → vereinfachte Strichzeichnung (Bild-zu-Bild)
-- [ ] **Eine durchgehende Linie** (TSP-Art)
+## Version 2 - Images & AI
+- [x] **Image to lines:** centre lines, outline, hatching by brightness, hatched fills,
+  stroke ordering to cut pen-up travel
+- [x] **AI invents:** prompt to line-art image to lines. Providers OpenAI or
+  OpenAI-compatible (e.g. LiteLLM, which can also route to Higgsfield), editable prompt
+  template
+- [x] Bring your own key: the API key stays in the browser
+- [ ] **AI draws directly:** a language model returns an SVG of single lines, no
+  conversion needed (cards, patterns, decorations)
+- [ ] **AI redraws:** photo to simplified line drawing (image to image)
+- [ ] **One continuous line** (TSP art)
 
-## Version 3 - Gestalten
-- [ ] **Kartengestalter:** Text und Bild frei auf einem Blatt anordnen, Vorlagen für
-  Grusskarten, Couverts, Tischkarten
-- [ ] **Eigene Handschrift:** Vorlage ausdrucken, von Hand ausfüllen, fotografieren;
-  inkbot zieht die Mittellinien der Buchstaben heraus und speichert sie als Schrift
-- [ ] Couverts mit Adressliste (CSV)
+## Version 3 - Design
+- [ ] **Card designer:** place text and images freely on a sheet, templates for greeting
+  cards, envelopes, place cards
+- [ ] **Own handwriting:** print a template, fill it in by hand, take a photo; inkbot
+  extracts the centre lines of each letter and stores them as a font
+- [ ] Envelopes from an address list (CSV)
 
-## Später
-- Zufallsvariation, damit Schrift echt wirkt (Zittern, Abstände, Buchstabenvarianten)
-- Mehrere Stifte / Farben mit Pause zum Wechseln
-- Projekte im Browser speichern (IndexedDB), Export/Import
-- Zweisprachige Oberfläche (Deutsch und Englisch)
-- Dark Mode
+## Later
+- Random variation so writing looks real (jitter, spacing, letter variants)
+- Several pens / colours with a pause to swap
+- Save projects in the browser (IndexedDB), export and import
+- German interface as a second language
+- Dark mode

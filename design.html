@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de-CH">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -622,11 +622,11 @@
 			<div class="toc">
 				<a href="#palette">Palette</a>
 				<a href="#tokens-light">Tokens Light</a>
-				<a href="#typography">Typografie</a>
+				<a href="#typography">Typography</a>
 				<a href="#spacing">Spacing</a>
 				<a href="#radius">Radius</a>
-				<a href="#components">Komponenten</a>
-				<a href="#composition">Komposition</a>
+				<a href="#components">Components</a>
+				<a href="#composition">Composition</a>
 				<a href="#tokens-dark">Tokens Dark</a>
 			</div>
 
@@ -634,19 +634,15 @@
 				<div>
 					<h1>inkbot</h1>
 					<p class="lede">
-						Living Styleguide. Warm und analog: Papier, Tinte, Blech, Siegellack. Farben aus der
-						Brand-Illustration, Buttons in Tinte, Stahlblau als Akzent. Abgeleitet aus
+						Living styleguide. Warm and analog: paper, ink, tin, sealing wax. Colours from the brand illustration, buttons in ink, steel blue as the accent. Derived from
 						<code>DESIGN.md</code>.
 					</p>
 				</div>
 			</header>
 
-			<h2 id="palette">Markenpalette · Steel</h2>
+			<h2 id="palette">Brand palette · Steel</h2>
 			<p class="section-desc">
-				Stahlblau aus dem Blech des Roboters. Steel-600 trägt Links und Focus-Ring auf hellen
-				Flächen, Steel-400 ist dekorativ (Scrollbar, Focus-Ring auf Dark), Steel-200 übernimmt Links
-				auf Dark, Steel-900 (Nachttinte) ist Dark-Theme-Canvas und Footer. Mid-Stops 300/500/700 sind
-				bewusst nicht definiert.
+				Steel blue from the robot's tin body. Steel-600 carries links and the focus ring on light surfaces, Steel-400 is decorative (scrollbar, focus ring on dark), Steel-200 takes links on dark, Steel-900 (night ink) is the dark theme canvas and footer. Mid stops 300/500/700 are left out on purpose.
 			</p>
 			<div class="grid">
 				<div class="swatch">
@@ -669,7 +665,7 @@
 					<div class="chip" style="background: var(--steel-200)"></div>
 					<div class="meta">
 						<p class="name">steel-200</p>
-						<p class="role">Link (Dark) · Brand-Pill-BG · Akzentflächen</p>
+						<p class="role">Link (dark) · brand pill BG · accent areas</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -677,7 +673,7 @@
 					<div class="chip" style="background: var(--steel-400)"></div>
 					<div class="meta">
 						<p class="name">steel-400</p>
-						<p class="role">Blech · Scrollbar · Focus-Ring (Dark)</p>
+						<p class="role">Tin · scrollbar · focus ring (dark)</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -685,7 +681,7 @@
 					<div class="chip" style="background: var(--steel-600)"></div>
 					<div class="meta">
 						<p class="name">steel-600</p>
-						<p class="role">Primärer Akzent · Link · Focus-Ring (Light)</p>
+						<p class="role">Primary accent · link · focus ring (light)</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -693,7 +689,7 @@
 					<div class="chip" style="background: var(--steel-800)"></div>
 					<div class="meta">
 						<p class="name">steel-800</p>
-						<p class="role">Link-Hover · Tiefe Akzentflächen</p>
+						<p class="role">Link hover · deep accent areas</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -701,23 +697,22 @@
 					<div class="chip" style="background: var(--steel-900)"></div>
 					<div class="meta">
 						<p class="name">steel-900</p>
-						<p class="role">Nachttinte · Dark-Canvas · Footer</p>
+						<p class="role">Night ink · dark canvas · footer</p>
 						<span class="hex"></span>
 					</div>
 				</div>
 			</div>
 
-			<h2 id="tokens-light">Semantische Tokens · Light</h2>
+			<h2 id="tokens-light">Semantic tokens · Light</h2>
 			<p class="section-desc">
-				Was tatsächlich im UI verwendet wird. Action-Layer ist Tinte (nicht Steel). Steel lebt
-				ausschliesslich am Akzent-Layer.
+				What the UI actually uses. The action layer is ink (not Steel). Steel lives at the accent layer only.
 			</p>
 			<div class="grid">
 				<div class="swatch">
 					<div class="chip bordered" style="background: var(--canvas)"></div>
 					<div class="meta">
 						<p class="name">canvas</p>
-						<p class="role">Seiten-Hintergrund</p>
+						<p class="role">Page background</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -725,7 +720,7 @@
 					<div class="chip bordered" style="background: var(--surface-card)"></div>
 					<div class="meta">
 						<p class="name">surface-card</p>
-						<p class="role">Papier · Vorschau-Karten · Einstellungsgruppen</p>
+						<p class="role">Paper · preview cards · settings groups</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -733,7 +728,7 @@
 					<div class="chip bordered" style="background: var(--surface-soft)"></div>
 					<div class="meta">
 						<p class="name">surface-soft</p>
-						<p class="role">Nav-Pill-Group-BG · Tabellenkopf</p>
+						<p class="role">Nav pill group BG · table header</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -757,7 +752,7 @@
 					<div class="chip" style="background: var(--primary-active)"></div>
 					<div class="meta">
 						<p class="name">primary-active</p>
-						<p class="role">Press-State für Primary-Button</p>
+						<p class="role">Press state for the primary button</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -765,7 +760,7 @@
 					<div class="chip" style="background: var(--ink-soft)"></div>
 					<div class="meta">
 						<p class="name">ink-soft</p>
-						<p class="role">Standard-Body-Text</p>
+						<p class="role">Default body text</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -789,7 +784,7 @@
 					<div class="chip bordered" style="background: var(--hairline-soft)"></div>
 					<div class="meta">
 						<p class="name">hairline-soft</p>
-						<p class="role">Innere Card-Trenner</p>
+						<p class="role">Inner card dividers</p>
 						<span class="hex" data-keep>ink / 8%</span>
 					</div>
 				</div>
@@ -813,7 +808,7 @@
 					<div class="chip" style="background: var(--danger)"></div>
 					<div class="meta">
 						<p class="name">danger</p>
-						<p class="role">Validation · Destructive · Maschinen-Alarm</p>
+						<p class="role">Validation · destructive · machine alarm</p>
 						<span class="hex"></span>
 					</div>
 				</div>
@@ -821,56 +816,52 @@
 					<div class="chip" style="background: var(--danger-dark)"></div>
 					<div class="meta">
 						<p class="name">danger-dark</p>
-						<p class="role">Danger auf dunklen Flächen</p>
+						<p class="role">Danger on dark surfaces</p>
 						<span class="hex"></span>
 					</div>
 				</div>
 			</div>
 
-			<h2 id="typography">Typografie</h2>
+			<h2 id="typography">Typography</h2>
 			<p class="section-desc">
-				System-Schrift in zwei Rollen, kein Webfont: Display (600 mit negativem Letter-Spacing) für
-				Headlines, Body (400-600) für Text, Buttons und Navigation. Auf Apple-Geräten SF Pro, auf
-				Windows Segoe UI, auf Android Roboto. Display-Weight bleibt 600 quer durch alle Grössen, niemals
-				700. Wer eine Markenschrift will (z.B. Inter, Manrope, Geist), hostet sie selbst und tauscht
-				sie projektspezifisch ein, behält aber Weight und Tracking-Signatur.
+				System typeface in two roles, no webfont: Display (600 with negative letter spacing) for headlines, Body (400-600) for text, buttons and navigation. SF Pro on Apple devices, Segoe UI on Windows, Roboto on Android. Display weight stays 600 across all sizes, never 700. A brand face (e.g. Inter, Manrope, Geist) is self-hosted and keeps the weight and tracking signature.
 			</p>
 			<div class="type-stack">
 				<div class="type-row">
 					<div class="type-spec"><strong>display-xl</strong><br>64 / 1.05 / -2px<br>Display 600</div>
-					<div class="type-sample display-xl">Handschrift aus dem Browser</div>
+					<div class="type-sample display-xl">Handwriting from the browser</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>display-lg</strong><br>48 / 1.1 / -1.5px<br>Display 600</div>
-					<div class="type-sample display-lg">Dein Schreibroboter für den VG-X4</div>
+					<div class="type-sample display-lg">Your writing robot for the VG-X4</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>display-md</strong><br>36 / 1.15 / -1px<br>Display 600</div>
-					<div class="type-sample display-md">Text setzen</div>
+					<div class="type-sample display-md">Write text</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>display-sm</strong><br>28 / 1.2 / -0.5px<br>Display 600</div>
-					<div class="type-sample display-sm">Grusskarte · A6 quer</div>
+					<div class="type-sample display-sm">Greeting card · A6 landscape</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>title-lg</strong><br>22 / 1.3 / -0.3px<br>Body 600</div>
-					<div class="type-sample title-lg">Papierformat</div>
+					<div class="type-sample title-lg">Paper format</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>title-md</strong><br>18 / 1.4 / 0<br>Body 600</div>
-					<div class="type-sample title-md">Stift hoch, Stift runter</div>
+					<div class="type-sample title-md">Pen up, pen down</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>title-sm</strong><br>16 / 1.4 / 0<br>Body 600</div>
-					<div class="type-sample title-sm">Ränder und Ausrichtung</div>
+					<div class="type-sample title-sm">Margins and alignment</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>body-md</strong><br>16 / 1.5 / 0<br>Body 400</div>
-					<div class="type-sample body-md">Standard Body Copy. System-Schrift im Regular-Weight. Dieser Text steht in <code>{colors.ink-soft}</code>, alle Headlines darüber in <code>{colors.ink}</code>. Inline-Links wie <a href="#">dieser hier</a> nehmen <code>{colors.link}</code> (Steel-600) als Akzent.</div>
+					<div class="type-sample body-md">Default body copy. System typeface in regular weight. This text uses <code>{colors.ink-soft}</code>, all headlines above use <code>{colors.ink}</code>. Inline links like <a href="#">this one</a> take <code>{colors.link}</code> (Steel-600) as the accent.</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>body-sm</strong><br>14 / 1.5 / 0<br>Body 400</div>
-					<div class="type-sample body-sm">Footer-Body und Fine-Print laufen auf body-sm. Etwas schmaler als body-md, gleicher Weight.</div>
+					<div class="type-sample body-sm">Footer body and fine print use body-sm. Slightly smaller than body-md, same weight.</div>
 				</div>
 				<div class="type-row">
 					<div class="type-spec"><strong>caption</strong><br>13 / 1.4 / 0<br>Body 500</div>
@@ -884,8 +875,7 @@
 
 			<h2 id="spacing">Spacing</h2>
 			<p class="section-desc">
-				4px-Base. Section-Padding ist 96px (universelle vertikale Rhythmus zwischen Editorial-Bands).
-				Card-Padding meist 32px (Feature) oder 24px (Vorschau-Karte).
+				4px base. Section padding is 96px (the vertical rhythm between bands). Card padding mostly 32px (feature) or 24px (preview card).
 			</p>
 			<div>
 				<div class="spacing-row">
@@ -932,8 +922,7 @@
 
 			<h2 id="radius">Border Radius</h2>
 			<p class="section-desc">
-				Hierarchisch: 8px für Buttons + Inputs, 12px für Content-Cards, 16px für Hero, Pill für
-				Nav-Group + Badges, Full für Icon-Buttons.
+				Hierarchical: 8px for buttons and inputs, 12px for content cards, 16px for the hero, pill for nav group and badges, full for icon buttons.
 			</p>
 			<div class="radius-grid">
 				<div class="radius-card">
@@ -973,49 +962,48 @@
 				</div>
 			</div>
 
-			<h2 id="components">Komponenten</h2>
+			<h2 id="components">Components</h2>
 			<p class="section-desc">
-				Die Komponenten-Grammatik von inkbot. Alle Buttons, Inputs, Badges und Cards beziehen sich
-				ausschliesslich auf Token-Referenzen.
+				The component grammar of inkbot. All buttons, inputs, badges and cards use token references only.
 			</p>
 			<div class="component-grid">
 				<div class="component-card">
 					<div class="component-label">button-primary · button-secondary</div>
 					<div class="component-demo">
-						<button class="btn btn-primary">Plotter verbinden</button>
-						<button class="btn btn-secondary">Vorschau</button>
+						<button class="btn btn-primary">Connect plotter</button>
+						<button class="btn btn-secondary">Preview</button>
 					</div>
-					<p class="role">Primary CTA in <code>{colors.primary}</code>, Secondary mit Hairline-Border.</p>
+					<p class="role">Primary CTA in <code>{colors.primary}</code>, secondary with a hairline border.</p>
 				</div>
 
 				<div class="component-card">
 					<div class="component-label">button-icon · button-text</div>
 					<div class="component-demo">
-						<button class="btn btn-icon" aria-label="Teilen">↗</button>
-						<button class="btn btn-icon" aria-label="Mehr">⋯</button>
-						<button class="btn btn-text">Hilfe</button>
+						<button class="btn btn-icon" aria-label="Share">↗</button>
+						<button class="btn btn-icon" aria-label="More">⋯</button>
+						<button class="btn btn-text">Help</button>
 					</div>
-					<p class="role">36 × 36 Icon-Buttons, Text-Link für Top-Nav.</p>
+					<p class="role">36 × 36 icon buttons, text link for the top nav.</p>
 				</div>
 
 				<div class="component-card">
 					<div class="component-label">text-input</div>
 					<div class="component-demo" style="flex-direction: column; align-items: stretch">
-						<input class="input" type="text" placeholder="Dein Text, z.B. Alles Gute!" />
+						<input class="input" type="text" placeholder="Your text, e.g. Happy birthday!" />
 					</div>
-					<p class="role">40px Höhe, 8px Radius, Hairline-Border, Focus auf Ink.</p>
+					<p class="role">40px high, 8px radius, hairline border, focus on ink.</p>
 				</div>
 
 				<div class="component-card">
 					<div class="component-label">badge-pill</div>
 					<div class="component-demo">
-						<span class="badge">Getrennt</span>
-						<span class="badge brand">Verbunden</span>
-						<span class="badge success">Fertig</span>
-						<span class="badge warning">Pausiert</span>
+						<span class="badge">Disconnected</span>
+						<span class="badge brand">Connected</span>
+						<span class="badge success">Done</span>
+						<span class="badge warning">Paused</span>
 						<span class="badge danger">Alarm</span>
 					</div>
-					<p class="role">Caption-Type (13/500), Pill-Radius, Default oder Brand-/Semantic-Variante.</p>
+					<p class="role">Caption type (13/500), pill radius, default or brand/semantic variant.</p>
 				</div>
 
 				<div class="component-card">
@@ -1024,25 +1012,25 @@
 						<div class="nav-pill-group">
 							<button class="pill-tab active">Text</button>
 							<button class="pill-tab">SVG</button>
-							<button class="pill-tab">Bild</button>
+							<button class="pill-tab">Image</button>
 						</div>
 					</div>
-					<p class="role">Pill-in-Pill: aktives Segment in <code>{colors.canvas}</code> mit Soft-Shadow.</p>
+					<p class="role">Pill in pill: the active segment in <code>{colors.canvas}</code> with a soft shadow.</p>
 				</div>
 
 				<div class="component-card">
 					<div class="component-label">feature-list</div>
 					<div class="feature-list">
 						<div class="item">
-							<h3>Text in Handschrift</h3>
-							<p>Single-Line-Fonts mit Grösse, Zeilenabstand und Rändern.</p>
+							<h3>Text as handwriting</h3>
+							<p>Single-line fonts with size, line height and margins.</p>
 						</div>
 						<div class="item">
-							<h3>SVG importieren</h3>
-							<p>Skalieren, positionieren und vor dem Zeichnen ansehen.</p>
+							<h3>Import SVG</h3>
+							<p>Scale, position and preview before drawing.</p>
 						</div>
 					</div>
-					<p class="role">Default für Feature-Aussagen: direkt auf dem Canvas, Hairline statt Card.</p>
+					<p class="role">Default for feature claims: right on the canvas, a hairline instead of a card.</p>
 				</div>
 
 				<div class="component-card">
@@ -1051,48 +1039,45 @@
 						<div class="row">
 							<span class="avatar">A6</span>
 							<div>
-								<div class="name">Grusskarte</div>
-								<div class="role-sm">A6 quer · Hershey Script</div>
+								<div class="name">Greeting card</div>
+								<div class="role-sm">A6 landscape · Hershey Script</div>
 							</div>
 						</div>
-						<blockquote>Alles Gute zum Geburtstag und einen schönen Tag!</blockquote>
+						<blockquote>Happy birthday and have a lovely day!</blockquote>
 					</div>
 				</div>
 			</div>
 
-			<h2 id="composition">Live-Komposition · Hero</h2>
+			<h2 id="composition">Live composition · Hero</h2>
 			<p class="section-desc">
-				So setzen sich die Tokens im echten UI-Kontext zusammen. Hero-Band mit 7/5-Split: Headline +
-				Sub-Headline + Button-Row links, App-Mockup-Card rechts.
+				How the tokens come together in real UI. Hero band with a 7/5 split: headline, sub headline and button row on the left, app mockup card on the right.
 			</p>
 			<div class="composition">
 				<div>
-					<h3 class="hero-h1">Dein Plotter, direkt im Browser.</h3>
+					<h3 class="hero-h1">Your plotter, right in the browser.</h3>
 					<p class="lede" style="margin-bottom: 1.75rem">
-						Text, SVGs und Bilder auf den VigoTec VG-X4 bringen. Ohne Installation, ohne
-						Server, alles läuft im Browser.
+						Bring text, SVGs and images to the VigoTec VG-X4. No install, no server, everything runs in the browser.
 					</p>
 					<div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
-						<a class="btn btn-primary" href="#">Plotter verbinden</a>
-						<a class="btn btn-secondary" href="#">Ohne Plotter testen</a>
+						<a class="btn btn-primary" href="#">Connect plotter</a>
+						<a class="btn btn-secondary" href="#">Try without a plotter</a>
 					</div>
 				</div>
 				<div class="hero-mockup">
 					<div style="font-size: 0.8125rem; color: var(--ink-mute); margin-bottom: 0.75rem">
-						Auftrag · Grusskarte A6
+						Job · Greeting card A6
 					</div>
-					<div class="slot">Papier <span>A6 quer</span></div>
-					<div class="slot active">Text <span>3 Zeilen</span></div>
-					<div class="slot">Nullpunkt <span>gesetzt</span></div>
-					<div class="slot">Laufzeit <span>ca. 2 min</span></div>
-					<button class="btn btn-primary" style="width: 100%; margin-top: 0.875rem; text-align: center">Zeichnen starten</button>
+					<div class="slot">Paper <span>A6 landscape</span></div>
+					<div class="slot active">Text <span>3 lines</span></div>
+					<div class="slot">Origin <span>set</span></div>
+					<div class="slot">Run time <span>approx. 2 min</span></div>
+					<button class="btn btn-primary" style="width: 100%; margin-top: 0.875rem; text-align: center">Start drawing</button>
 				</div>
 			</div>
 
-			<h2 id="pricing-row">Quellen · Featured Card</h2>
+			<h2 id="pricing-row">Sources · Featured card</h2>
 			<p class="section-desc">
-				Der einzige Ort ausser dem Footer, an dem die Dark-Surface erscheint. Die Inversion IST das
-				Featured-Signal, kein Badge nötig.
+				The only place besides the footer where the dark surface appears. The inversion IS the featured signal, no badge needed.
 			</p>
 			<div class="component-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
 				<div class="pricing-card">
@@ -1100,46 +1085,45 @@
 					<div class="price">V1</div>
 					<ul>
 						<li>Single-Line-Fonts</li>
-						<li>Papierformate A4 bis A6</li>
-						<li>Couverts C6 und DL</li>
+						<li>Paper formats A4 to A6</li>
+						<li>Envelopes C6 and DL</li>
 					</ul>
-					<a class="btn btn-secondary" style="text-align: center" href="#">Text schreiben</a>
+					<a class="btn btn-secondary" style="text-align: center" href="#">Write text</a>
 				</div>
 				<div class="pricing-card featured">
 					<div class="plan">SVG</div>
 					<div class="price">V1</div>
 					<ul>
-						<li>Import und Skalieren</li>
-						<li>Pfadoptimierung</li>
-						<li>Vorschau mit Laufzeit</li>
-						<li>Live-Tempo</li>
+						<li>Import and scale</li>
+						<li>Path optimisation</li>
+						<li>Preview with run time</li>
+						<li>Live speed</li>
 					</ul>
-					<a class="btn btn-primary-on-dark" style="text-align: center" href="#">SVG laden</a>
+					<a class="btn btn-primary-on-dark" style="text-align: center" href="#">Load SVG</a>
 				</div>
 				<div class="pricing-card">
-					<div class="plan">Bild und KI</div>
+					<div class="plan">Image and AI</div>
 					<div class="price">V2</div>
 					<ul>
-						<li>Foto zu Strichzeichnung</li>
-						<li>Prompt zu Zeichnung</li>
-						<li>Eigener API-Key</li>
+						<li>Photo to line drawing</li>
+						<li>Prompt to drawing</li>
+						<li>Your own API key</li>
 					</ul>
-					<a class="btn btn-secondary" style="text-align: center" href="#">Bald verfügbar</a>
+					<a class="btn btn-secondary" style="text-align: center" href="#">Coming soon</a>
 				</div>
 			</div>
 
 			<div class="dark-block">
-				<h2 id="tokens-dark">Semantische Tokens · Dark</h2>
+				<h2 id="tokens-dark">Semantic tokens · Dark</h2>
 				<p class="section-desc">
-					Im Dark-Theme kippt das Canvas auf Steel-900, das Emphasis-Paar invertiert (CTA wird
-					Papier, Hover wird Steel-100).
+					In the dark theme the canvas flips to Steel-900 and the emphasis pair inverts (the CTA becomes paper, hover becomes Steel-100).
 				</p>
 				<div class="grid">
 					<div class="swatch">
 						<div class="chip" style="background: var(--surface-dark)"></div>
 						<div class="meta">
 							<p class="name">canvas-dark</p>
-							<p class="role">Dark-Theme-Hintergrund (= steel-900)</p>
+							<p class="role">Dark theme background (= steel-900)</p>
 							<span class="hex"></span>
 						</div>
 					</div>
@@ -1147,7 +1131,7 @@
 						<div class="chip" style="background: var(--surface-dark-elevated)"></div>
 						<div class="meta">
 							<p class="name">surface-dark-elevated</p>
-							<p class="role">Cards im Dark-Canvas</p>
+							<p class="role">Cards on the dark canvas</p>
 							<span class="hex"></span>
 						</div>
 					</div>
@@ -1155,7 +1139,7 @@
 						<div class="chip" style="background: var(--surface-dark-soft)"></div>
 						<div class="meta">
 							<p class="name">surface-dark-soft</p>
-							<p class="role">Sekundäre Flächen</p>
+							<p class="role">Secondary surfaces</p>
 							<span class="hex"></span>
 						</div>
 					</div>
@@ -1171,23 +1155,23 @@
 						<div class="chip" style="background: var(--on-dark-soft)"></div>
 						<div class="meta">
 							<p class="name">on-dark-soft</p>
-							<p class="role">Body-Text auf Dark</p>
-							<span class="hex" data-keep>Papier / 82%</span>
+							<p class="role">Body text on dark</p>
+							<span class="hex" data-keep>Paper / 82%</span>
 						</div>
 					</div>
 					<div class="swatch">
 						<div class="chip" style="background: var(--on-dark-mute)"></div>
 						<div class="meta">
 							<p class="name">on-dark-mute</p>
-							<p class="role">Sekundär-Text auf Dark</p>
-							<span class="hex" data-keep>Papier / 68%</span>
+							<p class="role">Secondary text on dark</p>
+							<span class="hex" data-keep>Paper / 68%</span>
 						</div>
 					</div>
 					<div class="swatch">
 						<div class="chip" style="background: var(--emphasis-hover-dark)"></div>
 						<div class="meta">
 							<p class="name">emphasis-hover-dark</p>
-							<p class="role">Button-Hover auf Dark (= steel-100)</p>
+							<p class="role">Button hover on dark (= steel-100)</p>
 							<span class="hex"></span>
 						</div>
 					</div>
@@ -1195,7 +1179,7 @@
 						<div class="chip" style="background: var(--link-dark)"></div>
 						<div class="meta">
 							<p class="name">link-dark</p>
-							<p class="role">Inline-Links auf Dark (= steel-200)</p>
+							<p class="role">Inline links on dark (= steel-200)</p>
 							<span class="hex"></span>
 						</div>
 					</div>
@@ -1208,29 +1192,28 @@
 				<div>
 					<div class="wordmark">inkbot</div>
 					<p class="tagline">
-						Schreibroboter im Browser für den VigoTec VG-X4. Open Source, ohne Installation,
-						ohne Server. Nicht mit VigoTec verbunden.
+						Writing robot in the browser for the VigoTec VG-X4. Open source, no install, no server. Not affiliated with VigoTec.
 					</p>
 				</div>
 				<div>
 					<h4>App</h4>
 					<ul>
-						<li><a href="#">Verbinden</a></li>
+						<li><a href="#">Connect</a></li>
 						<li><a href="#">Text</a></li>
 						<li><a href="#">SVG</a></li>
-						<li><a href="#">Vorschau</a></li>
+						<li><a href="#">Preview</a></li>
 					</ul>
 				</div>
 				<div>
-					<h4>Hilfe</h4>
+					<h4>Help</h4>
 					<ul>
-						<li><a href="#">Erste Schritte</a></li>
+						<li><a href="#">Getting started</a></li>
 						<li><a href="#">Hardware</a></li>
-						<li><a href="#">GRBL-Notizen</a></li>
+						<li><a href="#">GRBL notes</a></li>
 					</ul>
 				</div>
 				<div>
-					<h4>Projekt</h4>
+					<h4>Project</h4>
 					<ul>
 						<li><a href="#">GitHub</a></li>
 						<li><a href="#">Roadmap</a></li>
@@ -1239,7 +1222,7 @@
 			</div>
 		</footer>
 
-		<div class="toast" id="toast">Kopiert</div>
+		<div class="toast" id="toast">Copied</div>
 
 		<script>
 			const toast = document.getElementById('toast');
@@ -1265,7 +1248,7 @@
 				el.addEventListener('click', () => {
 					const hex = el.dataset.hex;
 					navigator.clipboard?.writeText(hex);
-					toast.textContent = hex + ' kopiert';
+					toast.textContent = hex + ' copied';
 					toast.classList.add('show');
 					clearTimeout(timer);
 					timer = setTimeout(() => toast.classList.remove('show'), 1400);

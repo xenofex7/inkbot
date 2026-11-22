@@ -1,8 +1,8 @@
 # Design System - inkbot
 
-> Design-System für inkbot, die Browser-App für den Stift-Plotter VigoTec VG-X4. Gestartet aus der Petrol-Baseline von `claude-stuff` (`/design`): Struktur und Token-Namen stammen von dort, Farben, Beispiele und Komponenten sind auf inkbot umgeschrieben.
+> Design system for inkbot, the browser app for the VigoTec VG-X4 pen plotter. Started from the Petrol baseline in `claude-stuff` (`/design`): structure and token names come from there, colours, examples and components are rewritten for inkbot.
 >
-> **Für Codegen + Audits:** Die maschinenlesbare Token-Schicht steht im JSONC-Block unter `## Tokens (machine-readable)`. Codegen-Prompts und `/audit-design` lesen diesen Block (deterministisch), nicht die Prosa. Der Living Styleguide `design.html` wird daraus abgeleitet.
+> **For codegen and audits:** the machine-readable token layer is the JSONC block under `## Tokens (machine-readable)`. Codegen prompts and `/audit-design` read that block (deterministic), not the prose. The living styleguide `design.html` is derived from it.
 
 ## Overview
 
@@ -17,8 +17,8 @@ The sheet of paper is the centre of the app. Previews show the drawing on a pape
 - **System typeface** in two roles: Display (600, negative letter-spacing) for headlines, Body for everything else. No webfont yet (see `Known Gaps`).
 - Paper-tinted surfaces (`{colors.surface-card}` - #f3f0da) only where a container has a reason: the sheet preview, a saved job, a settings group.
 - Machine state is always visible: connection, pen up/down and job progress use `{component.badge-pill}` and never rely on colour alone.
-- Nav-pill-group (`{component.nav-pill-group}`) switches the source: Text, SVG, Bild.
-- The dark surface (`{colors.surface-dark}` - #23283a, Nachttinte) closes the start page as footer and carries the optional dark theme.
+- Nav-pill-group (`{component.nav-pill-group}`) switches the source: Text, SVG, Image.
+- The dark surface (`{colors.surface-dark}` - #23283a, night ink) closes the start page as footer and carries the optional dark theme.
 - Border radius is hierarchical: `{rounded.md}` (8px) for buttons + inputs, `{rounded.lg}` (12px) for cards, `{rounded.xl}` (16px) for the job card, `{rounded.pill}` for nav-pill-group + badges, `{rounded.full}` for icon buttons.
 
 ## Design Principles
@@ -35,7 +35,7 @@ Every decision further down traces back to one of these. Where the project needs
 
 ## Tokens (machine-readable)
 
-> Dieser JSONC-Block ist der **maschinenlesbare Spiegel** der Token-Tabellen weiter unten. Die Prosa-Sektionen (`Colors`, `Typography`, `Layout`, `Shapes`) sind die Begründung; dieser Block ist die prüfbare Wahrheit. **Codegen-Prompts und `/audit-design` lesen diesen Block, nicht die Prosa** - so wird aus "interpretiere die Beschreibung" ein deterministischer Token-Lookup. Beim Refine via `/design`: Werte hier **und** in der zugehörigen Prosa-Tabelle gleichziehen (beide bleiben synchron, dieser Block gewinnt im Zweifel).
+> This JSONC block is the **machine-readable mirror** of the token tables below. The prose sections (`Colors`, `Typography`, `Layout`, `Shapes`) give the reasons; this block is the checkable truth. **Codegen prompts and `/audit-design` read this block, not the prose**, which turns "interpret the description" into a deterministic token lookup. When refining via `/design`, update values here **and** in the matching prose table (both stay in sync, this block wins when in doubt).
 
 ```jsonc
 {
@@ -45,12 +45,12 @@ Every decision further down traces back to one of these. Where the project needs
     "themeStrategy": "system-default + data-theme override",
     "fontStrategy": "system stack, Display = 600 with negative tracking, no webfont (brand face open)"
   },
-  // Harte Anforderungen, die jeder generierte UI-Code erfüllen MUSS.
-  // /audit-design und /verify-ui prüfen genau diese drei Flags.
+  // Hard requirements every generated UI code MUST meet.
+  // /audit-design and /verify-ui check exactly these three flags.
   "requirements": {
-    "darkMode": true,        // Dark Mode ist Pflicht, kein optionales Polish
-    "responsive": true,      // alle Breakpoints müssen bedient werden
-    "tokensOnly": true       // keine Hardcodes - nur Token-Referenzen (keine rohen Hex/px)
+    "darkMode": true,        // dark mode is required, not optional polish
+    "responsive": true,      // every breakpoint must be served
+    "tokensOnly": true       // no hardcodes - token references only (no raw hex/px)
   },
   "colors": {
     "canvas": "#faf8f0",
@@ -66,7 +66,7 @@ Every decision further down traces back to one of these. Where the project needs
     "ink": "#363d52",
     "ink-soft": "#474d63",
     "ink-mute": "#5e6478",
-    // Dark-Surface-Set (Footer, Dark Mode): Nachttinte
+    // dark surface set (footer, dark mode): night ink
     "surface-dark": "#23283a",
     "surface-dark-elevated": "#2c3246",
     "surface-dark-soft": "#272c3f",
@@ -74,7 +74,7 @@ Every decision further down traces back to one of these. Where the project needs
     "on-dark": "#faf8f0",
     "on-dark-soft": "rgb(250 248 240 / 0.82)",
     "on-dark-mute": "rgb(250 248 240 / 0.68)",
-    // Interaktion (Stahlblau lebt hier, nie auf Primary-CTAs)
+    // interaction (steel lives here, never on primary CTAs)
     "link": "#3f6b8d",
     "link-dark": "#8db6c9",
     "focus-ring": "#3f6b8d",
@@ -84,14 +84,14 @@ Every decision further down traces back to one of these. Where the project needs
     "scrollbar-thumb": "#659eb4",
     "scrollbar-hover": "#3f6b8d",
     "emphasis-hover-dark": "#b9d0dc",
-    // Semantik (nur in semantischer Rolle, kein zweiter Akzent)
+    // semantic (semantic role only, no second accent)
     "success": "#10b981",
     "warning": "#f59e0b",
     "danger": "#ac503a",
     "danger-dark": "#e59a86",
-    // Brand-Farben aus der Illustration
-    "seal": "#ac503a",   // Siegelrot: Fehler und Zustand "Stift unten"
-    "wood": "#d69b68",   // Holz: nur Illustration, nie UI
+    // brand colours from the illustration
+    "seal": "#ac503a",   // sealing-wax red: errors and the "pen down" state
+    "wood": "#d69b68",   // wood: illustration only, never UI
     // Stahlblau-Skala - 7 Stops, Mid-Stops 300/500/700 bewusst undefiniert
     "steel": {
       "50": "#e3ecf1",
@@ -145,30 +145,30 @@ Every decision further down traces back to one of these. Where the project needs
 
 ## Colors
 
-Die Palette stammt aus der Brand-Illustration (`assets/logo.png`): Papier, Tinte, Blech, Siegellack, Holz. Warm und analog statt kühles SaaS-Weiss.
+The palette comes from the brand illustration (`assets/logo.png`): paper, ink, tin, sealing wax, wood. Warm and analog instead of cool SaaS white.
 
 ### Brand Scale (Steel)
 
-Stahlblau aus dem Blech des Roboters. Each step has a defined role - don't reach for a Steel shade unless its role matches.
+Steel blue from the robot's tin body. Each step has a defined role - don't reach for a Steel shade unless its role matches.
 
 | Token | Value | Role |
 |---|---|---|
 | `{colors.steel-50}` | #e3ecf1 | Selection highlight background |
 | `{colors.steel-100}` | #b9d0dc | Dark-theme emphasis hover |
 | `{colors.steel-200}` | #8db6c9 | Inline links on dark surfaces |
-| `{colors.steel-400}` | #659eb4 | Blech: decorative accent, scrollbar thumb, focus ring on dark (4.95:1 on surface-dark). Not for text on light (2.78:1) |
+| `{colors.steel-400}` | #659eb4 | Tin: decorative accent, scrollbar thumb, focus ring on dark (4.95:1 on surface-dark). Not for text on light (2.78:1) |
 | `{colors.steel-600}` | #3f6b8d | **Primary accent** - inline links and focus ring on light (5.34:1 on canvas, 4.94:1 on surface-card) |
 | `{colors.steel-800}` | #2f5573 | Link hover / pressed, deep accent (7.40:1 on canvas) |
-| `{colors.steel-900}` | #23283a | Nachttinte: dark-theme canvas, footer background |
+| `{colors.steel-900}` | #23283a | Night ink: dark-theme canvas, footer background |
 
 ### Brand Accents
 
-- **Seal** (`{colors.seal}` - #ac503a): Siegelrot vom Tintenfass und der Antennenkugel. Carries errors (`{colors.danger}`) and the machine state "pen down" / plotting in progress. Never decorative in UI, so red always means "attention" or "ink is flowing". 4.98:1 on canvas.
-- **Wood** (`{colors.wood}` - #d69b68): Holz vom Pult. Illustrations only, never UI (2.26:1 on canvas).
+- **Seal** (`{colors.seal}` - #ac503a): Sealing-wax red from the ink bottle and the antenna ball. Carries errors (`{colors.danger}`) and the machine state "pen down" / plotting in progress. Never decorative in UI, so red always means "attention" or "ink is flowing". 4.98:1 on canvas.
+- **Wood** (`{colors.wood}` - #d69b68): Wood from the desk. Illustrations only, never UI (2.26:1 on canvas).
 
 ### Action Layer (Ink, not Steel)
 
-The primary CTA color is **Tinte**, not Steel. Steel is the accent, never the action.
+The primary CTA color is **ink**, not Steel. Steel is the accent, never the action.
 
 - **Primary** (`{colors.primary}` - #363d52): All primary CTAs. Identical to `{colors.ink}`.
 - **Primary Active** (`{colors.primary-active}` - #23283a): Press state for primary buttons.
@@ -178,9 +178,9 @@ The primary CTA color is **Tinte**, not Steel. Steel is the accent, never the ac
 
 ### Surface (Light)
 
-- **Canvas** (`{colors.canvas}` - #faf8f0): Helles Papier, the default page floor.
+- **Canvas** (`{colors.canvas}` - #faf8f0): Light paper, the default page floor.
 - **Surface** (`{colors.surface}` - #faf8f0): Standard surface. Same hex as canvas, separated so dark theme can flip it independently.
-- **Surface Card** (`{colors.surface-card}` - #f3f0da): Papier aus der Illustration. Containers with a reason: the drawing sheet preview, quotes, settings groups.
+- **Surface Card** (`{colors.surface-card}` - #f3f0da): Paper from the illustration. Containers with a reason: the drawing sheet preview, quotes, settings groups.
 - **Surface Soft** (`{colors.surface-soft}` - #eae5ca): Nav-pill-group background, table headers, ghost-control hover. One step stronger than surface-card.
 - **Surface Strong** (`{colors.surface-strong}` - #dfd8b8): Disabled button background, progress-bar track (ink on it 7.53:1).
 - **Hairline** (`{colors.hairline}` - `rgb(54 61 82 / 0.14)`): 1px border on light surfaces, tinted with ink instead of black.
@@ -188,7 +188,7 @@ The primary CTA color is **Tinte**, not Steel. Steel is the accent, never the ac
 
 ### Surface (Dark)
 
-- **Canvas Dark** (`{colors.surface-dark}` - #23283a): Nachttinte. Dark theme canvas, footer background.
+- **Canvas Dark** (`{colors.surface-dark}` - #23283a): Night ink. Dark theme canvas, footer background.
 - **Surface Dark** (`{colors.surface-dark-elevated}` - #2c3246): Card surfaces inside the dark canvas.
 - **Surface Dark Soft** (`{colors.surface-dark-soft}` - #272c3f): Secondary surfaces inside the dark canvas.
 - **Hairline Dark** (`{colors.hairline-dark}` - `rgb(250 248 240 / 0.10)`): Border tone on dark surfaces.
@@ -199,7 +199,7 @@ System preference is the default, `data-theme="light"` / `data-theme="dark"` on 
 
 ### Text (Light)
 
-- **Ink** (`{colors.ink}` - #363d52): Tinte. Headlines and emphasis text (10.15:1 on canvas).
+- **Ink** (`{colors.ink}` - #363d52): Ink. Headlines and emphasis text (10.15:1 on canvas).
 - **Ink Soft** (`{colors.ink-soft}` - #474d63): Default running text (7.87:1 on canvas, 7.29:1 on surface-card).
 - **Ink Mute** (`{colors.ink-mute}` - #5e6478): Secondary text, captions, meta (5.53:1 on canvas, 5.12:1 on surface-card).
 
@@ -238,11 +238,11 @@ The split is functional:
 
 | Token | Size | Weight | Line Height | Letter Spacing | Use |
 |---|---|---|---|---|---|
-| `{typography.display-xl}` | 64px | 600 | 1.05 | -2px | Start page h1 ("Handschrift aus dem Browser") - Display |
-| `{typography.display-lg}` | 48px | 600 | 1.1 | -1.5px | Section heads ("Text setzen") - Display |
+| `{typography.display-xl}` | 64px | 600 | 1.05 | -2px | Start page h1 ("Handwriting from the browser") - Display |
+| `{typography.display-lg}` | 48px | 600 | 1.1 | -1.5px | Section heads ("Write text") - Display |
 | `{typography.display-md}` | 36px | 600 | 1.15 | -1px | Sub-section heads, card titles - Display |
-| `{typography.display-sm}` | 28px | 600 | 1.2 | -0.5px | Job card title ("Grusskarte · A6 quer") - Display |
-| `{typography.title-lg}` | 22px | 600 | 1.3 | -0.3px | Panel titles ("Papierformat") - Body |
+| `{typography.display-sm}` | 28px | 600 | 1.2 | -0.5px | Job card title ("Greeting card · A6 landscape") - Display |
+| `{typography.title-lg}` | 22px | 600 | 1.3 | -0.3px | Panel titles ("Paper format") - Body |
 | `{typography.title-md}` | 18px | 600 | 1.4 | 0 | Feature titles, intro paragraphs |
 | `{typography.title-sm}` | 16px | 600 | 1.4 | 0 | Small card titles, list labels |
 | `{typography.body-md}` | 16px | 400 | 1.5 | 0 | Default running-text |
@@ -340,7 +340,7 @@ A single easing curve is intentional. A second one needs a reason this document 
 
 ### Voice Principles
 - **Plain over clever.** Name the function, not the brand.
-- **Active verbs, no nominal style.** "Speichert Deine Änderungen", not "Speicherung erfolgt".
+- **Active verbs, no nominal style.** "Saves your changes", not "Saving is performed".
 - **Marketing language stops at the app boundary.** The landing page may sell; a settings panel states facts.
 - **No trailing period on single-line UI strings.** Button labels, headlines and empty-state titles end without one. Sentences in body copy keep theirs.
 - **The empty state carries the value promise**, not an apology.
@@ -348,28 +348,28 @@ A single easing curve is intentional. A second one needs a reason this document 
 ### Microcopy Patterns
 | Context | Pattern | Example |
 |---|---|---|
-| Primary CTA | Verb + object, max 3 words | "Zeichnen starten" |
-| Error message | What happened + next step | "Plotter antwortet nicht. Prüfe das USB-Kabel." |
-| Empty state | What is missing + what it is worth | "Noch kein Text. Schreib etwas, die Vorschau zeigt es sofort." |
-| Success toast | Past tense, short | "Gespeichert" |
-| Loading | Active, optimistic | "Verbinde mit dem Plotter …" |
+| Primary CTA | Verb + object, max 3 words | "Start drawing" |
+| Error message | What happened + next step | "Plotter does not respond. Check the USB cable." |
+| Empty state | What is missing + what it is worth | "No text yet. Type something, the preview shows it right away." |
+| Success toast | Past tense, short | "Saved" |
+| Loading | Active, optimistic | "Connecting to the plotter …" |
 
 ### Language & Localisation
-- **Languages:** German (Swiss orthography, `ss` instead of the sharp s, informal "Du") and English. Both are first-class.
-- **Dates:** `TT.MM.JJJJ`, times `14:30`.
+- **Language:** English interface, informal and direct. A German translation is planned (Swiss orthography, `ss` instead of the sharp s, informal "Du").
+- **Dates:** `DD.MM.YYYY`, times `14:30`.
 - **Numbers and currency:** apostrophe as thousands separator, point as decimal separator - `1'234.55`, `CHF 1'234.55`.
 - **Quotes:** straight `"…"` only. No guillemets, no typographic quotes.
 - **Dashes:** plain hyphens. No em-dashes, no en-dashes.
-- **URLs are English even where labels are German:** `/text`, `/svg`, `/settings` - never `/einstellungen`.
+- **URLs are English:** `/text`, `/image`, `/settings`.
 
 
 ## Components
 
 ### Top Navigation
 
-**`top-nav`** - App bar pinned to the top. 64px tall, `{colors.canvas}` background, hairline bottom border. Left: logo + wordmark "inkbot". Right: the connection `{component.badge-pill}` ("Getrennt" / "Verbunden") and `{component.button-primary}` "Plotter verbinden" (becomes `{component.button-secondary}` "Trennen" once connected). Language switch DE / EN as `{component.button-text-link}`.
+**`top-nav`** - App bar pinned to the top. 64px tall, `{colors.canvas}` background, hairline bottom border. Left: logo + wordmark "inkbot". Right: the connection `{component.badge-pill}` ("Disconnected" / "Connected") and `{component.button-primary}` "Connect plotter" (becomes `{component.button-secondary}` "Disconnect" once connected). Language switch DE / EN as `{component.button-text-link}`.
 
-**`nav-pill-group`** - Pill-radius wrapper around the source switcher "Text" / "SVG" / "Bild". Background `{colors.surface-soft}` with internal padding 6px, rounded `{rounded.pill}`. The active segment renders as a `{colors.canvas}` pill with a subtle drop shadow inside the wrapper.
+**`nav-pill-group`** - Pill-radius wrapper around the source switcher "Text" / "SVG" / "Image". Background `{colors.surface-soft}` with internal padding 6px, rounded `{rounded.pill}`. The active segment renders as a `{colors.canvas}` pill with a subtle drop shadow inside the wrapper.
 
 ### Buttons
 
@@ -381,13 +381,13 @@ A single easing curve is intentional. A second one needs a reason this document 
 
 **`button-icon-circular`** - 36 × 36px circular icon button. Background `{colors.canvas}`, hairline border, ink-colour icon. Used for jog arrows, share, "more".
 
-**`button-text-link`** - Inline text button, no background. Used for "Hilfe" and the language switch in the top nav.
+**`button-text-link`** - Inline text button, no background. Used for "Help" and the language switch in the top nav.
 
 **`text-link`** - Inline body links in `{colors.link}`, or `{colors.link-dark}` on dark surfaces. Underlined on hover - one of the functional hovers named in Design Principle 6. Not on `{colors.surface-soft}` (4.48:1).
 
 ### Cards & Containers
 
-**`hero-band`** - Start page hero with a 7-5 grid: h1 + sub-headline + button row on the left ("Plotter verbinden", "Ohne Plotter testen"), `{component.job-card}` on the right. Vertical padding `{spacing.section}` (96px).
+**`hero-band`** - Start page hero with a 7-5 grid: h1 + sub-headline + button row on the left ("Connect plotter", "Try without a plotter"), `{component.job-card}` on the right. Vertical padding `{spacing.section}` (96px).
 
 **`job-card`** - Summary of the current job: format, content, origin, estimated run time, and the start button. Background `{colors.canvas}`, 1px hairline border, rounded `{rounded.xl}` (16px), `{shadow.md}`. Rows are 40px with label left and value right; the active row uses `{colors.primary}` with `{colors.on-primary}` text. While a job runs, the start button turns into `{component.button-stop}` plus pause.
 
@@ -397,9 +397,9 @@ A single easing curve is intentional. A second one needs a reason this document 
 
 **`feature-card`** - Only when the item has a reason to be a container: the whole card is a link or carries an image. Background `{colors.surface-card}`, rounded `{rounded.lg}` (12px), internal padding `{spacing.xl}` (32px).
 
-**`preview-card`** - A saved job or template ("Grusskarte, A6 quer, Hershey Script") with a short text sample. Background `{colors.surface-card}`, rounded `{rounded.lg}`, padding `{spacing.lg}` (24px). Top row: format badge + title + meta in `{typography.caption}`; below the sample in `{typography.body-md}`.
+**`preview-card`** - A saved job or template ("Greeting card, A6 landscape, Hershey Script") with a short text sample. Background `{colors.surface-card}`, rounded `{rounded.lg}`, padding `{spacing.lg}` (24px). Top row: format badge + title + meta in `{typography.caption}`; below the sample in `{typography.body-md}`.
 
-**`source-card`** - Start page card per source (Text, SVG, Bild und KI) with version, three facts and one button. Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xl}` (32px). Name in `{typography.title-lg}`, version in `{typography.display-sm}`, facts in `{typography.body-md}`.
+**`source-card`** - Start page card per source (Text, SVG, Image and AI) with version, three facts and one button. Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xl}` (32px). Name in `{typography.title-lg}`, version in `{typography.display-sm}`, facts in `{typography.body-md}`.
 
 **`source-card-featured`** - The recommended source flips to `{colors.surface-dark}` (#23283a), text inverts to `{colors.on-dark}`. The dark surface IS the signal - no badge, no accent border.
 
@@ -411,7 +411,7 @@ A single easing curve is intentional. A second one needs a reason this document 
 
 **`field-error`** - Inline validation message below a field. Every form carries `novalidate`; the browser's native validity bubbles never appear. The invalid input gets `aria-invalid="true"` and a `{colors.danger}` border, the message sits directly under it in `{typography.caption}` in `{colors.danger}` and is linked via `aria-describedby`. The first invalid field receives focus; the message clears on the next input.
 
-**`file-picker`** - Replacement for the native file control, used for SVG and image import. The real `<input type="file">` stays hidden; visible is a `{component.button-secondary}` ("Datei wählen") plus the chosen file name, or a "Keine Datei gewählt" placeholder, in `{typography.caption}` / `{colors.ink-mute}`, truncated with an ellipsis. Dropping a file on the sheet preview works as well.
+**`file-picker`** - Replacement for the native file control, used for SVG and image import. The real `<input type="file">` stays hidden; visible is a `{component.button-secondary}` ("Choose file") plus the chosen file name, or a "No file chosen" placeholder, in `{typography.caption}` / `{colors.ink-mute}`, truncated with an ellipsis. Dropping a file on the sheet preview works as well.
 
 ### Feedback
 
@@ -431,11 +431,11 @@ Variants flag status via the icon colour and a thin 3px left border:
 
 **`tooltip`** - Short hint for a control, declared with `data-tooltip="..."`, never with the native `title` attribute. Background `{colors.ink}`, text `{colors.canvas}`, 12px / 500, padding 4px × 8px, rounded `{rounded.sm}`, `{shadow.md}`, max-width 280px. Shows on hover and keyboard focus; hides on pointer down, click, scroll or Escape. Icon-only controls carry an `aria-label` in addition.
 
-**`dialog`** - Modal that replaces native `confirm()` / `alert()` and hosts short forms. Backdrop `{colors.ink}` at 50%; panel `{colors.surface}`, 1px hairline border, rounded `{rounded.lg}`, `{shadow.md}`, max-height 90vh. Sizes: small (420px), large (680px). Header carries the title in `{typography.title-md}`; footer right-aligns cancel (`{component.button-secondary}`) and the action (`{component.button-primary}` or `{component.button-stop}`). A destructive question names the object ("Job "Grusskarte" abbrechen?"). Escape and backdrop click cancel, Tab is trapped, focus returns to the trigger.
+**`dialog`** - Modal that replaces native `confirm()` / `alert()` and hosts short forms. Backdrop `{colors.ink}` at 50%; panel `{colors.surface}`, 1px hairline border, rounded `{rounded.lg}`, `{shadow.md}`, max-height 90vh. Sizes: small (420px), large (680px). Header carries the title in `{typography.title-md}`; footer right-aligns cancel (`{component.button-secondary}`) and the action (`{component.button-primary}` or `{component.button-stop}`). A destructive question names the object ("Cancel job "Greeting card"?"). Escape and backdrop click cancel, Tab is trapped, focus returns to the trigger.
 
 ### Tags / Badges
 
-**`badge-pill`** - Small pill label for machine and job state: "Getrennt" (default), "Verbunden" (brand), "Fertig" (success), "Pausiert" (warning), "Alarm" (danger), "Stift unten" (seal). Background `{colors.surface-card}` (default) or a tint of the state colour, text `{colors.ink}`, type `{typography.caption}` (13px / 500), rounded `{rounded.pill}`, padding 4px × 12px. A state badge always carries the word, never only a coloured dot.
+**`badge-pill`** - Small pill label for machine and job state: "Disconnected" (default), "Connected" (brand), "Done" (success), "Paused" (warning), "Alarm" (danger), "Pen down" (seal). Background `{colors.surface-card}` (default) or a tint of the state colour, text `{colors.ink}`, type `{typography.caption}` (13px / 500), rounded `{rounded.pill}`, padding 4px × 12px. A state badge always carries the word, never only a coloured dot.
 
 ### Tab / Filter
 
@@ -443,7 +443,7 @@ Variants flag status via the icon colour and a thin 3px left border:
 
 ### Footer
 
-**`footer`** - Closes the start page. Background `{colors.surface-dark}` (#23283a, Nachttinte), text `{colors.on-dark-soft}`. Wordmark "inkbot" top-left in `{colors.on-dark}` with the line "Nicht mit VigoTec verbunden." 3-column link list: App, Hilfe, Projekt. Vertical padding 64px. The app view itself has no footer.
+**`footer`** - Closes the start page. Background `{colors.surface-dark}` (#23283a, night ink), text `{colors.on-dark-soft}`. Wordmark "inkbot" top-left in `{colors.on-dark}` with the line "Not affiliated with VigoTec." 3-column link list: App, Help, Project. Vertical padding 64px. The app view itself has no footer.
 
 ## Do's and Don'ts
 
@@ -543,7 +543,7 @@ Two token groups do **not** reach a text threshold, and that is a constraint, no
 - **`prefers-color-scheme`:** supported - `requirements.darkMode` is true. Activation is system preference plus a `data-theme` override.
 - **Screen readers:** semantic HTML before ARIA. Buttons are `<button>`, links are `<a>`, icon-only buttons carry `aria-label`.
 - **Forms:** every field has a label wired with `for`/`id`; error messages reference it via `aria-describedby`.
-- **Language:** `<html lang="de-CH">` or `<html lang="en">`, matching the active UI language.
+- **Language:** `<html lang="en">`; a German version would switch to `de-CH`.
 
 ### Don't
 - No `outline: none` without a visible replacement.

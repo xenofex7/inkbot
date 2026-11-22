@@ -1,56 +1,56 @@
 # Hardware: VigoTec VG-X4
 
-## Eckdaten
+## Key facts
 
 | | |
 |---|---|
-| Typ | Stift-Plotter / Schreibroboter (写字机), optional Laser-Kit |
-| Zeichenfläche | 310 × 256 mm laut Hardware-Manual (Händler: 310 × 266 mm) |
-| Aussenmass | 570 × 436 × 88 mm |
-| Antrieb | 2 Schrittmotoren (42er), ein Zahnriemen 1800 mm über Mittelkreuz |
-| Stift | Servo auf Platine C4 (PWM), kein Z-Motor |
-| Anschluss | Micro-USB, serielle Schnittstelle |
-| Firmware | GRBL 1.1f (meldet sich als „VigoWriter 1.1f“) |
-| Baudrate | 115200 |
-| Original-Software | VigoWriter (Windows), mit USB-„Encryption Lock“ |
-| Netzteil | 12 V |
+| Type | Pen plotter / writing robot, optional laser kit |
+| Drawing area | 310 × 256 mm according to the hardware manual (dealers say 310 × 266 mm) |
+| Outer size | 570 × 436 × 88 mm |
+| Drive | 2 stepper motors (NEMA 17 size), one 1800 mm timing belt over the centre cross |
+| Pen | Servo on board C4 (PWM), no Z motor |
+| Connection | Micro USB, serial |
+| Firmware | GRBL 1.1f (greets as "VigoWriter 1.1f") |
+| Baud rate | 115200 |
+| Original software | VigoWriter (Windows) with a USB "encryption lock" |
+| Power supply | 12 V |
 
-Die Original-Software braucht den USB-Dongle. Die Community-Projekte (siehe
-`references.md`) reden direkt GRBL und kommen offenbar ohne aus. An der eigenen
-Maschine bestätigen.
+The original software needs the USB dongle. inkbot talks GRBL directly and works without
+it (confirmed 22.11.2026).
 
-## Platinen
+## Boards
 
-- **C1** Hauptplatine: Motor L / R, Steuerleitung von C2
-- **C2** Seitenplatine (3-Pin zur C1)
-- **C3** Platine am Mittelkreuz
-- **C4** vordere Platine: **links 3-Pin = Servo**, rechts = Laser
+- **C1** main board: motor L / R, control line from C2, power switch next to the 12 V
+  socket
+- **C2** side board (3 pin to C1)
+- **C3** board on the centre cross
+- **C4** front board: **left 3 pin = servo**, right = laser
 
-## Wichtig beim Zusammenbau
+## Assembly essentials
 
-- **Servo nie an den rechten Anschluss von C4**, sonst brennt es durch. Orange = Signal.
-- Motorkabel: 4-Pin-Ende nach links, 6-Pin-Ende nach rechts.
-- Flachkabel: C4 hat Schubladen-Stecker (Kontakte nach hinten), C2/C3 Klapp-Stecker
-  (Kontakte nach unten).
-- Rollen ohne Spiel, aber leichtgängig einstellen. Entscheidet über die Schriftqualität.
-- Riemen waagrecht zwischen den Motor-Pulleys, vor dem Fixieren spannen.
-- Pulley auf Motorwelle mit ca. 1 mm Abstand.
-- Erster Start: USB zuerst einstecken, dann Software öffnen. Key-LED blinkt langsam,
-  Power-LED leuchtet.
+- **Never plug the servo into the right socket of C4**, it burns out. Orange = signal.
+- Motor cables: 4 pin end to the left, 6 pin end to the right.
+- Ribbon cables: C4 has slide-in connectors (contacts to the back), C2/C3 have flip-lock
+  connectors (contacts down).
+- Adjust the rollers without play but running freely. This decides the writing quality.
+- Belt level between the motor pulleys, tension it before fixing.
+- Pulley on the motor shaft with about 1 mm gap.
+- First start: plug in USB first, then open the software. Key LED blinks slowly, power
+  LED is on.
 
-## Erfahrungen aus dem Zusammenbau (2026-11-22)
+## Notes from assembling (22.11.2026)
 
-- Motorstecker zeigen nach **unten**, sonst stossen sie an (Motor um 90° gedreht).
-- Riemenscheibe ca. 1 mm über dem Motor (microSD-Karte als Lehre), Höhe so, dass der
-  Riemen waagrecht zu den Umlenkrollen läuft.
-- Umlenkrollen auf S5: N6 (kurz), W2, N7 (lang), dann P2.
-- Beigelegtes doppelseitiges Klebeband (CROWN): Flachkabel flach aufs Profil kleben,
-  damit es nicht in Riemen/Riemenscheibe gerät. Am Mittelkreuz Schlaufe lassen.
-- Flachkabel: blaue Verstärkung nach oben (Kontakte unten).
+- Motor connectors point **down**, otherwise they collide (motor rotated by 90°).
+- Pulley about 1 mm above the motor (a microSD card works as a gauge), height so that the
+  belt runs level to the idler pulleys.
+- Idler pulleys on S5: N6 (short), W2, N7 (long), then P2.
+- Included double-sided tape (CROWN): stick the ribbon cable flat onto the profile so it
+  cannot get into the belt or pulley. Leave a loop at the centre cross.
+- Ribbon cable: blue stiffener up (contacts down).
 
-## Quellen
+## Sources
 
-- Hardware-Manual (PDF): http://vigotec.cn/software/VG-X4_Hardware_Installation_Manual_Eng_20190417.pdf
-- Hardware-Manual (Bilder): https://www.vigotec.cn/X4/Hardware_manual_x4.htm
-- Software-Manual VigoWriter: https://www.vigotec.cn/X4/Software_manual_x4.htm
-- Übersicht / Downloads: https://www.vigotec.cn/ und http://vigotec.cn/X4/
+- Hardware manual (PDF): http://vigotec.cn/software/VG-X4_Hardware_Installation_Manual_Eng_20190417.pdf
+- Hardware manual (pictures): https://www.vigotec.cn/X4/Hardware_manual_x4.htm
+- VigoWriter software manual: https://www.vigotec.cn/X4/Software_manual_x4.htm
+- Overview / downloads: https://www.vigotec.cn/ and http://vigotec.cn/X4/
