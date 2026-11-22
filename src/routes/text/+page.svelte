@@ -95,6 +95,11 @@
 	</section>
 
 	<section class="flex flex-col gap-4">
-		<DrawPanel {polylines} {sheet} emptyHint="Type some text, the preview shows it right away." />
+		<DrawPanel
+			{polylines}
+			{sheet}
+			name={text}
+			emptyHint="Type some text, the preview shows it right away."
+		/>
 	</section>
 </main>

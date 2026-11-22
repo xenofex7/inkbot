@@ -1,21 +1,25 @@
 <script lang="ts">
-	import { OctagonX, Pause, PenLine, Play } from '@lucide/svelte';
+	import { Download, OctagonX, Pause, PenLine, Play } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Button from './Button.svelte';
 	import SheetPreview from './SheetPreview.svelte';
 	import { estimateSeconds, outsideArea, toGcode } from '../gcode/fromPolylines';
 	import { orient, type Polyline } from '../geometry/types';
 	import { REALTIME, VGX4 } from '../grbl/vgx4';
+	import { download, filenameFrom } from '../download';
+	import { toSvg } from '../geometry/svg';
 	import { plotter } from '../serial/plotter.svelte';
 	import { settings } from '../settings.svelte';
 
 	let {
 		polylines,
 		sheet,
+		name = 'inkbot',
 		emptyHint = 'Nothing to draw yet.'
 	}: {
 		polylines: Polyline[];
 		sheet: { width: number; height: number };
+		name?: string;
 		emptyHint?: string;
 	} = $props();
 
@@ -32,6 +36,11 @@
 			!outsideSheet &&
 			!outsideMachine
 	);
+
+	function saveSvg() {
+		const svg = toSvg(polylines, sheet.width, sheet.height);
+		download(new Blob([svg], { type: 'image/svg+xml' }), filenameFrom(name, 'svg'));
+	}
 
 	async function draw() {
 		drawError = '';
@@ -72,6 +81,9 @@
 			<PenLine size={16} /> Draw
 		</Button>
 	{/if}
+	<Button onclick={saveSvg} disabled={polylines.length === 0}>
+		<Download size={16} /> Save SVG
+	</Button>
 	<span class="text-sm text-ink-mute">
 		{sheet.width} × {sheet.height} mm · {polylines.length} strokes · approx. {minutes} min
 	</span>

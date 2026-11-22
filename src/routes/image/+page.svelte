@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ImageUp, Sparkles } from '@lucide/svelte';
+	import { Download, ImageUp, Sparkles } from '@lucide/svelte';
+	import { download, filenameFrom } from '#lib/download.ts';
 	import { resolve } from '$app/paths';
 	import { buildPrompt, generateImage } from '#lib/ai/images.ts';
 	import { aiSettings } from '#lib/ai/settings.svelte.ts';
@@ -179,6 +180,17 @@
 					alt={imageSource.name}
 					class="mt-3 max-h-40 rounded-md border border-hairline"
 				/>
+				<Button
+					class="mt-3"
+					onclick={() =>
+						imageSource.blob &&
+						download(
+							imageSource.blob,
+							filenameFrom(imageSource.name, imageSource.blob.type.split('/')[1] || 'png')
+						)}
+				>
+					<Download size={16} /> Save image
+				</Button>
 			{/if}
 			{#if loadError}
 				<p class="mt-2 text-[13px] text-danger" role="alert">{loadError}</p>
@@ -268,6 +280,11 @@
 			pick(event.dataTransfer?.files);
 		}}
 	>
-		<DrawPanel {polylines} {sheet} emptyHint="Choose an image or drop it on the preview." />
+		<DrawPanel
+			{polylines}
+			{sheet}
+			name={imageSource.name}
+			emptyHint="Choose an image or drop it on the preview."
+		/>
 	</section>
 </main>
