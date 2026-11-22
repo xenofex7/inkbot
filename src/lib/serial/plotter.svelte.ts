@@ -42,9 +42,15 @@ export class Plotter {
 	async connect() {
 		if (this.connection !== 'disconnected') return;
 		this.lastError = '';
-		const port = await navigator.serial.requestPort({
-			filters: [{ usbVendorId: VGX4.usbVendorId }]
-		});
+		let port: SerialPort;
+		try {
+			port = await navigator.serial.requestPort({ filters: [{ usbVendorId: VGX4.usbVendorId }] });
+		} catch (error) {
+			if (!(error instanceof DOMException && error.name === 'NotFoundError')) {
+				this.lastError = error instanceof Error ? error.message : String(error);
+			}
+			return;
+		}
 		this.connection = 'connecting';
 		try {
 			await port.open({ baudRate: VGX4.baudRate });

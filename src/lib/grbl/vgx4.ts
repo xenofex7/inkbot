@@ -6,7 +6,9 @@ export const VGX4 = {
 	penDwellSeconds: 0.3,
 	jogFeed: 3000,
 	drawFeed: 1500,
-	pollIntervalMs: 250
+	pollIntervalMs: 250,
+	areaWidth: 310,
+	areaHeight: 256
 } as const;
 
 export const REALTIME = {

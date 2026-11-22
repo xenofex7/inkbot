@@ -11,7 +11,6 @@
 		OctagonX
 	} from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
-	import StatusBadge from '#lib/components/StatusBadge.svelte';
 	import { jog, penDown, penUp, setOrigin, testSquare } from '#lib/grbl/commands.ts';
 	import { REALTIME } from '#lib/grbl/vgx4.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
@@ -39,15 +38,6 @@
 		}
 	}
 
-	async function connect() {
-		try {
-			await plotter.connect();
-		} catch (error) {
-			if (error instanceof DOMException && error.name === 'NotFoundError') return;
-			plotter.lastError = error instanceof Error ? error.message : String(error);
-		}
-	}
-
 	async function sendConsole(event: SubmitEvent) {
 		event.preventDefault();
 		const line = consoleLine.trim();
@@ -58,23 +48,6 @@
 
 	const format = (value: number | undefined) => (value ?? 0).toFixed(2);
 </script>
-
-<header class="sticky top-0 z-10 border-b border-hairline bg-canvas">
-	<div class="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4">
-		<img src="favicon.png" alt="" class="size-9 rounded-sm" />
-		<span class="font-display text-lg font-semibold tracking-tight text-ink">inkbot</span>
-		<div class="ml-auto flex items-center gap-3">
-			<StatusBadge />
-			{#if plotter.connection === 'disconnected'}
-				<Button variant="primary" onclick={connect} disabled={!plotter.supported}>
-					Plotter verbinden
-				</Button>
-			{:else}
-				<Button onclick={() => plotter.disconnect()}>Trennen</Button>
-			{/if}
-		</div>
-	</div>
-</header>
 
 <main class="mx-auto max-w-[1200px] px-4 py-8">
 	{#if !connected}
@@ -96,7 +69,7 @@
 					<div class="mt-8 flex flex-wrap gap-3">
 						<Button
 							variant="primary"
-							onclick={connect}
+							onclick={() => plotter.connect()}
 							disabled={plotter.connection === 'connecting'}
 						>
 							Plotter verbinden
