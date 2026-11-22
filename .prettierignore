@@ -11,3 +11,7 @@ bun.lockb
 # Docs
 *.md
 design.html
+
+# Generated
+src/lib/text/fonts.json
+fonts/
