@@ -43,17 +43,22 @@ Status-Poll alle ~200 ms mit `?` für Position und Vorschau-Cursor.
 - `G92 X0 Y0` aktuelle Position als Nullpunkt
 - `$J=G91 X10 F1000` Joggen (abbrechbar mit `0x85`)
 
-## Stift (Servo) **[prüfen]**
+## Stift (Servo)
 
 Beide Community-Projekte (`references.md`) steuern den Stift über die Spindel-PWM:
 - `M5` Stift hoch, `M3 S905` Stift runter (Wert S905 laut beiden Projekten am Gerät
   bestätigt, Bereich S0-S1000), danach Pause `G4 P0.3` (100-600 ms), damit der Servo ankommt.
 - Beide nennen +X = rechts, +Y = unten, Nullpunkt oben links per `G92 X0 Y0`.
 
-Test am eigenen Gerät (22.11.2026): `M5`, dann `M3 S0`, `S250`, `S500`, `S750`, `S1000`
-je 4 s, ausserdem `G0 Z5` / `Z0` / `Z-5`. Alle Befehle mit `ok` quittiert, der Stift hat
-sich aber **nicht bewegt**. Da die Befehle laut beiden Projekten stimmen, liegt die
-Ursache vermutlich an der Hardware (Servo-Kabel, Anschluss auf C4, Servoarm). Offen.
+Test am eigenen Gerät (22.11.2026): `M5` / `M3 S905` abwechselnd, je 3 s: **Stift fährt
+hoch und runter.** Bestätigt.
+
+Stolperfalle: Die Hauptplatine C1 hat einen **Netzschalter** (Power Switch neben der
+12-V-Buchse). Ist er aus, versorgt USB nur die Steuerung: GRBL antwortet normal und
+quittiert alle Befehle mit `ok`, aber Servo und Motoren bewegen sich nicht. Ein erster
+Test mit ausgeschaltetem Schalter sah deshalb wie ein Defekt aus. Beim Einschalten hebt
+der Servo den Stift einmal an. Die App kann den Schalter nicht erkennen und sollte beim
+Verbinden darauf hinweisen.
 
 ## Ausgabe der echten Maschine
 
