@@ -24,6 +24,7 @@
 	let detail = $state(400);
 	let sizePercent = $state(100);
 	let hatchSpacing = $state(1.2);
+	let fillHatch = $state(false);
 	let gray = $state<Gray | undefined>();
 	let loadError = $state('');
 	let fileInput = $state<HTMLInputElement>();
@@ -86,7 +87,10 @@
 			threshold,
 			hatchSpacing: hatchSpacing / scale,
 			simplify: 0.8,
-			minLength: Math.max(1, 0.8 / scale)
+			minLength: Math.max(1, 0.8 / scale),
+			fill: fillHatch
+				? { spacing: hatchSpacing / scale, minWidth: Math.max(3, 1.2 / scale) }
+				: undefined
 		});
 		const offsetX = settings.margin + (printable.width - gray.width * scale) / 2;
 		const offsetY = settings.margin;
@@ -255,7 +259,19 @@
 			/>
 		</div>
 
-		{#if mode === 'hatch'}
+		{#if mode !== 'hatch'}
+			<label class="flex items-start gap-2.5 text-sm text-ink">
+				<input type="checkbox" class="mt-0.5 size-4 accent-primary" bind:checked={fillHatch} />
+				<span>
+					Hatch filled areas
+					<span class="block text-[13px] text-ink-mute">
+						Dark areas wider than a stroke get an outline and diagonal hatching.
+					</span>
+				</span>
+			</label>
+		{/if}
+
+		{#if mode === 'hatch' || fillHatch}
 			<div>
 				<label class={label} for="spacing">Line spacing: {hatchSpacing} mm</label>
 				<input

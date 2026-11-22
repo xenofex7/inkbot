@@ -10,6 +10,7 @@ export type TraceOptions = {
 	hatchSpacing: number;
 	simplify: number;
 	minLength: number;
+	fill?: { spacing: number; minWidth: number };
 };
 
 export function grayFromRgba(rgba: Uint8ClampedArray, width: number, height: number): Gray {
@@ -172,43 +173,86 @@ const HATCH_LAYERS = [
 	{ angle: 135, level: 0.22 }
 ];
 
-export function hatch(gray: Gray, spacing: number, threshold: number): Polyline[] {
-	const { width, height, data } = gray;
+function scanLines(
+	width: number,
+	height: number,
+	spacing: number,
+	angleDegrees: number,
+	dark: (x: number, y: number) => boolean
+): Polyline[] {
 	const lines: Polyline[] = [];
 	const diagonal = Math.hypot(width, height);
 	const cx = width / 2;
 	const cy = height / 2;
-	for (const layer of HATCH_LAYERS) {
-		const limit = threshold * layer.level;
-		const angle = (layer.angle * Math.PI) / 180;
-		const dir = { x: Math.cos(angle), y: Math.sin(angle) };
-		const normal = { x: -dir.y, y: dir.x };
-		let row = 0;
-		for (let offset = -diagonal / 2; offset <= diagonal / 2; offset += spacing, row++) {
-			let current: Point[] = [];
-			const samples: Point[] = [];
-			for (let t = -diagonal / 2; t <= diagonal / 2; t += 0.5) {
-				samples.push({
-					x: cx + normal.x * offset + dir.x * t,
-					y: cy + normal.y * offset + dir.y * t
-				});
-			}
-			if (row % 2) samples.reverse();
-			for (const p of samples) {
-				const x = Math.floor(p.x);
-				const y = Math.floor(p.y);
-				const dark = x >= 0 && y >= 0 && x < width && y < height && data[y * width + x] < limit;
-				if (dark) {
-					current.push(p);
-				} else if (current.length) {
-					lines.push([current[0], current[current.length - 1]]);
-					current = [];
-				}
-			}
-			if (current.length) lines.push([current[0], current[current.length - 1]]);
+	const angle = (angleDegrees * Math.PI) / 180;
+	const dir = { x: Math.cos(angle), y: Math.sin(angle) };
+	const normal = { x: -dir.y, y: dir.x };
+	let row = 0;
+	for (let offset = -diagonal / 2; offset <= diagonal / 2; offset += spacing, row++) {
+		let current: Point[] = [];
+		const samples: Point[] = [];
+		for (let t = -diagonal / 2; t <= diagonal / 2; t += 0.5) {
+			samples.push({
+				x: cx + normal.x * offset + dir.x * t,
+				y: cy + normal.y * offset + dir.y * t
+			});
 		}
+		if (row % 2) samples.reverse();
+		for (const p of samples) {
+			const x = Math.floor(p.x);
+			const y = Math.floor(p.y);
+			if (x >= 0 && y >= 0 && x < width && y < height && dark(x, y)) {
+				current.push(p);
+			} else if (current.length) {
+				lines.push([current[0], current[current.length - 1]]);
+				current = [];
+			}
+		}
+		if (current.length) lines.push([current[0], current[current.length - 1]]);
 	}
 	return lines;
+}
+
+export function hatch(gray: Gray, spacing: number, threshold: number): Polyline[] {
+	const { width, height, data } = gray;
+	return HATCH_LAYERS.flatMap((layer) =>
+		scanLines(
+			width,
+			height,
+			spacing,
+			layer.angle,
+			(x, y) => data[y * width + x] < threshold * layer.level
+		)
+	);
+}
+
+function morph(mask: Uint8Array, width: number, height: number, radius: number, grow: boolean) {
+	const pass = (input: Uint8Array, horizontal: boolean) => {
+		const output = new Uint8Array(input.length);
+		for (let y = 0; y < height; y++) {
+			for (let x = 0; x < width; x++) {
+				let value = grow ? 0 : 1;
+				for (let d = -radius; d <= radius; d++) {
+					const nx = horizontal ? x + d : x;
+					const ny = horizontal ? y : y + d;
+					const inside = nx >= 0 && ny >= 0 && nx < width && ny < height;
+					const v = inside ? input[ny * width + nx] : 0;
+					value = grow ? Math.max(value, v) : Math.min(value, v);
+				}
+				output[y * width + x] = value;
+			}
+		}
+		return output;
+	};
+	return pass(pass(mask, true), false);
+}
+
+export function erode(mask: Uint8Array, width: number, height: number, radius: number) {
+	return radius > 0 ? morph(mask, width, height, radius, false) : mask;
+}
+
+export function dilate(mask: Uint8Array, width: number, height: number, radius: number) {
+	return radius > 0 ? morph(mask, width, height, radius, true) : mask;
 }
 
 function length(line: Polyline) {
@@ -221,14 +265,29 @@ function length(line: Polyline) {
 
 export function traceImage(gray: Gray, options: TraceOptions): Polyline[] {
 	const { width, height } = gray;
+	const trace = (pixels: Uint8Array) =>
+		tracePixels(pixels, width, height).map((line) => simplify(line, options.simplify));
 	let lines: Polyline[];
 	if (options.mode === 'hatch') {
 		lines = hatch(gray, options.hatchSpacing, options.threshold);
+	} else if (!options.fill) {
+		const mask = binarize(gray, options.threshold);
+		lines = trace(
+			options.mode === 'lines' ? thin(mask, width, height) : outline(mask, width, height)
+		);
 	} else {
 		const mask = binarize(gray, options.threshold);
-		const pixels =
-			options.mode === 'lines' ? thin(mask, width, height) : outline(mask, width, height);
-		lines = tracePixels(pixels, width, height).map((line) => simplify(line, options.simplify));
+		const radius = Math.max(1, Math.round(options.fill.minWidth / 2));
+		const fills = dilate(erode(mask, width, height, radius), width, height, radius);
+		const strokes = mask.map((v, i) => (v && !fills[i] ? 1 : 0));
+		const inner = erode(fills, width, height, 1);
+		lines = [
+			...trace(
+				options.mode === 'lines' ? thin(strokes, width, height) : outline(strokes, width, height)
+			),
+			...trace(outline(fills, width, height)),
+			...scanLines(width, height, options.fill.spacing, 45, (x, y) => inner[y * width + x] === 1)
+		];
 	}
 	return lines.filter((line) => line.length > 1 && length(line) >= options.minLength);
 }

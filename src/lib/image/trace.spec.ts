@@ -82,6 +82,16 @@ describe('traceImage', () => {
 		expect(bounds(lines)!.maxX).toBeLessThan(21);
 	});
 
+	it('hatches filled areas but not thin strokes when fill is on', () => {
+		const fill = { spacing: 3, minWidth: 6 };
+		const square = canvas(40, 40, (x, y) => x >= 5 && x < 35 && y >= 5 && y < 35);
+		const plain = traceImage(square, { ...base, mode: 'outline' });
+		const filled = traceImage(square, { ...base, mode: 'outline', fill });
+		expect(filled.length).toBeGreaterThan(plain.length + 5);
+		const bar = canvas(40, 12, (x, y) => x >= 5 && x < 35 && y >= 5 && y <= 7);
+		expect(traceImage(bar, { ...base, mode: 'lines', fill })).toHaveLength(1);
+	});
+
 	it('returns nothing for a blank image', () => {
 		const gray = canvas(20, 20, () => false);
 		for (const mode of ['lines', 'outline', 'hatch'] as const) {
