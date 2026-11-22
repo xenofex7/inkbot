@@ -64,11 +64,20 @@ Verbinden darauf hinweisen.
 
 Test am 22.11.2026 (ohne eingelegten Stift): `G92 X0 Y0`, `M3 S905`, Quadrat 20 mm mit
 `G1 … F1500`, `M5`. Die Maschine fährt das Quadrat sauber ab und meldet danach `Idle` am
-Startpunkt. Ob +X rechts und +Y unten ist, wie die Community-Projekte sagen, ist noch
-nicht bestätigt.
+Startpunkt.
 
-Wichtig fürs Senden: Port erst schliessen, wenn der Status `Idle` meldet. Beim Öffnen
-und Schliessen setzt der DTR-Reset die Maschine zurück und bricht eine laufende Fahrt ab.
+**Achsrichtung bestätigt** (Kreis als Startmarke, dann Quadrat, mit Stift): Von vorne
+gesehen, also so, wie man das Blatt liest, geht **+X nach rechts** und **+Y nach vorne**,
+auf dem Blatt also nach unten. Der Nullpunkt gehört damit an die obere linke Papierecke
+(`G92 X0 Y0`), alle Koordinaten auf dem Blatt sind positiv.
+
+Wichtig fürs Senden:
+- Port erst schliessen, wenn wirklich alles fertig ist. Beim Öffnen und Schliessen setzt
+  der DTR-Reset die Maschine zurück und bricht eine laufende Fahrt ab.
+- Ein einzelnes `Idle` im Status reicht dafür nicht: Während einer Pause (`G4`) zwischen
+  zwei Fahrten meldet die Maschine kurz `Idle`. Ein Test brach deshalb mitten im Job ab.
+  Erst wenn jede gesendete Zeile mit `ok` quittiert ist **und** der Status mehrmals
+  hintereinander `Idle` meldet, ist der Job fertig.
 
 ## Ausgabe der echten Maschine
 
