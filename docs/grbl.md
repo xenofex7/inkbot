@@ -60,6 +60,16 @@ Test mit ausgeschaltetem Schalter sah deshalb wie ein Defekt aus. Beim Einschalt
 der Servo den Stift einmal an. Die App kann den Schalter nicht erkennen und sollte beim
 Verbinden darauf hinweisen.
 
+## Erste Bewegung
+
+Test am 22.11.2026 (ohne eingelegten Stift): `G92 X0 Y0`, `M3 S905`, Quadrat 20 mm mit
+`G1 … F1500`, `M5`. Die Maschine fährt das Quadrat sauber ab und meldet danach `Idle` am
+Startpunkt. Ob +X rechts und +Y unten ist, wie die Community-Projekte sagen, ist noch
+nicht bestätigt.
+
+Wichtig fürs Senden: Port erst schliessen, wenn der Status `Idle` meldet. Beim Öffnen
+und Schliessen setzt der DTR-Reset die Maschine zurück und bricht eine laufende Fahrt ab.
+
 ## Ausgabe der echten Maschine
 
 Ausgelesen am 22.11.2026, Maschine im Ruhezustand, nur lesende Befehle.
