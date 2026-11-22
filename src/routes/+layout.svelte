@@ -13,7 +13,8 @@
 	const nav = [
 		{ href: resolve('/'), label: 'Maschine' },
 		{ href: resolve('/text'), label: 'Text' },
-		{ href: resolve('/image'), label: 'Bild' }
+		{ href: resolve('/image'), label: 'Bild' },
+		{ href: resolve('/settings'), label: 'Einstellungen' }
 	];
 </script>
 
