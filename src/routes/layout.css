@@ -1,1 +1,121 @@
 @import 'tailwindcss';
+
+:root {
+	--steel-50: #e3ecf1;
+	--steel-100: #b9d0dc;
+	--steel-200: #8db6c9;
+	--steel-400: #659eb4;
+	--steel-600: #3f6b8d;
+	--steel-800: #2f5573;
+	--steel-900: #23283a;
+	--seal: #ac503a;
+	--wood: #d69b68;
+
+	--primary: #363d52;
+	--primary-active: #23283a;
+	--on-primary: #faf8f0;
+	--canvas: #faf8f0;
+	--surface: #faf8f0;
+	--surface-card: #f3f0da;
+	--surface-soft: #eae5ca;
+	--surface-strong: #dfd8b8;
+	--hairline: rgb(54 61 82 / 0.14);
+	--hairline-soft: rgb(54 61 82 / 0.08);
+	--ink: #363d52;
+	--ink-soft: #474d63;
+	--ink-mute: #5e6478;
+	--link: var(--steel-600);
+	--focus-ring: var(--steel-600);
+	--selection-bg: var(--steel-50);
+	--selection-text: var(--steel-900);
+	--success: #10b981;
+	--warning: #f59e0b;
+	--danger: var(--seal);
+
+	--surface-dark: var(--steel-900);
+	--surface-dark-elevated: #2c3246;
+	--surface-dark-soft: #272c3f;
+	--hairline-dark: rgb(250 248 240 / 0.1);
+	--on-dark: #faf8f0;
+	--on-dark-soft: rgb(250 248 240 / 0.82);
+	--on-dark-mute: rgb(250 248 240 / 0.68);
+	--link-dark: var(--steel-200);
+	--focus-ring-dark: var(--steel-400);
+	--emphasis-hover-dark: var(--steel-100);
+	--danger-dark: #e59a86;
+}
+
+@theme inline {
+	--font-sans:
+		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto,
+		sans-serif;
+	--font-display:
+		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto,
+		sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+	--color-steel-50: var(--steel-50);
+	--color-steel-100: var(--steel-100);
+	--color-steel-200: var(--steel-200);
+	--color-steel-400: var(--steel-400);
+	--color-steel-600: var(--steel-600);
+	--color-steel-800: var(--steel-800);
+	--color-steel-900: var(--steel-900);
+	--color-seal: var(--seal);
+	--color-primary: var(--primary);
+	--color-primary-active: var(--primary-active);
+	--color-on-primary: var(--on-primary);
+	--color-canvas: var(--canvas);
+	--color-surface: var(--surface);
+	--color-surface-card: var(--surface-card);
+	--color-surface-soft: var(--surface-soft);
+	--color-surface-strong: var(--surface-strong);
+	--color-hairline: var(--hairline);
+	--color-hairline-soft: var(--hairline-soft);
+	--color-ink: var(--ink);
+	--color-ink-soft: var(--ink-soft);
+	--color-ink-mute: var(--ink-mute);
+	--color-link: var(--link);
+	--color-success: var(--success);
+	--color-warning: var(--warning);
+	--color-danger: var(--danger);
+	--color-surface-dark: var(--surface-dark);
+	--color-on-dark: var(--on-dark);
+	--color-on-dark-soft: var(--on-dark-soft);
+
+	--radius-xs: 4px;
+	--radius-sm: 6px;
+	--radius-md: 8px;
+	--radius-lg: 12px;
+	--radius-xl: 16px;
+	--radius-pill: 9999px;
+
+	--shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+	--shadow-md: 0 4px 12px rgb(0 0 0 / 0.08);
+
+	--ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+	background: var(--canvas);
+	color: var(--ink-soft);
+	font-family: var(--font-sans);
+	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: var(--selection-bg);
+	color: var(--selection-text);
+}
+
+:focus-visible {
+	outline: 2px solid var(--focus-ring);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition-duration: 0ms !important;
+		animation-duration: 0ms !important;
+	}
+}
