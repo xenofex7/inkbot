@@ -66,10 +66,15 @@ Test am 22.11.2026 (ohne eingelegten Stift): `G92 X0 Y0`, `M3 S905`, Quadrat 20 
 `G1 … F1500`, `M5`. Die Maschine fährt das Quadrat sauber ab und meldet danach `Idle` am
 Startpunkt.
 
-**Achsrichtung bestätigt** (Kreis als Startmarke, dann Quadrat, mit Stift): Von vorne
-gesehen, also so, wie man das Blatt liest, geht **+X nach rechts** und **+Y nach vorne**,
-auf dem Blatt also nach unten. Der Nullpunkt gehört damit an die obere linke Papierecke
-(`G92 X0 Y0`), alle Koordinaten auf dem Blatt sind positiv.
+**Achsrichtung** (korrigiert nach dem ersten Text am 22.11.2026): Von der Stift-Seite aus
+gesehen, also so, wie man das Blatt liest, geht **+X nach rechts** und **+Y nach hinten**
+(vom Betrachter weg). Der erste Text kam dadurch auf dem Kopf und vertikal gespiegelt aufs
+Papier. Ein früherer Kreis-Quadrat-Test hatte +Y nach vorne ergeben, vermutlich von der
+anderen Seite aus beurteilt.
+
+Die App spiegelt deshalb standardmässig die Y-Achse (Einstellung "Y-Achse umkehren" auf der
+Maschinen-Seite). Der Nullpunkt liegt an der oberen linken Papierecke (`G92 X0 Y0`), auf dem
+Blatt nach unten heisst dann in Maschinenkoordinaten -Y.
 
 Wichtig fürs Senden:
 - Port erst schliessen, wenn wirklich alles fertig ist. Beim Öffnen und Schliessen setzt

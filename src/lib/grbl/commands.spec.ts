@@ -12,7 +12,8 @@ describe('jog', () => {
 	it('builds a relative jog with only the moved axes', () => {
 		expect(jog(10, 0)).toEqual(['$J=G91 G21 X10 F3000']);
 		expect(jog(0, -0.5)).toEqual(['$J=G91 G21 Y-0.5 F3000']);
-		expect(jog(1.25, 2, 1000)).toEqual(['$J=G91 G21 X1.25 Y2 F1000']);
+		expect(jog(1.25, 2, false, 1000)).toEqual(['$J=G91 G21 X1.25 Y2 F1000']);
+		expect(jog(10, -5, true)).toEqual(['$J=G91 G21 X10 Y5 F3000']);
 	});
 
 	it('returns nothing for a zero move', () => {
@@ -30,6 +31,15 @@ describe('testSquare', () => {
 			'G1 Y20',
 			'G1 X-20',
 			'G1 Y-20'
+		]);
+	});
+
+	it('mirrors the Y axis when inverted', () => {
+		expect(testSquare(20, true).filter((line) => line.startsWith('G1'))).toEqual([
+			'G1 X20 F1500',
+			'G1 Y-20',
+			'G1 X-20',
+			'G1 Y20'
 		]);
 	});
 

@@ -5,9 +5,10 @@
 	import SheetPreview from '#lib/components/SheetPreview.svelte';
 	import { estimateSeconds, outsideArea, toGcode } from '#lib/gcode/fromPolylines.ts';
 	import { PAPER_FORMATS, sheetSize, type Orientation } from '#lib/geometry/paper.ts';
-	import { translate } from '#lib/geometry/types.ts';
+	import { orient, translate } from '#lib/geometry/types.ts';
 	import { REALTIME, VGX4 } from '#lib/grbl/vgx4.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
+	import { settings } from '#lib/settings.svelte.ts';
 	import { fonts, layoutText, type Align } from '#lib/text/layout.ts';
 
 	let text = $state('Alles Gute zum Geburtstag!');
@@ -45,7 +46,7 @@
 	async function draw() {
 		drawError = '';
 		try {
-			await plotter.sendAll(toGcode(polylines));
+			await plotter.sendAll(toGcode(polylines, settings.invertY));
 		} catch (error) {
 			drawError = error instanceof Error ? error.message : String(error);
 		}
@@ -113,7 +114,7 @@
 					<button
 						role="radio"
 						aria-checked={align === value}
-						class="rounded-md px-3.5 py-1.5 text-sm {align === value
+						class="rounded-pill px-3.5 py-1.5 text-sm {align === value
 							? 'bg-canvas text-ink shadow-sm'
 							: 'text-ink-mute'}"
 						onclick={() => (align = value as Align)}
@@ -152,7 +153,7 @@
 						<button
 							role="radio"
 							aria-checked={orientation === value}
-							class="rounded-md px-3.5 py-1.5 text-sm {orientation === value
+							class="rounded-pill px-3.5 py-1.5 text-sm {orientation === value
 								? 'bg-canvas text-ink shadow-sm'
 								: 'text-ink-mute'}"
 							onclick={() => (orientation = value as Orientation)}
@@ -172,7 +173,7 @@
 				height={sheet.height}
 				{margin}
 				{polylines}
-				pen={running ? plotter.position : undefined}
+				pen={running && plotter.position ? orient(plotter.position, settings.invertY) : undefined}
 			/>
 		</div>
 

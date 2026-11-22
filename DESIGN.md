@@ -439,7 +439,7 @@ Variants flag status via the icon colour and a thin 3px left border:
 
 ### Tab / Filter
 
-**`category-tab`** + **`category-tab-active`** - Used inside the nav-pill-group. Inactive: transparent background, `{colors.ink-mute}` text. Active: `{colors.canvas}` background, `{colors.ink}` text, subtle drop shadow inside the wrapper. Padding 8px × 14px, rounded `{rounded.md}`.
+**`category-tab`** + **`category-tab-active`** - Used inside the nav-pill-group. Inactive: transparent background, `{colors.ink-mute}` text. Active: `{colors.canvas}` background, `{colors.ink}` text, subtle drop shadow inside the wrapper. Padding 8px × 14px, rounded `{rounded.pill}` so the segment follows the pill wrapper.
 
 ### Footer
 

@@ -14,6 +14,8 @@
 	import { jog, penDown, penUp, setOrigin, testSquare } from '#lib/grbl/commands.ts';
 	import { REALTIME } from '#lib/grbl/vgx4.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
+	import { settings } from '#lib/settings.svelte.ts';
+	import { orient } from '#lib/geometry/types.ts';
 
 	const steps = [1, 5, 10] as const;
 	let step = $state<(typeof steps)[number]>(5);
@@ -23,6 +25,9 @@
 
 	const connected = $derived(plotter.connection === 'connected');
 	const canAct = $derived(connected && !plotter.busy);
+	const position = $derived(
+		plotter.position ? orient(plotter.position, settings.invertY) : undefined
+	);
 
 	$effect(() => {
 		void plotter.log.length;
@@ -105,7 +110,7 @@
 					<dd class="text-ink">{plotter.status?.state ?? '-'}</dd>
 					<dt class="text-ink-mute">Position</dt>
 					<dd class="font-mono text-ink">
-						X {format(plotter.position?.x)} · Y {format(plotter.position?.y)} mm
+						X {format(position?.x)} · Y {format(position?.y)} mm
 					</dd>
 					<dt class="text-ink-mute">Firmware</dt>
 					<dd class="text-ink">{plotter.greeting || '-'}</dd>
@@ -128,7 +133,11 @@
 				</div>
 				<h2 class="mt-6 font-semibold text-ink">Test</h2>
 				<div class="mt-4 flex flex-wrap gap-3">
-					<Button variant="primary" onclick={() => run(testSquare(20))} disabled={!canAct}>
+					<Button
+						variant="primary"
+						onclick={() => run(testSquare(20, settings.invertY))}
+						disabled={!canAct}
+					>
 						<Square size={16} /> Quadrat 20 mm
 					</Button>
 					{#if plotter.status?.state === 'Hold'}
@@ -154,7 +163,7 @@
 							<button
 								role="radio"
 								aria-checked={step === value}
-								class="rounded-md px-3.5 py-1.5 text-sm {step === value
+								class="rounded-pill px-3.5 py-1.5 text-sm {step === value
 									? 'bg-canvas text-ink shadow-sm'
 									: 'text-ink-mute'}"
 								onclick={() => (step = value)}
@@ -169,7 +178,7 @@
 					<Button
 						variant="icon"
 						aria-label="Nach oben"
-						onclick={() => run(jog(0, -step))}
+						onclick={() => run(jog(0, -step, settings.invertY))}
 						disabled={!canAct}
 					>
 						<ArrowUp size={18} />
@@ -178,7 +187,7 @@
 					<Button
 						variant="icon"
 						aria-label="Nach links"
-						onclick={() => run(jog(-step, 0))}
+						onclick={() => run(jog(-step, 0, settings.invertY))}
 						disabled={!canAct}
 					>
 						<ArrowLeft size={18} />
@@ -194,7 +203,7 @@
 					<Button
 						variant="icon"
 						aria-label="Nach rechts"
-						onclick={() => run(jog(step, 0))}
+						onclick={() => run(jog(step, 0, settings.invertY))}
 						disabled={!canAct}
 					>
 						<ArrowRight size={18} />
@@ -203,7 +212,7 @@
 					<Button
 						variant="icon"
 						aria-label="Nach unten"
-						onclick={() => run(jog(0, step))}
+						onclick={() => run(jog(0, step, settings.invertY))}
 						disabled={!canAct}
 					>
 						<ArrowDown size={18} />
@@ -214,6 +223,21 @@
 					Das Fadenkreuz setzt den Nullpunkt an die aktuelle Stiftposition. Es gibt keine
 					Endschalter, also nicht über den Rahmen hinausfahren.
 				</p>
+				<label class="mt-4 flex items-start gap-2.5 text-sm text-ink">
+					<input
+						type="checkbox"
+						class="mt-0.5 size-4 accent-primary"
+						checked={settings.invertY}
+						onchange={(event) => settings.setInvertY(event.currentTarget.checked)}
+					/>
+					<span>
+						Y-Achse umkehren
+						<span class="block text-ink-mute">
+							Einschalten, wenn Text auf dem Kopf steht. Passt zum VG-X4, wenn Du von der
+							Stift-Seite her liest.
+						</span>
+					</span>
+				</label>
 			</section>
 
 			<section class="flex min-h-80 flex-col rounded-lg border border-hairline bg-canvas p-6">

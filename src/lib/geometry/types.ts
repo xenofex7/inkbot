@@ -26,3 +26,7 @@ export function pathLength(line: Polyline) {
 	}
 	return length;
 }
+
+export function orient(point: Point, invertY: boolean): Point {
+	return invertY ? { x: point.x, y: -point.y } : point;
+}

@@ -28,7 +28,7 @@
 			{#each nav as item (item.href)}
 				<a
 					href={item.href}
-					class="rounded-md px-3.5 py-1.5 text-sm {page.url.pathname === item.href
+					class="rounded-pill px-3.5 py-1.5 text-sm {page.url.pathname === item.href
 						? 'bg-canvas text-ink shadow-sm'
 						: 'text-ink-mute'}"
 					aria-current={page.url.pathname === item.href ? 'page' : undefined}
