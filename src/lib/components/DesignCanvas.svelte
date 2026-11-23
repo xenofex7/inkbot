@@ -2,6 +2,7 @@
 	import { extent, place, scaleFromCorner, type Placement } from '../design/model';
 	import { design, type DesignElement } from '../design/store.svelte';
 	import type { Point } from '../geometry/types';
+	import { simplify } from '../image/trace';
 	import { t, type MessageKey } from '../i18n.svelte';
 	import { settings } from '../settings.svelte';
 	import { penColor } from '../design/pens';
@@ -15,6 +16,11 @@
 
 	let svg = $state<SVGSVGElement>();
 	let drag: { id: string; mode: 'move' | 'scale'; start: Point; origin: Placement } | undefined;
+	let stroke = $state<Point[] | undefined>();
+	let hover = $state<Point | undefined>();
+	let lastErase: Point | undefined;
+
+	const radius = $derived(design.eraserSize / 2);
 
 	const HANDLE = 3.5;
 
@@ -46,9 +52,36 @@
 		svg?.setPointerCapture(event.pointerId);
 	}
 
+	function down(event: PointerEvent) {
+		if (design.tool === 'select') {
+			design.selectedId = undefined;
+			return;
+		}
+		event.preventDefault();
+		svg?.setPointerCapture(event.pointerId);
+		const point = toSheet(event);
+		if (design.tool === 'draw') stroke = [point];
+		else eraseAt(point);
+	}
+
+	function eraseAt(point: Point) {
+		lastErase = point;
+		design.erase(point, radius);
+	}
+
 	function moveTo(event: PointerEvent) {
-		if (!drag) return;
 		const current = toSheet(event);
+		hover = current;
+		if (stroke) {
+			stroke = [...stroke, current];
+			return;
+		}
+		if (design.tool === 'erase' && lastErase) {
+			if (Math.hypot(current.x - lastErase.x, current.y - lastErase.y) > radius / 2)
+				eraseAt(current);
+			return;
+		}
+		if (!drag) return;
 		const element = design.view.find((e) => e.id === drag?.id);
 		if (!element) return;
 		if (drag.mode === 'move') {
@@ -63,7 +96,10 @@
 	}
 
 	function end(event: PointerEvent) {
-		if (drag) svg?.releasePointerCapture(event.pointerId);
+		if (svg?.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
+		if (stroke) design.addFreehand(simplify(stroke, 0.1), t('design.freehand'));
+		stroke = undefined;
+		lastErase = undefined;
 		drag = undefined;
 	}
 
@@ -74,9 +110,15 @@
 	bind:this={svg}
 	viewBox="-6 -6 {width + 12} {height + 12}"
 	class="h-auto max-h-[70vh] w-full touch-none select-none"
+	style="cursor: {design.tool === 'draw'
+		? 'crosshair'
+		: design.tool === 'erase'
+			? 'none'
+			: 'default'}"
 	role="application"
 	aria-label={t('preview.label', { width, height })}
-	onpointerdown={() => (design.selectedId = undefined)}
+	onpointerdown={down}
+	onpointerleave={() => (hover = undefined)}
 	onpointermove={moveTo}
 	onpointerup={end}
 	onpointercancel={end}
@@ -146,13 +188,13 @@
 				class={design.selectedId === element.id ? 'stroke-steel-600' : 'stroke-transparent'}
 				stroke-width="0.4"
 				stroke-dasharray="1.2 1"
-				style="cursor: move"
+				style="cursor: move; pointer-events: {design.tool === 'select' ? 'auto' : 'none'}"
 				role="button"
 				tabindex="-1"
 				aria-label={element.name}
 				onpointerdown={(event) => start(event, element, 'move')}
 			/>
-			{#if design.selectedId === element.id}
+			{#if design.selectedId === element.id && design.tool === 'select'}
 				<rect
 					x={element.x + w - HANDLE / 2}
 					y={element.y + h - HANDLE / 2}
@@ -170,6 +212,27 @@
 			{/if}
 		</g>
 	{/each}
+	{#if stroke}
+		<polyline
+			points={points(stroke)}
+			fill="none"
+			stroke={penColor(1)}
+			stroke-width="0.35"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		/>
+	{/if}
+	{#if design.tool === 'erase' && hover}
+		<circle
+			cx={hover.x}
+			cy={hover.y}
+			r={radius}
+			fill="none"
+			class="stroke-seal"
+			stroke-width="0.3"
+			pointer-events="none"
+		/>
+	{/if}
 	<circle cx="0" cy="0" r="1.4" class="fill-seal" />
 	{#if pen}
 		<circle cx={pen.x} cy={pen.y} r="1.2" class="fill-seal" opacity="0.8" />

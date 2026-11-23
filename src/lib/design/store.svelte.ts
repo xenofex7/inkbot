@@ -1,5 +1,5 @@
 import { smoothCurve } from '../geometry/curve';
-import { bounds, type Polyline } from '../geometry/types';
+import { bounds, type Point, type Polyline } from '../geometry/types';
 import { loadGray } from '../image/load';
 import { traceImage, type Gray, type TraceMode } from '../image/trace';
 import { orderPaths } from '../optimize/order';
@@ -8,10 +8,13 @@ import { handwriting } from '../handwriting/store.svelte';
 import { fonts, layoutText, type Align } from '../text/layout';
 import {
 	centred,
+	eraseLines,
 	extent,
 	normalize,
 	place,
 	rotated,
+	toLocal,
+	type Erasure,
 	type Placement,
 	type Rotation,
 	type Shape
@@ -35,7 +38,16 @@ export type TraceOptions = {
 	detail: number;
 };
 
-type Base = Placement & { id: string; name: string; shape: Shape; pen?: number };
+type Base = Placement & {
+	id: string;
+	name: string;
+	shape: Shape;
+	pen?: number;
+	hidden?: boolean;
+	erasures?: Erasure[];
+};
+
+export type Tool = 'select' | 'draw' | 'erase';
 
 export type PenGroup = { pen: number; polylines: Polyline[] };
 
@@ -47,7 +59,7 @@ export type RasterElement = Base & {
 	unit: number;
 	blob: Blob;
 };
-export type VectorElement = Base & { kind: 'vector'; source?: Blob };
+export type VectorElement = Base & { kind: 'vector'; source?: Blob; freehand?: boolean };
 export type DesignElement = TextElement | RasterElement | VectorElement;
 
 export type { Area };
@@ -102,6 +114,14 @@ function merged(element: DesignElement, row: Record<string, string>): DesignElem
 	};
 }
 
+function erased(element: DesignElement): DesignElement {
+	if (!element.erasures?.length) return element;
+	return {
+		...element,
+		shape: { ...element.shape, lines: eraseLines(element.shape.lines, element.erasures) }
+	};
+}
+
 class Design {
 	elements = $state.raw<DesignElement[]>([]);
 	selectedId = $state<string | undefined>();
@@ -113,9 +133,14 @@ class Design {
 	mergeIndex = $state(0);
 	mergeRow = $derived(this.merge?.rows[this.mergeIndex]);
 
+	tool = $state<Tool>('select');
+	eraserSize = $state(3);
+
 	view = $derived.by(() => {
 		const row = this.mergeRow;
-		return row ? this.elements.map((element) => merged(element, row)) : this.elements;
+		return this.elements
+			.filter((element) => !element.hidden)
+			.map((element) => erased(row ? merged(element, row) : element));
 	});
 
 	groups = $derived.by((): PenGroup[] => {
@@ -131,6 +156,68 @@ class Design {
 	});
 
 	polylines = $derived(this.groups.flatMap((group) => group.polylines));
+
+	toggleHidden(id: string) {
+		this.#update(id, (element) => ({ ...element, hidden: !element.hidden }));
+		if (this.selectedId === id) this.selectedId = undefined;
+	}
+
+	erase(point: Point, radius: number) {
+		const hits: Record<string, Erasure> = {};
+		for (const element of this.view) {
+			const size = extent(element.shape, element.rotation);
+			const inside =
+				point.x > element.x - radius &&
+				point.x < element.x + size.width * element.scale + radius &&
+				point.y > element.y - radius &&
+				point.y < element.y + size.height * element.scale + radius;
+			if (!inside) continue;
+			const local = toLocal(element.shape, element, point);
+			hits[element.id] = { ...local, r: radius / element.scale };
+		}
+		if (Object.keys(hits).length === 0) return;
+		this.elements = this.elements.map((element) => {
+			const hit = hits[element.id];
+			return hit ? { ...element, erasures: [...(element.erasures ?? []), hit] } : element;
+		});
+	}
+
+	clearErasures(id: string) {
+		this.#update(id, (element) => ({ ...element, erasures: undefined }));
+	}
+
+	addFreehand(line: Polyline, name: string) {
+		if (line.length < 2) return;
+		const target = this.elements.find(
+			(element) =>
+				element.kind === 'vector' && element.freehand && !element.hidden && !element.rotation
+		);
+		if (!target) {
+			const box = bounds([line])!;
+			this.#add({
+				kind: 'vector',
+				id: crypto.randomUUID(),
+				name,
+				freehand: true,
+				shape: normalize([line]),
+				x: box.minX,
+				y: box.minY,
+				scale: 1
+			});
+			return;
+		}
+		const local = line.map((p) => toLocal(target.shape, target, p));
+		const lines = [...target.shape.lines, local];
+		const box = bounds(lines)!;
+		this.#update(target.id, (element) => ({
+			...element,
+			shape: normalize(lines),
+			x: element.x + box.minX * element.scale,
+			y: element.y + box.minY * element.scale,
+			erasures: element.erasures?.map((e) => ({ ...e, x: e.x - box.minX, y: e.y - box.minY }))
+		}));
+		this.selectedId = target.id;
+	}
 
 	setPen(id: string, pen: number) {
 		this.#update(id, (element) => ({ ...element, pen }));

@@ -26,6 +26,7 @@ Browser app to drive the VigoTec VG-X4 pen plotter (writing robot) straight from
 - Import SVG files and draw their paths exactly
 - AI image or AI drawing (SVG) from a prompt, with OpenAI or any OpenAI-compatible server such as LiteLLM, editable prompts, your key stays in the browser
 - Card designer: combine text, images, AI results and gallery drawings on one sheet, drag and resize them
+- Freehand pen, eraser for any element and layers you can show or hide
 - Templates for folded cards, C6 envelopes and place cards, rotate elements, series from a CSV address list with placeholders like {Name}
 - Sheet preview with run time, pause and stop, save as SVG, gallery of saved drawings
 - Your own handwriting: write each character in the browser or on an iPhone (QR code, share via AirDrop), or fill in a printed or plotted template and scan a photo of it, with natural variation from letter to letter

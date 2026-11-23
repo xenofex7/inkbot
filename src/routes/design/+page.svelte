@@ -3,13 +3,19 @@
 	import {
 		Copy,
 		Download,
+		Eraser,
+		Eye,
+		EyeOff,
 		ImagePlus,
 		LibraryBig,
+		MousePointer2,
+		Pencil,
 		RotateCcw,
 		RotateCw,
 		Sparkles,
 		Trash2,
-		Type
+		Type,
+		Undo2
 	} from '@lucide/svelte';
 	import type { AiResult } from '#lib/ai/result.ts';
 	import { redrawImage } from '#lib/ai/images.ts';
@@ -25,6 +31,7 @@
 	import {
 		design,
 		type DesignElement,
+		type Tool,
 		type RasterElement,
 		type TextOptions,
 		type TraceOptions
@@ -157,6 +164,11 @@
 		['hatch', 'image.hatch', 'image.hatchHint'],
 		['tsp', 'image.tsp', 'image.tspHint']
 	];
+	const tools: [Tool, MessageKey, typeof MousePointer2][] = [
+		['select', 'tool.select', MousePointer2],
+		['draw', 'tool.draw', Pencil],
+		['erase', 'tool.erase', Eraser]
+	];
 	const aligns: [Align, MessageKey][] = [
 		['left', 'text.left'],
 		['center', 'text.centre'],
@@ -285,11 +297,21 @@
 					<ul class="divide-y divide-hairline-soft">
 						{#each design.elements as element (element.id)}
 							<li class="flex items-center gap-2 py-1.5">
+								<Button
+									variant="icon"
+									class="size-8!"
+									aria-label={element.hidden ? t('design.show') : t('design.hide')}
+									aria-pressed={!element.hidden}
+									onclick={() => design.toggleHidden(element.id)}
+								>
+									{#if element.hidden}<EyeOff size={14} />{:else}<Eye size={14} />{/if}
+								</Button>
 								<button
-									class="min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-sm {design.selectedId ===
-									element.id
-										? 'bg-surface-soft text-ink'
-										: 'text-ink-soft'}"
+									class="min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-sm {element.hidden
+										? 'text-ink-mute line-through'
+										: design.selectedId === element.id
+											? 'bg-surface-soft text-ink'
+											: 'text-ink-soft'}"
 									onclick={() => (design.selectedId = element.id)}
 								>
 									<span class="text-ink-mute">{t(kinds[element.kind])}</span> · {element.name}
@@ -333,6 +355,12 @@
 						onvalue={(value) => design.move(selected.id, { ...selected, scale: value / 100 })}
 					/>
 				</div>
+				{#if selected.erasures?.length}
+					<Button onclick={() => design.clearErasures(selected.id)}>
+						<Undo2 size={16} />
+						{t('design.clearErasures')}
+					</Button>
+				{/if}
 				<div class="flex flex-wrap items-center gap-3">
 					<Button onclick={() => design.rotate(selected.id)}>
 						<RotateCw size={16} />
@@ -521,6 +549,38 @@
 		}}
 	>
 		<div class="rounded-lg border border-hairline bg-canvas p-6">
+			<div class="mb-4 flex flex-wrap items-center gap-3">
+				<div
+					class="inline-flex rounded-pill bg-surface-soft p-1.5"
+					role="radiogroup"
+					aria-label={t('tool.label')}
+				>
+					{#each tools as [value, key, Icon] (value)}
+						<button
+							role="radio"
+							aria-checked={design.tool === value}
+							class="{pill(design.tool === value)} inline-flex items-center gap-1.5"
+							onclick={() => (design.tool = value)}
+						>
+							<Icon size={14} />
+							{t(key)}
+						</button>
+					{/each}
+				</div>
+				{#if design.tool === 'erase'}
+					<label class="flex items-center gap-2 text-sm text-ink-mute">
+						{t('tool.eraserSize', { value: design.eraserSize })}
+						<input
+							type="range"
+							min="1"
+							max="15"
+							step="0.5"
+							bind:value={design.eraserSize}
+							class="w-28 accent-primary"
+						/>
+					</label>
+				{/if}
+			</div>
 			<DesignCanvas
 				width={sheet.width}
 				height={sheet.height}

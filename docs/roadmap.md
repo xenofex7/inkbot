@@ -40,6 +40,8 @@ As of 23.11.2026. Done items are marked [x].
   vector drawing and a traced image from one idea
 - [x] **Card templates:** folded greeting card, envelope with address field, place card
 - [x] Rotate elements by 90°
+- [x] **Pen, eraser and layers:** draw freehand, erase parts of any element, show or hide
+  elements
 - [x] **Own handwriting:** draw each character in the browser or on an iPhone (QR code,
   share via AirDrop), or print or plot a template, fill it in and scan a photo; up to three
   variants per character, natural variation from letter to letter

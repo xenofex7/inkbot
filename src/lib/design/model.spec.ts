@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { centred, extent, normalize, place, rotated, scaleFromCorner } from './model';
+import {
+	centred,
+	eraseLines,
+	extent,
+	normalize,
+	place,
+	rotated,
+	scaleFromCorner,
+	toLocal
+} from './model';
 
 const square = normalize([
 	[
@@ -93,5 +102,45 @@ describe('rotation', () => {
 			expect(centre(placement)).toEqual(start);
 		}
 		expect(placement).toEqual({ x: 100, y: 50, scale: 2, rotation: 0 });
+	});
+});
+
+describe('toLocal', () => {
+	const wide = normalize([
+		[
+			{ x: 0, y: 0 },
+			{ x: 40, y: 0 },
+			{ x: 40, y: 10 }
+		]
+	]);
+
+	it('undoes place for every rotation', () => {
+		for (const rotation of [0, 90, 180, 270] as const) {
+			const placement = { x: 12, y: 7, scale: 1.5, rotation };
+			const [line] = place(wide, placement);
+			line.forEach((p, i) => {
+				const local = toLocal(wide, placement, p);
+				expect(local.x).toBeCloseTo(wide.lines[0][i].x, 6);
+				expect(local.y).toBeCloseTo(wide.lines[0][i].y, 6);
+			});
+		}
+	});
+});
+
+describe('eraseLines', () => {
+	it('cuts a line where the eraser touched it and leaves others alone', () => {
+		const line = [
+			{ x: 0, y: 0 },
+			{ x: 10, y: 0 }
+		];
+		const far = [
+			{ x: 0, y: 20 },
+			{ x: 10, y: 20 }
+		];
+		const result = eraseLines([line, far], [{ x: 5, y: 0, r: 1 }]);
+		expect(result).toHaveLength(3);
+		expect(result[2]).toBe(far);
+		expect(Math.max(...result[0].map((p) => p.x))).toBeLessThan(4.1);
+		expect(Math.min(...result[1].map((p) => p.x))).toBeGreaterThan(5.9);
 	});
 });
