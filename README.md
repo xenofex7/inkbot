@@ -28,7 +28,7 @@ Browser app to drive the VigoTec VG-X4 pen plotter (writing robot) straight from
 - Card designer: combine text, images, AI results and gallery drawings on one sheet, drag and resize them
 - Sheet preview with run time, pause and stop, save as SVG, gallery of saved drawings
 - Your own handwriting: write each character in the browser or on an iPhone (QR code, share via AirDrop), or fill in a printed or plotted template and scan a photo of it, with natural variation from letter to letter
-- Backup: export and import settings, prompts, gallery and handwriting in one file (without the API key)
+- Backup: export and import settings, prompts, gallery and handwriting in one file (without the API key), optionally saved automatically into a folder such as iCloud Drive
 - English and German interface
 
 ## Requirements

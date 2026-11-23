@@ -47,6 +47,8 @@ As of 23.11.2026. Done items are marked [x].
 ## Version 4 - Data
 - [x] **Backup:** export and import settings, prompts, gallery and handwriting in one file
   (without the API key)
+- [x] **Automatic backup:** write the backup file into a chosen folder (e.g. iCloud Drive)
+  after every change, Chrome and Edge on a computer
 
 ## Later
 - Several pens / colours with a pause to swap

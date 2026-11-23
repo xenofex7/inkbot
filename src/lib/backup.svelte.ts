@@ -41,7 +41,7 @@ export function withoutApiKey(ai: unknown) {
 }
 
 export async function createBackup(): Promise<string> {
-	await Promise.all([gallery.load(), handwriting.load()]);
+	await Promise.all([gallery.loaded ? undefined : gallery.load(), handwriting.load()]);
 	const items: StoredItem[] = await Promise.all(
 		gallery.items.map(async ({ source, ...item }) => ({
 			...$state.snapshot(item),

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { i18n, LOCALES, t } from '#lib/i18n.svelte.ts';
-	import { Download, Eye, EyeOff, Upload } from '@lucide/svelte';
+	import { Download, Eye, EyeOff, FolderSync, Upload } from '@lucide/svelte';
 	import { createBackup, restoreBackup } from '#lib/backup.svelte.ts';
+	import { autoBackup } from '#lib/autoBackup.svelte.ts';
 	import { download } from '#lib/download.ts';
 	import Button from '#lib/components/Button.svelte';
 	import { listModels, type ProviderId } from '#lib/ai/images.ts';
@@ -277,5 +278,49 @@
 		{#if backupError}
 			<p class="text-sm text-danger" role="alert">{backupError}</p>
 		{/if}
+
+		<div class="space-y-3 border-t border-hairline-soft pt-4">
+			<h3 class="font-semibold text-ink">{t('autoBackup.title')}</h3>
+			<p class="text-sm text-ink-mute">{t('autoBackup.hint')}</p>
+			{#if !autoBackup.supported}
+				<p class="text-sm text-ink-mute">{t('autoBackup.unsupported')}</p>
+			{:else if autoBackup.status === 'off'}
+				<Button onclick={() => autoBackup.choose()}>
+					<FolderSync size={16} />
+					{t('autoBackup.choose')}
+				</Button>
+			{:else}
+				<p class="text-sm text-ink">
+					{autoBackup.status === 'active'
+						? t('autoBackup.active', { folder: autoBackup.folder })
+						: t('autoBackup.paused', { folder: autoBackup.folder })}
+					{#if autoBackup.savedAt}
+						<span class="text-ink-mute">
+							· {t('autoBackup.savedAt', {
+								time: new Date(autoBackup.savedAt).toLocaleTimeString('de-CH', {
+									hour: '2-digit',
+									minute: '2-digit'
+								})
+							})}
+						</span>
+					{/if}
+				</p>
+				<div class="flex flex-wrap gap-2">
+					{#if autoBackup.status === 'paused'}
+						<Button variant="primary" onclick={() => autoBackup.resume()}>
+							<FolderSync size={16} />
+							{t('autoBackup.resume')}
+						</Button>
+					{:else}
+						<Button onclick={() => autoBackup.save()}>{t('autoBackup.saveNow')}</Button>
+					{/if}
+					<Button onclick={() => autoBackup.choose()}>{t('autoBackup.change')}</Button>
+					<Button onclick={() => autoBackup.stop()}>{t('autoBackup.stop')}</Button>
+				</div>
+			{/if}
+			{#if autoBackup.error}
+				<p class="text-sm text-danger" role="alert">{autoBackup.error}</p>
+			{/if}
+		</div>
 	</section>
 </main>

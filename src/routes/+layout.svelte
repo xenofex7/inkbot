@@ -7,6 +7,7 @@
 	import ControlBar from '#lib/components/ControlBar.svelte';
 	import StatusBadge from '#lib/components/StatusBadge.svelte';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
+	import { autoBackup } from '#lib/autoBackup.svelte.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -20,6 +21,10 @@
 	] as const;
 
 	const repo = 'https://github.com/xenofex7/inkbot';
+
+	$effect(() => {
+		void autoBackup.init();
+	});
 
 	$effect(() => {
 		document.documentElement.lang = i18n.locale === 'de' ? 'de-CH' : 'en';
@@ -86,6 +91,12 @@
 			<a href="{repo}/commits/main" target="_blank" rel="noopener" class="font-mono hover:text-ink">
 				{__COMMIT__}
 			</a>
+			{#if autoBackup.status === 'paused'}
+				<span aria-hidden="true">·</span>
+				<a href={resolve('/settings')} class="text-seal hover:underline">
+					{t('autoBackup.pausedShort')}
+				</a>
+			{/if}
 		</div>
 	</footer>
 </div>
