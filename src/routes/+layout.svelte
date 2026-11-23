@@ -15,6 +15,7 @@
 		{ href: resolve('/'), label: 'nav.machine' },
 		{ href: resolve('/text'), label: 'nav.text' },
 		{ href: resolve('/image'), label: 'nav.image' },
+		{ href: resolve('/design'), label: 'nav.design' },
 		{ href: resolve('/gallery'), label: 'nav.gallery' },
 		{ href: resolve('/settings'), label: 'nav.settings' }
 	] as const;

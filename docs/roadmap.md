@@ -32,8 +32,10 @@ As of 22.11.2026. Done items are marked [x].
 - [ ] **One continuous line** (TSP art)
 
 ## Version 3 - Design
-- [ ] **Card designer:** place text and images freely on a sheet, templates for greeting
-  cards, envelopes, place cards
+- [x] **Card designer:** place text, images, AI results and gallery drawings freely on a
+  sheet, move and resize them, plot or save the whole card
+- [ ] **Card templates:** folded greeting card, envelope with address field, place card
+- [ ] Rotate elements by 90°
 - [ ] **Own handwriting:** print a template, fill it in by hand, take a photo; inkbot
   extracts the centre lines of each letter and stores them as a font
 - [ ] Envelopes from an address list (CSV)

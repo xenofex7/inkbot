@@ -1,0 +1,143 @@
+<script lang="ts">
+	import { place, scaleFromCorner, type Placement } from '../design/model';
+	import { design, type DesignElement } from '../design/store.svelte';
+	import type { Point } from '../geometry/types';
+	import { t } from '../i18n.svelte';
+
+	let {
+		width,
+		height,
+		margin,
+		pen
+	}: { width: number; height: number; margin: number; pen?: Point } = $props();
+
+	let svg = $state<SVGSVGElement>();
+	let drag: { id: string; mode: 'move' | 'scale'; start: Point; origin: Placement } | undefined;
+
+	const HANDLE = 3.5;
+
+	function toSheet(event: PointerEvent): Point {
+		const matrix = svg?.getScreenCTM();
+		if (!svg || !matrix) return { x: 0, y: 0 };
+		const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+		return { x: point.x, y: point.y };
+	}
+
+	function start(event: PointerEvent, element: DesignElement, mode: 'move' | 'scale') {
+		event.stopPropagation();
+		event.preventDefault();
+		design.selectedId = element.id;
+		drag = {
+			id: element.id,
+			mode,
+			start: toSheet(event),
+			origin: { x: element.x, y: element.y, scale: element.scale }
+		};
+		svg?.setPointerCapture(event.pointerId);
+	}
+
+	function moveTo(event: PointerEvent) {
+		if (!drag) return;
+		const current = toSheet(event);
+		const element = design.elements.find((e) => e.id === drag?.id);
+		if (!element) return;
+		if (drag.mode === 'move') {
+			design.move(drag.id, {
+				...drag.origin,
+				x: drag.origin.x + current.x - drag.start.x,
+				y: drag.origin.y + current.y - drag.start.y
+			});
+		} else {
+			design.move(drag.id, scaleFromCorner(element.shape, drag.origin, current));
+		}
+	}
+
+	function end(event: PointerEvent) {
+		if (drag) svg?.releasePointerCapture(event.pointerId);
+		drag = undefined;
+	}
+
+	const points = (line: Point[]) => line.map((p) => `${p.x},${p.y}`).join(' ');
+</script>
+
+<svg
+	bind:this={svg}
+	viewBox="-6 -6 {width + 12} {height + 12}"
+	class="h-auto max-h-[70vh] w-full touch-none select-none"
+	role="application"
+	aria-label={t('preview.label', { width, height })}
+	onpointerdown={() => (design.selectedId = undefined)}
+	onpointermove={moveTo}
+	onpointerup={end}
+	onpointercancel={end}
+>
+	<rect
+		x="0"
+		y="0"
+		{width}
+		{height}
+		class="fill-surface-card"
+		style="filter: drop-shadow(0 0.4px 0.6px rgb(0 0 0 / 0.12))"
+	/>
+	<rect
+		x={margin}
+		y={margin}
+		width={Math.max(0, width - 2 * margin)}
+		height={Math.max(0, height - 2 * margin)}
+		fill="none"
+		class="stroke-hairline"
+		stroke-width="0.3"
+		stroke-dasharray="1.5 1.5"
+	/>
+	{#each design.elements as element (element.id)}
+		{@const w = element.shape.width * element.scale}
+		{@const h = element.shape.height * element.scale}
+		<g>
+			{#each place(element.shape, element) as line, index (index)}
+				<polyline
+					points={points(line)}
+					fill="none"
+					class="stroke-ink"
+					stroke-width="0.35"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			{/each}
+			<rect
+				x={element.x}
+				y={element.y}
+				width={Math.max(w, 1)}
+				height={Math.max(h, 1)}
+				fill="transparent"
+				class={design.selectedId === element.id ? 'stroke-steel-600' : 'stroke-transparent'}
+				stroke-width="0.4"
+				stroke-dasharray="1.2 1"
+				style="cursor: move"
+				role="button"
+				tabindex="-1"
+				aria-label={element.name}
+				onpointerdown={(event) => start(event, element, 'move')}
+			/>
+			{#if design.selectedId === element.id}
+				<rect
+					x={element.x + w - HANDLE / 2}
+					y={element.y + h - HANDLE / 2}
+					width={HANDLE}
+					height={HANDLE}
+					rx="0.6"
+					class="fill-canvas stroke-steel-600"
+					stroke-width="0.4"
+					style="cursor: nwse-resize"
+					role="button"
+					tabindex="-1"
+					aria-label={t('design.resize')}
+					onpointerdown={(event) => start(event, element, 'scale')}
+				/>
+			{/if}
+		</g>
+	{/each}
+	<circle cx="0" cy="0" r="1.4" class="fill-seal" />
+	{#if pen}
+		<circle cx={pen.x} cy={pen.y} r="1.2" class="fill-seal" opacity="0.8" />
+	{/if}
+</svg>

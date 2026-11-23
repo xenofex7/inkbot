@@ -19,6 +19,7 @@
 		name = 'inkbot',
 		source,
 		saveable = true,
+		showPreview = true,
 		emptyHint = ''
 	}: {
 		polylines: Polyline[];
@@ -26,6 +27,7 @@
 		name?: string;
 		source?: GallerySource;
 		saveable?: boolean;
+		showPreview?: boolean;
 		emptyHint?: string;
 	} = $props();
 
@@ -83,15 +85,17 @@
 	}
 </script>
 
-<div class="rounded-lg border border-hairline bg-canvas p-6">
-	<SheetPreview
-		width={sheet.width}
-		height={sheet.height}
-		margin={settings.margin}
-		{polylines}
-		pen={running && plotter.position ? orient(plotter.position, settings.invertY) : undefined}
-	/>
-</div>
+{#if showPreview}
+	<div class="rounded-lg border border-hairline bg-canvas p-6">
+		<SheetPreview
+			width={sheet.width}
+			height={sheet.height}
+			margin={settings.margin}
+			{polylines}
+			pen={running && plotter.position ? orient(plotter.position, settings.invertY) : undefined}
+		/>
+	</div>
+{/if}
 
 <div class="flex flex-wrap items-center gap-3 rounded-lg border border-hairline bg-canvas p-6">
 	{#if running}
