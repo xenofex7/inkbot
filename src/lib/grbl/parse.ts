@@ -10,7 +10,6 @@ export type StatusReport = {
 	wco?: Position;
 	feed?: number;
 	spindle?: number;
-	spindleOn?: boolean;
 };
 
 export type GrblMessage =
@@ -45,8 +44,7 @@ export function parseStatus(line: string): StatusReport | undefined {
 			const [feed, spindle] = value.split(',').map(Number);
 			report.feed = feed;
 			report.spindle = spindle;
-		} else if (key === 'Ov') report.spindleOn ??= false;
-		else if (key === 'A') report.spindleOn = value.includes('S');
+		}
 	}
 	return report;
 }

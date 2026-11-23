@@ -44,18 +44,10 @@ describe('parseStatus', () => {
 		});
 	});
 
-	it('detects a running spindle (pen down)', () => {
+	it('parses a running report with override fields', () => {
 		const report = parseStatus('<Run|MPos:6.544,-10.000,0.000|FS:7071,0|Ov:100,100,100|A:S>');
 		expect(report?.state).toBe('Run');
-		expect(report?.spindleOn).toBe(true);
 		expect(report?.feed).toBe(7071);
-	});
-
-	it('knows the pen is up only when the report carries override values', () => {
-		expect(parseStatus('<Idle|MPos:0.000,0.000,0.000|FS:0,0|Ov:100,100,100>')?.spindleOn).toBe(
-			false
-		);
-		expect(parseStatus('<Idle|MPos:0.000,0.000,0.000|FS:0,0>')?.spindleOn).toBeUndefined();
 	});
 
 	it('parses sub states', () => {

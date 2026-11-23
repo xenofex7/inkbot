@@ -113,6 +113,8 @@ export class Plotter {
 			this.#pending.push({ length: data.length, resolve, reject })
 		);
 		ack.catch(() => undefined);
+		const pen = /^M([35])\b/i.exec(line.trim());
+		if (pen) void ack.then(() => (this.penDown = pen[1] === '3'));
 		this.#addLog('tx', line.trim());
 		await this.#write(data);
 		return { ack };
@@ -200,7 +202,6 @@ export class Plotter {
 				break;
 			case 'status':
 				this.status = message.report;
-				if (message.report.spindleOn !== undefined) this.penDown = message.report.spindleOn;
 				if (message.report.wco) this.wco = message.report.wco;
 				if (message.report.state === 'Alarm') this.alarm ??= 0;
 				break;
