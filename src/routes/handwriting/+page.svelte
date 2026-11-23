@@ -16,6 +16,7 @@
 	} from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
 	import HandPad from '#lib/components/HandPad.svelte';
+	import HandScan from '#lib/components/HandScan.svelte';
 	import QrCode from '#lib/components/QrCode.svelte';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import type { Point } from '#lib/geometry/types.ts';
@@ -118,6 +119,16 @@
 		}));
 		strokes = [];
 		if (variants.length + 1 >= MAX_VARIANTS) step(1);
+	}
+
+	function addScanned(scanned: Record<string, Glyph>) {
+		update((item) => {
+			const glyphs = { ...item.glyphs };
+			for (const [key, glyph] of Object.entries(scanned)) {
+				glyphs[key] = [...(glyphs[key] ?? []), glyph].slice(-MAX_VARIANTS);
+			}
+			return { ...item, glyphs };
+		});
 	}
 
 	function removeVariant(index: number) {
@@ -301,6 +312,9 @@
 						</button>
 					{/each}
 				</div>
+			</div>
+			<div class="max-lg:order-last">
+				<HandScan onglyphs={addScanned} />
 			</div>
 		{/if}
 	</section>
