@@ -5,12 +5,17 @@
 	import { asset, resolve } from '$app/paths';
 	import Button from '#lib/components/Button.svelte';
 	import ControlBar from '#lib/components/ControlBar.svelte';
+	import JobBar from '#lib/components/JobBar.svelte';
 	import StatusBadge from '#lib/components/StatusBadge.svelte';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { autoBackup } from '#lib/autoBackup.svelte.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+
+	const jobRunning = $derived(
+		plotter.connection === 'connected' && (plotter.busy || plotter.status?.state === 'Hold')
+	);
 
 	const nav = [
 		{ href: resolve('/'), label: 'nav.machine' },
@@ -36,7 +41,7 @@
 	<title>inkbot</title>
 </svelte:head>
 
-<div class="flex min-h-dvh flex-col">
+<div class="flex min-h-dvh flex-col {jobRunning ? 'pb-16 max-sm:pb-36' : ''}">
 	<header class="sticky top-0 z-10 border-b border-hairline bg-canvas">
 		<div class="border-b border-hairline-soft">
 			<div class="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4">
@@ -81,6 +86,10 @@
 	</header>
 
 	{@render children()}
+
+	{#if jobRunning}
+		<JobBar />
+	{/if}
 
 	<footer class="mt-auto border-t border-hairline-soft">
 		<div class="mx-auto flex max-w-[1200px] items-center gap-2 px-4 py-1.5 text-xs text-ink-mute">

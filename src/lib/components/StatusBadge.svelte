@@ -8,9 +8,8 @@
 		if (plotter.connection === 'disconnected')
 			return { text: t('status.disconnected'), tone: 'offline' };
 		if (plotter.alarm !== undefined) return { text: t('status.alarm'), tone: 'danger' };
-		if (plotter.penDown) return { text: t('status.penDown'), tone: 'seal' };
-		if (plotter.status?.state === 'Hold') return { text: t('status.paused'), tone: 'warning' };
-		if (plotter.busy) return { text: t('status.moving'), tone: 'brand' };
+		const running = plotter.busy || plotter.status?.state === 'Hold';
+		if (plotter.penDown && !running) return { text: t('status.penDown'), tone: 'seal' };
 		return { text: t('status.connected'), tone: 'online' };
 	});
 

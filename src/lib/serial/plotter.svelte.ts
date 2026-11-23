@@ -24,6 +24,8 @@ export class Plotter {
 	penDown = $state(false);
 	feedOverride = $state(100);
 	queued = $state(0);
+	jobTotal = $state(0);
+	jobDone = $state(0);
 	busy = $derived(this.queued > 0 || this.status?.state === 'Run' || this.status?.state === 'Jog');
 
 	#port: SerialPort | undefined;
@@ -94,6 +96,11 @@ export class Plotter {
 	}
 
 	async sendAll(lines: string[]) {
+		if (this.queued === 0) {
+			this.jobTotal = 0;
+			this.jobDone = 0;
+		}
+		this.jobTotal += lines.length;
 		const queued = this.#queue.then(async () => {
 			const acks: Promise<void>[] = [];
 			for (const line of lines) acks.push((await this.#enqueue(line)).ack);
@@ -220,6 +227,7 @@ export class Plotter {
 		if (entry) {
 			if (error) entry.reject(error);
 			else entry.resolve();
+			this.jobDone++;
 		}
 		this.#spaceWaiters.splice(0).forEach((wake) => wake());
 	}

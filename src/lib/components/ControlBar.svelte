@@ -1,20 +1,11 @@
 <script lang="ts">
 	import { t } from '../i18n.svelte';
-	import {
-		ArrowDownToLine,
-		ArrowUpFromLine,
-		Minus,
-		OctagonX,
-		Pause,
-		Play,
-		Plus
-	} from '@lucide/svelte';
+	import { ArrowDownToLine, ArrowUpFromLine } from '@lucide/svelte';
 	import Button from './Button.svelte';
 	import PaperFields from './PaperFields.svelte';
 	import StatusBadge from './StatusBadge.svelte';
 	import { penDown, penUp } from '../grbl/commands';
 	import { orient } from '../geometry/types';
-	import { REALTIME } from '../grbl/vgx4';
 	import { plotter } from '../serial/plotter.svelte';
 	import { settings } from '../settings.svelte';
 
@@ -87,53 +78,6 @@
 		<PaperFields idPrefix="bar" />
 
 		<div class="ml-auto flex items-center gap-2">
-			{#if running}
-				<div class="flex items-center gap-1" role="group" aria-label={t('bar.speed')}>
-					<Button
-						variant="icon"
-						onclick={() => plotter.realtime(REALTIME.feedSlower)}
-						disabled={plotter.feedOverride <= 10}
-						aria-label={t('bar.slower')}
-					>
-						<Minus size={16} />
-					</Button>
-					<button
-						type="button"
-						class="min-w-24 rounded-md px-2 py-1 text-center text-ink hover:bg-surface-soft"
-						title={t('bar.speedReset')}
-						onclick={() => plotter.realtime(REALTIME.feedReset)}
-					>
-						{t('bar.speedValue', { value: plotter.feedOverride })}
-					</button>
-					<Button
-						variant="icon"
-						onclick={() => plotter.realtime(REALTIME.feedFaster)}
-						disabled={plotter.feedOverride >= 200}
-						aria-label={t('bar.faster')}
-					>
-						<Plus size={16} />
-					</Button>
-				</div>
-				{#if plotter.status?.state === 'Hold'}
-					<Button class="h-9! px-3!" onclick={() => plotter.realtime(REALTIME.cycleStart)}>
-						<Play size={16} />
-						{t('job.resume')}
-					</Button>
-				{:else}
-					<Button class="h-9! px-3!" onclick={() => plotter.realtime(REALTIME.feedHold)}>
-						<Pause size={16} />
-						{t('job.pause')}
-					</Button>
-				{/if}
-				<Button
-					variant="stop"
-					class="h-9! px-3!"
-					onclick={() => plotter.realtime(REALTIME.softReset)}
-				>
-					<OctagonX size={16} />
-					{t('job.stop')}
-				</Button>
-			{/if}
 			<StatusBadge />
 		</div>
 

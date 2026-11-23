@@ -142,7 +142,7 @@ const en = {
 	'status.alarm': 'Alarm',
 	'status.penDown': 'Pen down',
 	'status.paused': 'Paused',
-	'status.moving': 'Moving',
+	'job.running': 'Drawing',
 	'status.connected': 'Connected',
 
 	'bar.up': 'Up',
@@ -482,7 +482,7 @@ const de: Record<Key, string> = {
 	'status.alarm': 'Alarm',
 	'status.penDown': 'Stift unten',
 	'status.paused': 'Pausiert',
-	'status.moving': 'Fährt',
+	'job.running': 'Zeichnet',
 	'status.connected': 'Verbunden',
 
 	'bar.up': 'Hoch',
