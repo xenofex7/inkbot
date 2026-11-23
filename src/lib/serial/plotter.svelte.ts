@@ -219,6 +219,7 @@ export class Plotter {
 					this.feedOverride = message.report.feedOverride;
 				if (message.report.wco) this.wco = message.report.wco;
 				if (message.report.state === 'Alarm') this.alarm ??= 0;
+				else if (message.report.state === 'Idle') this.alarm = undefined;
 				break;
 		}
 	}
