@@ -1,3 +1,4 @@
+import { smoothCurve } from '../geometry/curve';
 import { bounds, type Polyline } from '../geometry/types';
 import { loadGray } from '../image/load';
 import { traceImage, type Gray, type TraceMode } from '../image/trace';
@@ -38,13 +39,15 @@ export type DesignElement = TextElement | RasterElement | VectorElement;
 export type Area = { x: number; y: number; width: number; height: number };
 
 const RASTER_WIDTH_MM = 60;
+const CURVE_STEP_MM = 0.2;
 
 export function textShape(options: TextOptions): Shape {
 	const font = fonts.find((f) => f.id === options.fontId) ?? fonts[0];
 	const base = { font, size: options.size, lineHeight: options.lineHeight };
 	const natural = bounds(layoutText(options.text, { ...base, align: 'left', width: 10_000 }));
 	const width = natural ? natural.maxX : 0;
-	return normalize(layoutText(options.text, { ...base, align: options.align, width }));
+	const lines = layoutText(options.text, { ...base, align: options.align, width });
+	return normalize(lines.map((line) => smoothCurve(line, CURVE_STEP_MM)));
 }
 
 export function rasterShape(gray: Gray, trace: TraceOptions, unit: number): Shape {
@@ -58,7 +61,14 @@ export function rasterShape(gray: Gray, trace: TraceOptions, unit: number): Shap
 			? { spacing: trace.spacing / unit, minWidth: Math.max(3, 1.2 / unit) }
 			: undefined
 	});
-	return normalize(lines.map((line) => line.map((p) => ({ x: p.x * unit, y: p.y * unit }))));
+	return normalize(
+		lines.map((line) =>
+			smoothCurve(
+				line.map((p) => ({ x: p.x * unit, y: p.y * unit })),
+				CURVE_STEP_MM
+			)
+		)
+	);
 }
 
 class Design {
