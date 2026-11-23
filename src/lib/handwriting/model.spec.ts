@@ -49,7 +49,21 @@ describe('toFont', () => {
 
 describe('handwriting files', () => {
 	it('round-trips through the share file', () => {
-		expect(fromFile(toFile(sample()))).toEqual(sample());
+		expect(fromFile(toFile([sample()]))).toEqual([sample()]);
+	});
+
+	it('reads several handwritings and older single files', () => {
+		const second = { ...sample(), id: 'hand-2', name: 'Second' };
+		expect(fromFile(toFile([sample(), second])).map((item) => item.id)).toEqual([
+			'hand-1',
+			'hand-2'
+		]);
+		const single = JSON.stringify({
+			format: 'inkbot-handwriting',
+			version: 1,
+			handwriting: sample()
+		});
+		expect(fromFile(single)).toEqual([sample()]);
 	});
 
 	it('rejects other JSON files', () => {

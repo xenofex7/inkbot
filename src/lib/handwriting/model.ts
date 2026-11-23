@@ -72,8 +72,8 @@ export function toFont(handwriting: Handwriting): Font {
 	};
 }
 
-export function toFile(handwriting: Handwriting) {
-	return JSON.stringify({ format: FILE_FORMAT, version: 1, handwriting });
+export function toFile(handwritings: Handwriting[]) {
+	return JSON.stringify({ format: FILE_FORMAT, version: 1, handwritings });
 }
 
 function isGlyph(value: unknown): value is Glyph {
@@ -86,12 +86,8 @@ function isGlyph(value: unknown): value is Glyph {
 	);
 }
 
-export function fromFile(text: string): Handwriting {
-	const data = JSON.parse(text) as { format?: string; handwriting?: Partial<Handwriting> };
-	const item = data.handwriting;
-	if (data.format !== FILE_FORMAT || !item || typeof item.id !== 'string') {
-		throw new Error('Not an inkbot handwriting file');
-	}
+function parseItem(item: Partial<Handwriting>): Handwriting {
+	if (typeof item.id !== 'string') throw new Error('Not an inkbot handwriting file');
 	const glyphs = Object.fromEntries(
 		Object.entries(item.glyphs ?? {}).map(([char, list]) => [
 			char,
@@ -105,4 +101,17 @@ export function fromFile(text: string): Handwriting {
 		updatedAt: typeof item.updatedAt === 'number' ? item.updatedAt : Date.now(),
 		glyphs
 	};
+}
+
+export function fromFile(text: string): Handwriting[] {
+	const data = JSON.parse(text) as {
+		format?: string;
+		handwriting?: Partial<Handwriting>;
+		handwritings?: Partial<Handwriting>[];
+	};
+	const items = data.handwritings ?? (data.handwriting ? [data.handwriting] : []);
+	if (data.format !== FILE_FORMAT || !Array.isArray(items) || items.length === 0) {
+		throw new Error('Not an inkbot handwriting file');
+	}
+	return items.map(parseItem);
 }

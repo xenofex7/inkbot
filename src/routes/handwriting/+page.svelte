@@ -4,6 +4,7 @@
 	import {
 		ChevronLeft,
 		ChevronRight,
+		Download,
 		Eraser,
 		Plus,
 		QrCode as QrIcon,
@@ -133,14 +134,12 @@
 		activeId = undefined;
 	}
 
-	function share() {
-		const current = active;
-		if (!current) return;
+	function share(items: Handwriting[], name: string) {
 		void run(async () => {
-			const filename = filenameFrom(current.name, 'json');
-			const file = new File([toFile(current)], filename, { type: 'application/json' });
+			const filename = filenameFrom(name, 'json');
+			const file = new File([toFile(items)], filename, { type: 'application/json' });
 			if (navigator.canShare?.({ files: [file] })) {
-				await navigator.share({ files: [file], title: current.name });
+				await navigator.share({ files: [file], title: name });
 			} else {
 				download(file, filename);
 			}
@@ -152,8 +151,9 @@
 		event.currentTarget.value = '';
 		if (!file) return;
 		void run(async () => {
-			const item = await handwriting.save(fromFile(await file.text()));
-			activeId = item.id;
+			const items = fromFile(await file.text());
+			for (const item of items) await handwriting.save(item);
+			activeId = items[0].id;
 		});
 	}
 
@@ -234,9 +234,15 @@
 					{t('hand.new')}
 				</Button>
 				{#if active}
-					<Button onclick={share}>
+					<Button onclick={() => share([active], active.name)}>
 						<Share size={16} />
 						{t('hand.share')}
+					</Button>
+				{/if}
+				{#if handwriting.items.length > 1}
+					<Button onclick={() => share(handwriting.items, 'inkbot-handwriting')}>
+						<Download size={16} />
+						{t('hand.exportAll')}
 					</Button>
 				{/if}
 				<Button onclick={() => importInput.click()}>
