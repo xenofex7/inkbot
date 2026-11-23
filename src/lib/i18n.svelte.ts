@@ -78,7 +78,7 @@ const en = {
 	'range.less': 'Less',
 	'range.more': 'More',
 
-	'machine.title': 'Your plotter, right in the browser.',
+	'machine.title': 'Your plotter, right in the browser',
 	'machine.lede':
 		'Connect the VigoTec VG-X4 via USB. No install, no server, everything runs here in the browser.',
 	'machine.unsupported':
@@ -276,7 +276,7 @@ const de: Record<Key, string> = {
 	'range.less': 'Weniger',
 	'range.more': 'Mehr',
 
-	'machine.title': 'Dein Plotter, direkt im Browser.',
+	'machine.title': 'Dein Plotter, direkt im Browser',
 	'machine.lede':
 		'Verbinde den VigoTec VG-X4 per USB. Ohne Installation, ohne Server, alles läuft hier im Browser.',
 	'machine.unsupported':
