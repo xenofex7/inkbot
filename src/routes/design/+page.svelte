@@ -63,7 +63,6 @@
 		height: Math.max(1, sheet.height - 2 * settings.margin)
 	});
 	const selected = $derived(design.selected);
-	const running = $derived(plotter.busy || plotter.status?.state === 'Hold');
 
 	onMount(() => {
 		void gallery.load();
@@ -581,7 +580,9 @@
 				width={sheet.width}
 				height={sheet.height}
 				margin={settings.margin}
-				pen={running && plotter.position ? toSheet(plotter.position, settings.axes) : undefined}
+				pen={plotter.connection === 'connected' && plotter.position
+					? toSheet(plotter.position, settings.axes)
+					: undefined}
 			/>
 			<p class="mt-3 text-[13px] text-ink-mute">{t('design.hint')}</p>
 		</div>

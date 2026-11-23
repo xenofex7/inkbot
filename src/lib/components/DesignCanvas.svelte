@@ -235,6 +235,9 @@
 	{/if}
 	<circle cx="0" cy="0" r="1.4" class="fill-seal" />
 	{#if pen}
-		<circle cx={pen.x} cy={pen.y} r="1.2" class="fill-seal" opacity="0.8" />
+		<g pointer-events="none">
+			<circle cx={pen.x} cy={pen.y} r="2.4" fill="none" class="stroke-link" stroke-width="0.45" />
+			<circle cx={pen.x} cy={pen.y} r="0.6" class="fill-link" />
+		</g>
 	{/if}
 </svg>

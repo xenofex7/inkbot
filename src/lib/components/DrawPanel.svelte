@@ -131,7 +131,9 @@
 			height={sheet.height}
 			margin={settings.margin}
 			{polylines}
-			pen={running && plotter.position ? toSheet(plotter.position, settings.axes) : undefined}
+			pen={plotter.connection === 'connected' && plotter.position
+				? toSheet(plotter.position, settings.axes)
+				: undefined}
 		/>
 	</div>
 {/if}
