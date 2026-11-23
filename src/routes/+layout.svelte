@@ -27,7 +27,7 @@
 <header class="sticky top-0 z-10 border-b border-hairline bg-canvas">
 	<div class="border-b border-hairline-soft">
 		<div class="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4">
-			<img src={asset('favicon.png')} alt="" class="size-9 rounded-sm" />
+			<img src={asset('favicon.png')} alt="" class="size-12 rounded-md" />
 			<span class="font-display text-lg font-semibold tracking-tight text-ink">inkbot</span>
 			<nav class="ml-4 inline-flex rounded-pill bg-surface-soft p-1.5">
 				{#each nav as item (item.href)}
