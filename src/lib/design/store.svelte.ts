@@ -276,6 +276,18 @@ class Design {
 		);
 	}
 
+	async replaceImage(id: string, blob: Blob) {
+		const element = this.elements.find((e) => e.id === id);
+		if (element?.kind !== 'raster') return;
+		const gray = await loadGray(blob, element.trace.detail);
+		const unit = (element.unit * element.gray.width) / gray.width;
+		this.#update(id, (current) =>
+			current.kind === 'raster'
+				? { ...current, blob, gray, unit, shape: rasterShape(gray, current.trace, unit) }
+				: current
+		);
+	}
+
 	move(id: string, placement: Placement) {
 		this.#update(id, (element) => ({ ...element, ...placement }));
 	}

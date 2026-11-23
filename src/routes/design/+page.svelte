@@ -12,6 +12,9 @@
 		Type
 	} from '@lucide/svelte';
 	import type { AiResult } from '#lib/ai/result.ts';
+	import { redrawImage } from '#lib/ai/images.ts';
+	import { aiSettings } from '#lib/ai/settings.svelte.ts';
+	import { toPng } from '#lib/image/load.ts';
 	import AiGenerator from '#lib/components/AiGenerator.svelte';
 	import Button from '#lib/components/Button.svelte';
 	import DesignCanvas from '#lib/components/DesignCanvas.svelte';
@@ -109,6 +112,21 @@
 	function retrace(element: RasterElement, change: Partial<TraceOptions>) {
 		error = '';
 		design.updateTrace(element.id, { ...element.trace, ...change }).catch(fail);
+	}
+
+	let redrawing = $state(false);
+
+	async function redraw(element: RasterElement) {
+		error = '';
+		redrawing = true;
+		try {
+			const photo = await toPng(element.blob, 1024);
+			await design.replaceImage(element.id, await redrawImage(aiSettings.config, photo));
+		} catch (e) {
+			fail(e);
+		} finally {
+			redrawing = false;
+		}
 	}
 
 	function saveSource(element: DesignElement) {
@@ -474,6 +492,14 @@
 							onvalue={(value: number) => retrace(raster, { spacing: value })}
 						/>
 					{/if}
+				{/if}
+				{#if selected.kind === 'raster' && aiSettings.ready}
+					{@const raster = selected}
+					<Button onclick={() => redraw(raster)} disabled={redrawing}>
+						<Sparkles size={16} />
+						{redrawing ? t('image.redrawing') : t('image.redraw')}
+					</Button>
+					<p class="text-[13px] text-ink-mute">{t('image.redrawHint')}</p>
 				{/if}
 				{#if selected.kind === 'raster' || (selected.kind === 'vector' && selected.source)}
 					<Button onclick={() => saveSource(selected)}>

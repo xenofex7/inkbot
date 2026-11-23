@@ -61,6 +61,38 @@ export async function generateImage(
 		headers: headers(config),
 		body: JSON.stringify({ model: config.model, prompt, size: config.size, n: 1 })
 	});
+	return imageFrom(response, fetcher);
+}
+
+export const REDRAW_PROMPT =
+	'Redraw this photo as a simple black line drawing on a plain white background. Clean single ' +
+	'strokes of even width, no shading, no fills, no gradients, no text, keep the main shapes and ' +
+	'the details that make it recognisable.';
+
+export async function redrawImage(
+	config: ProviderConfig,
+	photo: Blob,
+	prompt: string = REDRAW_PROMPT,
+	fetcher: typeof fetch = fetch
+): Promise<Blob> {
+	const form = new FormData();
+	form.append('model', config.model);
+	form.append('prompt', prompt);
+	form.append('size', config.size);
+	form.append('n', '1');
+	form.append('image', photo, 'photo.png');
+	const auth: Record<string, string> = config.apiKey
+		? { Authorization: `Bearer ${config.apiKey.trim()}` }
+		: {};
+	const response = await fetcher(`${baseUrlFor(config)}/images/edits`, {
+		method: 'POST',
+		headers: auth,
+		body: form
+	});
+	return imageFrom(response, fetcher);
+}
+
+async function imageFrom(response: Response, fetcher: typeof fetch): Promise<Blob> {
 	if (!response.ok) throw new Error(await errorMessage(response));
 	const body = (await response.json()) as { data?: { b64_json?: string; url?: string }[] };
 	const image = body.data?.[0];

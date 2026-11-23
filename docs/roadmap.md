@@ -29,7 +29,7 @@ As of 23.11.2026. Done items are marked [x].
 - [x] Bring your own key: the API key stays in the browser
 - [x] **AI draws directly:** a language model returns an SVG of single lines, no
   conversion needed (cards, patterns, decorations)
-- [ ] **AI redraws:** photo to simplified line drawing (image to image)
+- [x] **AI redraws:** photo to simplified line drawing (image to image)
 - [x] **One continuous line** (TSP art): stippling by brightness, nearest neighbour route
   improved with 2-opt
 

@@ -247,6 +247,10 @@ const en = {
 	'image.hatch': 'Hatching',
 	'image.hatchHint': 'Brightness as hatching, for photos',
 	'image.tsp': 'One line',
+	'image.redraw': 'AI redraws it',
+	'image.redrawing': 'AI is drawing...',
+	'image.redrawHint':
+		'Sends the picture to your image model, which returns a simplified line drawing. Uses your API key and costs like a generated image.',
 	'image.tspHint': 'The whole picture as one continuous line, dark areas get denser',
 	'image.pointSpacing': 'Point spacing: {value} mm',
 	'image.threshold': 'Threshold: {value}',
@@ -572,6 +576,10 @@ const de: Record<Key, string> = {
 	'image.hatch': 'Schraffur',
 	'image.hatchHint': 'Helligkeit als Schraffur, für Fotos',
 	'image.tsp': 'Eine Linie',
+	'image.redraw': 'KI zeichnet nach',
+	'image.redrawing': 'KI zeichnet...',
+	'image.redrawHint':
+		'Schickt das Bild an Dein Bildmodell, das eine vereinfachte Strichzeichnung zurückgibt. Läuft über Deinen API-Schlüssel und kostet wie ein generiertes Bild.',
 	'image.tspHint': 'Das ganze Bild als eine durchgehende Linie, dunkle Stellen werden dichter',
 	'image.pointSpacing': 'Punktabstand: {value} mm',
 	'image.threshold': 'Schwelle: {value}',
