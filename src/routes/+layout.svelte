@@ -6,6 +6,8 @@
 	import Button from '#lib/components/Button.svelte';
 	import ControlBar from '#lib/components/ControlBar.svelte';
 	import JobBar from '#lib/components/JobBar.svelte';
+	import { moveToMachine } from '#lib/grbl/commands.ts';
+	import { positions } from '#lib/machine/positions.svelte.ts';
 	import StatusBadge from '#lib/components/StatusBadge.svelte';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { autoBackup } from '#lib/autoBackup.svelte.ts';
@@ -16,6 +18,21 @@
 	const jobRunning = $derived(
 		plotter.connection === 'connected' && (plotter.busy || plotter.status?.state === 'Hold')
 	);
+
+	async function disconnect() {
+		const anchor = positions.anchor;
+		const here = positions.machine();
+		const away = anchor && here && Math.hypot(here.x - anchor.x, here.y - anchor.y) > 0.5;
+		if (anchor && away && !plotter.busy && confirm(t('connect.parkFirst'))) {
+			try {
+				await plotter.sendAll(moveToMachine(anchor));
+				await plotter.untilIdle();
+			} catch {
+				return;
+			}
+		}
+		await plotter.disconnect();
+	}
 
 	const nav = [
 		{ href: resolve('/'), label: 'nav.machine' },
@@ -75,7 +92,7 @@
 							{t('connect.button')}
 						</Button>
 					{:else}
-						<Button onclick={() => plotter.disconnect()}>{t('connect.disconnect')}</Button>
+						<Button onclick={disconnect}>{t('connect.disconnect')}</Button>
 					{/if}
 				</div>
 			</div>

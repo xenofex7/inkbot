@@ -89,21 +89,13 @@
 		download(new Blob([svg], { type: 'image/svg+xml' }), filenameFrom(name, 'svg'));
 	}
 
-	async function untilIdle() {
-		let calm = 0;
-		while (plotter.connection === 'connected' && calm < 3) {
-			await new Promise((resolve) => setTimeout(resolve, 200));
-			calm = plotter.busy || plotter.status?.state !== 'Idle' ? 0 : calm + 1;
-		}
-	}
-
 	async function drawGroup(index: number) {
 		nextGroup = undefined;
 		drawError = '';
 		try {
 			await plotter.sendAll(toGcode(groups[index].polylines, settings));
 			if (index + 1 < groups.length) {
-				await untilIdle();
+				await plotter.untilIdle();
 				if (plotter.connection === 'connected') nextGroup = index + 1;
 			}
 		} catch (error) {

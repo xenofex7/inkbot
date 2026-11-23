@@ -79,6 +79,14 @@ export class Plotter {
 		}
 	}
 
+	async untilIdle() {
+		let calm = 0;
+		while (this.connection === 'connected' && calm < 3) {
+			await new Promise((resolve) => setTimeout(resolve, 200));
+			calm = this.busy || this.status?.state !== 'Idle' ? 0 : calm + 1;
+		}
+	}
+
 	async disconnect() {
 		clearInterval(this.#poll);
 		this.#poll = undefined;

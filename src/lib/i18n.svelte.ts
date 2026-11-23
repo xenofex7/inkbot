@@ -135,6 +135,8 @@ const en = {
 	'design.kindRaster': 'Image',
 	'design.kindVector': 'Drawing',
 	'connect.button': 'Connect plotter',
+	'connect.parkFirst':
+		'Drive to the start stop before disconnecting? OK lifts the pen, drives there and then disconnects. Cancel disconnects right away.',
 	'connect.disconnect': 'Disconnect plotter',
 
 	'status.connecting': 'Connecting …',
@@ -513,6 +515,8 @@ const de: Record<Key, string> = {
 	'design.kindRaster': 'Bild',
 	'design.kindVector': 'Zeichnung',
 	'connect.button': 'Plotter verbinden',
+	'connect.parkFirst':
+		'Vor dem Trennen zum Anschlag fahren? OK hebt den Stift, fährt hin und trennt danach. Abbrechen trennt sofort.',
 	'connect.disconnect': 'Plotter trennen',
 
 	'status.connecting': 'Verbinde …',
