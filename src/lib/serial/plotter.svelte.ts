@@ -22,6 +22,7 @@ export class Plotter {
 
 	position = $derived(this.status ? workPosition(this.status, this.wco) : undefined);
 	penDown = $state(false);
+	feedOverride = $state(100);
 	busy = $derived(this.status?.state === 'Run' || this.status?.state === 'Jog');
 
 	#port: SerialPort | undefined;
@@ -130,7 +131,7 @@ export class Plotter {
 	async realtime(command: string) {
 		if (!this.#writer) return;
 		if (command !== REALTIME.status) this.#addLog('tx', `[${describeRealtime(command)}]`);
-		await this.#write(command);
+		await this.#writer.write(Uint8Array.of(command.charCodeAt(0)));
 	}
 
 	async #write(data: string) {
@@ -193,6 +194,7 @@ export class Plotter {
 				this.greeting = message.text;
 				this.alarm = undefined;
 				this.penDown = false;
+				this.feedOverride = 100;
 				this.#rejectPending(new Error(t('error.reset')));
 				this.#greetingWaiter?.();
 				this.#greetingWaiter = undefined;
@@ -202,6 +204,8 @@ export class Plotter {
 				break;
 			case 'status':
 				this.status = message.report;
+				if (message.report.feedOverride !== undefined)
+					this.feedOverride = message.report.feedOverride;
 				if (message.report.wco) this.wco = message.report.wco;
 				if (message.report.state === 'Alarm') this.alarm ??= 0;
 				break;
@@ -233,7 +237,10 @@ function describeRealtime(command: string) {
 		[REALTIME.feedHold]: 'Pause',
 		[REALTIME.cycleStart]: 'Resume',
 		[REALTIME.softReset]: 'Stop',
-		[REALTIME.jogCancel]: 'Cancel jog'
+		[REALTIME.jogCancel]: 'Cancel jog',
+		[REALTIME.feedReset]: 'Speed 100 %',
+		[REALTIME.feedFaster]: 'Speed +10 %',
+		[REALTIME.feedSlower]: 'Speed -10 %'
 	};
 	return names[command] ?? 'Realtime command';
 }

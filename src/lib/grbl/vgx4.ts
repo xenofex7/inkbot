@@ -16,5 +16,8 @@ export const REALTIME = {
 	feedHold: '!',
 	cycleStart: '~',
 	softReset: '\x18',
-	jogCancel: '\x85'
+	jogCancel: '\x85',
+	feedReset: '\x90',
+	feedFaster: '\x91',
+	feedSlower: '\x92'
 } as const;

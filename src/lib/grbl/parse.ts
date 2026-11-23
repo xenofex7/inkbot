@@ -10,6 +10,7 @@ export type StatusReport = {
 	wco?: Position;
 	feed?: number;
 	spindle?: number;
+	feedOverride?: number;
 };
 
 export type GrblMessage =
@@ -44,7 +45,7 @@ export function parseStatus(line: string): StatusReport | undefined {
 			const [feed, spindle] = value.split(',').map(Number);
 			report.feed = feed;
 			report.spindle = spindle;
-		}
+		} else if (key === 'Ov') report.feedOverride = Number(value.split(',')[0]);
 	}
 	return report;
 }

@@ -48,6 +48,7 @@ describe('parseStatus', () => {
 		const report = parseStatus('<Run|MPos:6.544,-10.000,0.000|FS:7071,0|Ov:100,100,100|A:S>');
 		expect(report?.state).toBe('Run');
 		expect(report?.feed).toBe(7071);
+		expect(report?.feedOverride).toBe(100);
 	});
 
 	it('parses sub states', () => {

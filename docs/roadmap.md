@@ -16,7 +16,7 @@ As of 23.11.2026. Done items are marked [x].
 - [x] **Gallery:** save drawings with their source in the browser (IndexedDB), preview,
   plot again, reopen in the editor, delete
 - [x] **SVG:** import, scale, position
-- [ ] **Live speed** via feed override
+- [x] **Live speed** via feed override (10 to 200 %)
 - [x] **GitHub Pages:** put inkbot online, usable without a local server, version and build
   shown in the footer
 
