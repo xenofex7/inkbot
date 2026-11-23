@@ -35,7 +35,9 @@ export type TraceOptions = {
 	detail: number;
 };
 
-type Base = Placement & { id: string; name: string; shape: Shape };
+type Base = Placement & { id: string; name: string; shape: Shape; pen?: number };
+
+export type PenGroup = { pen: number; polylines: Polyline[] };
 
 export type TextElement = Base & { kind: 'text'; options: TextOptions };
 export type RasterElement = Base & {
@@ -116,9 +118,23 @@ class Design {
 		return row ? this.elements.map((element) => merged(element, row)) : this.elements;
 	});
 
-	polylines = $derived(
-		orderPaths(this.view.flatMap((element): Polyline[] => place(element.shape, element)))
-	);
+	groups = $derived.by((): PenGroup[] => {
+		const pens = [...new Set(this.view.map((element) => element.pen ?? 1))].sort((a, b) => a - b);
+		return pens.map((pen) => ({
+			pen,
+			polylines: orderPaths(
+				this.view
+					.filter((element) => (element.pen ?? 1) === pen)
+					.flatMap((element): Polyline[] => place(element.shape, element))
+			)
+		}));
+	});
+
+	polylines = $derived(this.groups.flatMap((group) => group.polylines));
+
+	setPen(id: string, pen: number) {
+		this.#update(id, (element) => ({ ...element, pen }));
+	}
 
 	setMerge(list: MergeList | undefined) {
 		this.merge = list;

@@ -44,6 +44,7 @@ As of 23.11.2026. Done items are marked [x].
   variants per character, natural variation from letter to letter
 - [x] Envelopes from an address list (CSV): placeholders like {Name} in any text, step
   through the rows
+- [x] **Several pens:** up to four pens per card, drawn pen by pen with a prompt to swap
 
 ## Version 4 - Data
 - [x] **Backup:** export and import settings, prompts, gallery and handwriting in one file
@@ -52,5 +53,4 @@ As of 23.11.2026. Done items are marked [x].
   after every change, Chrome and Edge on a computer
 
 ## Later
-- Several pens / colours with a pause to swap
 - Dark mode

@@ -4,6 +4,7 @@
 	import type { Point } from '../geometry/types';
 	import { t, type MessageKey } from '../i18n.svelte';
 	import { settings } from '../settings.svelte';
+	import { penColor } from '../design/pens';
 
 	let {
 		width,
@@ -130,7 +131,7 @@
 				<polyline
 					points={points(line)}
 					fill="none"
-					class="stroke-ink"
+					stroke={penColor(element.pen)}
 					stroke-width="0.35"
 					stroke-linecap="round"
 					stroke-linejoin="round"

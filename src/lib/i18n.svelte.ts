@@ -75,6 +75,11 @@ const en = {
 	'design.selected': 'Selected element',
 	'design.scale': 'Size: {value} %',
 	'design.rotate': 'Rotate 90°',
+	'design.pen': 'Pen',
+	'design.penNumber': 'Pen {pen}',
+	'job.changePen': 'Done so far. Put in pen {pen}, then continue.',
+	'job.continuePen': 'Continue with pen {pen}',
+	'job.cancelPens': 'Stop here',
 	'merge.title': 'Series from a list (CSV)',
 	'merge.intro':
 		'Load an address list, for example exported from Excel or Numbers. Placeholders like {Name} in a text are filled from each row.',
@@ -382,6 +387,11 @@ const de: Record<Key, string> = {
 	'design.selected': 'Ausgewähltes Element',
 	'design.scale': 'Grösse: {value} %',
 	'design.rotate': '90° drehen',
+	'design.pen': 'Stift',
+	'design.penNumber': 'Stift {pen}',
+	'job.changePen': 'Fertig bis hier. Setz Stift {pen} ein und mach dann weiter.',
+	'job.continuePen': 'Weiter mit Stift {pen}',
+	'job.cancelPens': 'Hier aufhören',
 	'merge.title': 'Serie aus Liste (CSV)',
 	'merge.intro':
 		'Lade eine Adressliste, zum Beispiel aus Excel oder Numbers exportiert. Platzhalter wie {Name} in einem Text werden pro Zeile ersetzt.',

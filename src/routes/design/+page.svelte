@@ -28,6 +28,7 @@
 	} from '#lib/design/store.svelte.ts';
 	import { CARD_TEMPLATES } from '#lib/design/templates.ts';
 	import MergePanel from '#lib/components/MergePanel.svelte';
+	import { PENS } from '#lib/design/pens.ts';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { gallery } from '#lib/gallery/store.svelte.ts';
 	import { orient } from '#lib/geometry/types.ts';
@@ -313,10 +314,31 @@
 						onvalue={(value) => design.move(selected.id, { ...selected, scale: value / 100 })}
 					/>
 				</div>
-				<Button onclick={() => design.rotate(selected.id)}>
-					<RotateCw size={16} />
-					{t('design.rotate')}
-				</Button>
+				<div class="flex flex-wrap items-center gap-3">
+					<Button onclick={() => design.rotate(selected.id)}>
+						<RotateCw size={16} />
+						{t('design.rotate')}
+					</Button>
+					<div class="flex items-center gap-1.5" role="radiogroup" aria-label={t('design.pen')}>
+						<span class="text-[13px] text-ink-mute">{t('design.pen')}</span>
+						{#each PENS as pen (pen.id)}
+							<button
+								type="button"
+								role="radio"
+								aria-checked={(selected.pen ?? 1) === pen.id}
+								aria-label={t('design.penNumber', { pen: pen.id })}
+								class="flex size-8 items-center justify-center rounded-full border text-xs font-semibold text-on-primary {(selected.pen ??
+									1) === pen.id
+									? 'border-ink ring-2 ring-ink/30'
+									: 'border-transparent'}"
+								style="background-color: {pen.color}"
+								onclick={() => design.setPen(selected.id, pen.id)}
+							>
+								{pen.id}
+							</button>
+						{/each}
+					</div>
+				</div>
 
 				{#if selected.kind === 'text'}
 					<div>
@@ -478,6 +500,7 @@
 		</div>
 		<DrawPanel
 			polylines={design.polylines}
+			groups={design.groups}
 			{sheet}
 			name={t('design.card')}
 			showPreview={false}

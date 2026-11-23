@@ -20,6 +20,7 @@
 	import { plotter } from '../serial/plotter.svelte';
 	import { settings } from '../settings.svelte';
 	import { gallery } from '../gallery/store.svelte';
+	import { penColor } from '../design/pens';
 
 	let {
 		polylines,
@@ -27,7 +28,8 @@
 		name = 'inkbot',
 		saveable = true,
 		showPreview = true,
-		emptyHint = ''
+		emptyHint = '',
+		groups = []
 	}: {
 		polylines: Polyline[];
 		sheet: { width: number; height: number };
@@ -35,7 +37,10 @@
 		saveable?: boolean;
 		showPreview?: boolean;
 		emptyHint?: string;
+		groups?: { pen: number; polylines: Polyline[] }[];
 	} = $props();
+
+	let nextGroup = $state<number | undefined>();
 
 	let drawError = $state('');
 	let saveState = $state<'idle' | 'saving' | 'saved'>('idle');
@@ -76,8 +81,29 @@
 		download(new Blob([svg], { type: 'image/svg+xml' }), filenameFrom(name, 'svg'));
 	}
 
+	async function untilIdle() {
+		while (plotter.connection === 'connected' && plotter.status?.state !== 'Idle') {
+			await new Promise((resolve) => setTimeout(resolve, 200));
+		}
+	}
+
+	async function drawGroup(index: number) {
+		nextGroup = undefined;
+		drawError = '';
+		try {
+			await plotter.sendAll(toGcode(groups[index].polylines, settings));
+			if (index + 1 < groups.length) {
+				await untilIdle();
+				if (plotter.connection === 'connected') nextGroup = index + 1;
+			}
+		} catch (error) {
+			drawError = error instanceof Error ? error.message : String(error);
+		}
+	}
+
 	async function draw() {
 		if (outsideSheet && !confirm(t('job.outsideSheetConfirm'))) return;
+		if (groups.length > 1) return drawGroup(0);
 		drawError = '';
 		try {
 			await plotter.sendAll(toGcode(polylines, settings));
@@ -116,6 +142,20 @@
 			<OctagonX size={16} />
 			{t('job.stop')}
 		</Button>
+	{:else if nextGroup !== undefined}
+		{@const index = nextGroup}
+		<p class="basis-full text-sm text-ink" role="status">
+			<span
+				class="mr-1.5 inline-block size-2.5 rounded-full align-middle"
+				style="background-color: {penColor(groups[index].pen)}"
+			></span>
+			{t('job.changePen', { pen: groups[index].pen })}
+		</p>
+		<Button variant="primary" onclick={() => drawGroup(index)} disabled={!canDraw}>
+			<PenLine size={16} />
+			{t('job.continuePen', { pen: groups[index].pen })}
+		</Button>
+		<Button onclick={() => (nextGroup = undefined)}>{t('job.cancelPens')}</Button>
 	{:else}
 		<Button variant="primary" onclick={draw} disabled={!canDraw}>
 			<PenLine size={16} />
