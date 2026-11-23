@@ -2,7 +2,8 @@
 	import { extent, place, scaleFromCorner, type Placement } from '../design/model';
 	import { design, type DesignElement } from '../design/store.svelte';
 	import type { Point } from '../geometry/types';
-	import { t } from '../i18n.svelte';
+	import { t, type MessageKey } from '../i18n.svelte';
+	import { settings } from '../settings.svelte';
 
 	let {
 		width,
@@ -15,6 +16,14 @@
 	let drag: { id: string; mode: 'move' | 'scale'; start: Point; origin: Placement } | undefined;
 
 	const HANDLE = 3.5;
+
+	const guides = $derived(
+		design.guides &&
+			design.guides.formatId === settings.formatId &&
+			design.guides.orientation === settings.orientation
+			? design.guides
+			: undefined
+	);
 
 	function toSheet(event: PointerEvent): Point {
 		const matrix = svg?.getScreenCTM();
@@ -89,6 +98,29 @@
 		stroke-width="0.3"
 		stroke-dasharray="1.5 1.5"
 	/>
+	{#if guides}
+		{#each guides.lines as line, index (index)}
+			<polyline
+				points={points(line)}
+				fill="none"
+				class="stroke-seal/50"
+				stroke-width="0.35"
+				stroke-dasharray="2.5 1.5"
+			/>
+		{/each}
+		{#each guides.labels as guide (guide.key + guide.x + guide.y)}
+			<text
+				x={guide.x}
+				y={guide.y}
+				text-anchor="middle"
+				dominant-baseline="middle"
+				class="fill-seal/70"
+				font-size="3"
+			>
+				{t(guide.key as MessageKey)}
+			</text>
+		{/each}
+	{/if}
 	{#each design.elements as element (element.id)}
 		{@const size = extent(element.shape, element.rotation)}
 		{@const w = size.width * element.scale}

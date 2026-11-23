@@ -6,7 +6,16 @@ import { orderPaths } from '../optimize/order';
 import { parseSvg } from '../svg/parse';
 import { handwriting } from '../handwriting/store.svelte';
 import { fonts, layoutText, type Align } from '../text/layout';
-import { centred, normalize, place, rotated, type Placement, type Shape } from './model';
+import {
+	centred,
+	normalize,
+	place,
+	rotated,
+	type Placement,
+	type Rotation,
+	type Shape
+} from './model';
+import type { Area, CardTemplate, Guides } from './templates';
 
 export type TextOptions = {
 	text: string;
@@ -37,7 +46,7 @@ export type RasterElement = Base & {
 export type VectorElement = Base & { kind: 'vector'; source?: Blob };
 export type DesignElement = TextElement | RasterElement | VectorElement;
 
-export type Area = { x: number; y: number; width: number; height: number };
+export type { Area };
 
 const RASTER_WIDTH_MM = 60;
 const CURVE_STEP_MM = 0.2;
@@ -75,6 +84,7 @@ export function rasterShape(gray: Gray, trace: TraceOptions, unit: number): Shap
 class Design {
 	elements = $state.raw<DesignElement[]>([]);
 	selectedId = $state<string | undefined>();
+	guides = $state.raw<Guides | undefined>();
 
 	selected = $derived(this.elements.find((element) => element.id === this.selectedId));
 
@@ -91,16 +101,45 @@ class Design {
 		this.elements = this.elements.map((element) => (element.id === id ? change(element) : element));
 	}
 
-	addText(options: TextOptions, area: Area) {
+	addText(
+		options: TextOptions,
+		area: Area,
+		anchor: 'center' | 'start' = 'center',
+		rotation: Rotation = 0
+	) {
 		const shape = textShape(options);
+		const placement =
+			anchor === 'start' ? { x: area.x, y: area.y, scale: 1 } : centred(shape, area, 0.8);
 		this.#add({
 			kind: 'text',
 			id: crypto.randomUUID(),
 			name: options.text.split('\n')[0] || 'Text',
 			options,
 			shape,
-			...centred(shape, area, 0.8)
+			...placement,
+			rotation
 		});
+	}
+
+	applyTemplate(template: CardTemplate, text: (key: string) => string) {
+		this.clear();
+		const { formatId, orientation, lines, labels } = template;
+		this.guides = { formatId, orientation, lines, labels };
+		for (const item of template.texts) {
+			this.addText(
+				{
+					text: text(item.key),
+					fontId: item.fontId,
+					size: item.size,
+					lineHeight: 1.4,
+					align: item.align
+				},
+				item.area,
+				item.anchor,
+				item.rotation
+			);
+		}
+		this.selectedId = undefined;
 	}
 
 	addVector(
@@ -205,6 +244,7 @@ class Design {
 	clear() {
 		this.elements = [];
 		this.selectedId = undefined;
+		this.guides = undefined;
 	}
 }
 

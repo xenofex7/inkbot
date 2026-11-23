@@ -26,6 +26,7 @@
 		type TextOptions,
 		type TraceOptions
 	} from '#lib/design/store.svelte.ts';
+	import { CARD_TEMPLATES } from '#lib/design/templates.ts';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { gallery } from '#lib/gallery/store.svelte.ts';
 	import { orient } from '#lib/geometry/types.ts';
@@ -59,6 +60,16 @@
 	function fail(e: unknown) {
 		error =
 			e instanceof TypeError ? t('image.noResponse') : e instanceof Error ? e.message : String(e);
+	}
+
+	function applyTemplate(id: string) {
+		const template = CARD_TEMPLATES.find((item) => item.id === id);
+		if (!template) return;
+		if (design.elements.length > 0 && !confirm(t('template.replace'))) return;
+		settings.formatId = template.formatId;
+		settings.orientation = template.orientation;
+		settings.margin = template.margin;
+		design.applyTemplate(template, (key) => t(key as MessageKey));
 	}
 
 	function addText() {
@@ -152,6 +163,24 @@
 						{t('design.clear')}
 					</Button>
 				{/if}
+			</div>
+
+			<div>
+				<label class={label} for="design-template">{t('template.label')}</label>
+				<select
+					id="design-template"
+					class={field}
+					value=""
+					onchange={(event) => {
+						applyTemplate(event.currentTarget.value);
+						event.currentTarget.value = '';
+					}}
+				>
+					<option value="" disabled>{t('template.choose')}</option>
+					{#each CARD_TEMPLATES as template (template.id)}
+						<option value={template.id}>{t(`template.${template.id}`)}</option>
+					{/each}
+				</select>
 			</div>
 
 			<div>
