@@ -42,7 +42,7 @@
 	import { PENS } from '#lib/design/pens.ts';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { gallery } from '#lib/gallery/store.svelte.ts';
-	import { orient } from '#lib/geometry/types.ts';
+	import { toSheet } from '#lib/geometry/types.ts';
 	import { t, type MessageKey } from '#lib/i18n.svelte.ts';
 	import type { TraceMode } from '#lib/image/trace.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
@@ -581,7 +581,7 @@
 				width={sheet.width}
 				height={sheet.height}
 				margin={settings.margin}
-				pen={running && plotter.position ? orient(plotter.position, settings.invertY) : undefined}
+				pen={running && plotter.position ? toSheet(plotter.position, settings.axes) : undefined}
 			/>
 			<p class="mt-3 text-[13px] text-ink-mute">{t('design.hint')}</p>
 		</div>

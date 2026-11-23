@@ -4,8 +4,9 @@ As of 23.11.2026. Done items are marked [x].
 
 ## Version 1 - Basics
 - [x] **Connect:** choose port, check firmware, show status, console
-- [x] **Machine:** jogging (1/5/10 mm), pen up/down with adjustable depth, set origin,
-  go to origin, invert Y axis
+- [x] **Machine:** jogging (1 to 50 mm), pen up/down with adjustable depth, orientation
+  check for any plotter placement, start stop as reference, sheet corner kept across
+  restarts, travel area limit, saved positions
 - [x] **Control bar:** pen, depth, position and paper on every page
 - [x] **Text:** single-line fonts (Hershey, EMS), size, line height, margins, paper format
   (A4, A5, A6, envelopes C6/DL), alignment

@@ -9,7 +9,7 @@ const line = (...coords: number[]) => {
 
 describe('toGcode', () => {
 	it('lifts the pen for travel and lowers it to draw', () => {
-		expect(toGcode([line(10, 10, 20, 10, 20, 20)], { feed: 1500 })).toEqual([
+		expect(toGcode([line(10, 10, 20, 10, 20, 20)], { feed: 1500, axes: [1, 0, 0, 1] })).toEqual([
 			'G21',
 			'G90',
 			'G94',
@@ -37,8 +37,8 @@ describe('toGcode', () => {
 		expect(gcode.at(-1)).toBe('G0 X0 Y0');
 	});
 
-	it('mirrors the Y axis when inverted', () => {
-		const gcode = toGcode([line(10, 5, 20, 5)], { invertY: true, feed: 1500 });
+	it('mirrors the Y axis by default', () => {
+		const gcode = toGcode([line(10, 5, 20, 5)], { feed: 1500 });
 		expect(gcode).toContain('G0 X10 Y-5');
 		expect(gcode).toContain('G1 X20 Y-5 F1500');
 		expect(gcode.at(-1)).toBe('G0 X0 Y0');

@@ -5,7 +5,7 @@
 	import PaperFields from './PaperFields.svelte';
 	import StatusBadge from './StatusBadge.svelte';
 	import { penDown, penUp } from '../grbl/commands';
-	import { orient } from '../geometry/types';
+	import { toSheet } from '../geometry/types';
 	import { plotter } from '../serial/plotter.svelte';
 	import { settings } from '../settings.svelte';
 
@@ -15,7 +15,7 @@
 	const running = $derived(plotter.busy || plotter.status?.state === 'Hold');
 	const canAct = $derived(connected && !running);
 	const position = $derived(
-		plotter.position ? orient(plotter.position, settings.invertY) : undefined
+		plotter.position ? toSheet(plotter.position, settings.axes) : undefined
 	);
 
 	async function run(lines: string[]) {

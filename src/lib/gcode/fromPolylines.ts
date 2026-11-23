@@ -1,4 +1,4 @@
-import { orient, pathLength, type Point, type Polyline } from '../geometry/types';
+import { DEFAULT_AXES, pathLength, toMachine, type Point, type Polyline } from '../geometry/types';
 import { penDown, penUp, type DrawOptions } from '../grbl/commands';
 import { VGX4 } from '../grbl/vgx4';
 
@@ -9,9 +9,9 @@ const coord = (value: number) => (Math.round(value * 1000) / 1000).toString();
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
 export function toGcode(polylines: Polyline[], options: DrawOptions = {}) {
-	const { invertY = false, penDownS = VGX4.penDownS, feed = VGX4.drawFeed } = options;
+	const { axes = DEFAULT_AXES, penDownS = VGX4.penDownS, feed = VGX4.drawFeed } = options;
 	const xy = (p: Point) => {
-		const m = orient(p, invertY);
+		const m = toMachine(p, axes);
 		return `X${coord(m.x)} Y${coord(m.y)}`;
 	};
 	const lines = ['G21', 'G90', 'G94', ...penUp()];

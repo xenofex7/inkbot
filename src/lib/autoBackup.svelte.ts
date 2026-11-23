@@ -42,7 +42,10 @@ function request<T>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => ID
 
 function watched() {
 	return [
-		settings.invertY,
+		settings.axes,
+		settings.axesConfirmed,
+		settings.travel,
+		settings.corner,
 		settings.penDownS,
 		settings.formatId,
 		settings.orientation,

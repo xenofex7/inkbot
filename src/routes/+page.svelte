@@ -8,10 +8,10 @@
 		ArrowUp,
 		Crosshair,
 		House,
+		Compass,
 		MapPin,
 		SquareParking,
 		Square,
-		SquareDashed,
 		Trash2
 	} from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
@@ -23,12 +23,14 @@
 		setOrigin,
 		testSquare
 	} from '#lib/grbl/commands.ts';
-	import { orient } from '#lib/geometry/types.ts';
+	import { axesFromDirections, toMachine, type Direction } from '#lib/geometry/types.ts';
 	import { positions } from '#lib/machine/positions.svelte.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { settings } from '#lib/settings.svelte.ts';
 
 	const steps = [1, 5, 10, 20, 50] as const;
+	const ALIGN_MM = 10;
+	const SAFE_STEP = 10;
 	let step = $state<(typeof steps)[number]>(5);
 	let consoleLine = $state('');
 	let actionError = $state('');
@@ -38,6 +40,7 @@
 
 	const connected = $derived(plotter.connection === 'connected');
 	const canAct = $derived(connected && !plotter.busy);
+	const jogStep = $derived(positions.ready ? step : Math.min(step, SAFE_STEP));
 
 	$effect(() => {
 		void plotter.log.length;
@@ -55,8 +58,8 @@
 
 	function jogBy(dx: number, dy: number) {
 		const base = positions.machine();
-		const target = positions.jogTarget(orient({ x: dx, y: dy }, settings.invertY));
-		if (!base || !target) return run(jog(dx, dy, settings.invertY));
+		const target = positions.jogTarget(toMachine({ x: dx, y: dy }, settings.axes));
+		if (!base || !target) return run(jog(dx, dy, settings.axes));
 		if (!plotter.busy && Math.hypot(target.x - base.x, target.y - base.y) < 0.01) {
 			notice = t('positions.atEdge');
 			return;
@@ -70,6 +73,94 @@
 		if (target) void run(moveToMachine(target));
 	}
 
+	function goToStop() {
+		if (positions.anchor) void run(moveToMachine(positions.anchor));
+	}
+
+	function confirmAnchor() {
+		const lines = positions.confirmAnchor();
+		if (lines.length) void run(lines);
+	}
+
+	async function setCorner() {
+		if (!confirm(t('machine.originConfirm'))) return;
+		await run(setOrigin());
+		if (!actionError) positions.markCorner();
+	}
+
+	const OPPOSITE: Record<Direction, Direction> = {
+		right: 'left',
+		left: 'right',
+		up: 'down',
+		down: 'up'
+	};
+	const answers: [Direction, typeof ArrowUp][] = [
+		['up', ArrowUp],
+		['left', ArrowLeft],
+		['right', ArrowRight],
+		['down', ArrowDown]
+	];
+	let alignStep = $state<'idle' | 'x' | 'y'>('idle');
+	let alignX = $state<Direction | undefined>();
+	let alignError = $state('');
+	let moved = { X: false, Y: false };
+
+	$effect(() => {
+		void plotter.resets;
+		void plotter.connection;
+		alignStep = 'idle';
+		moved = { X: false, Y: false };
+	});
+
+	function returnFromTest() {
+		const parts = [moved.X ? `X${ALIGN_MM}` : '', moved.Y ? `Y${ALIGN_MM}` : ''].filter(Boolean);
+		moved = { X: false, Y: false };
+		if (parts.length) void run([`$J=G91 G21 ${parts.join(' ')} F1500`]);
+	}
+
+	async function testAxis(axis: 'X' | 'Y') {
+		await run([`$J=G91 G21 ${axis}-${ALIGN_MM} F1500`]);
+		if (actionError) {
+			alignStep = 'idle';
+			alignError = t('align.failed');
+			returnFromTest();
+			return;
+		}
+		moved[axis] = true;
+		alignStep = axis === 'X' ? 'x' : 'y';
+	}
+
+	function startAlign() {
+		alignError = '';
+		alignX = undefined;
+		void testAxis('X');
+	}
+
+	function answer(direction: Direction) {
+		if (alignStep === 'x') {
+			alignX = OPPOSITE[direction];
+			alignStep = 'idle';
+			void testAxis('Y');
+			return;
+		}
+		const axes = alignX && axesFromDirections(alignX, OPPOSITE[direction]);
+		alignStep = 'idle';
+		returnFromTest();
+		if (!axes) {
+			alignError = t('align.invalid');
+			return;
+		}
+		settings.axes = axes;
+		settings.axesConfirmed = true;
+	}
+
+	function setTravel(key: 'width' | 'height', event: Event & { currentTarget: HTMLInputElement }) {
+		const max = settings.defaultTravel[key];
+		const value = Math.round(Math.min(max, Math.max(10, event.currentTarget.valueAsNumber || 0)));
+		settings.travel = { ...settings.area, [key]: value };
+		event.currentTarget.value = String(value);
+	}
+
 	function savePosition(event: SubmitEvent) {
 		event.preventDefault();
 		positions.save(
@@ -77,8 +168,6 @@
 		);
 		positionName = '';
 	}
-
-	const mm = (value: number) => value.toFixed(1);
 
 	async function sendConsole(event: SubmitEvent) {
 		event.preventDefault();
@@ -189,7 +278,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.up')}
-						onclick={() => jogBy(0, -step)}
+						onclick={() => jogBy(0, -jogStep)}
 						disabled={!canAct}
 					>
 						<ArrowUp size={18} />
@@ -198,7 +287,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.left')}
-						onclick={() => jogBy(-step, 0)}
+						onclick={() => jogBy(-jogStep, 0)}
 						disabled={!canAct}
 					>
 						<ArrowLeft size={18} />
@@ -214,7 +303,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.right')}
-						onclick={() => jogBy(step, 0)}
+						onclick={() => jogBy(jogStep, 0)}
 						disabled={!canAct}
 					>
 						<ArrowRight size={18} />
@@ -223,7 +312,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.downMove')}
-						onclick={() => jogBy(0, step)}
+						onclick={() => jogBy(0, jogStep)}
 						disabled={!canAct}
 					>
 						<ArrowDown size={18} />
@@ -231,16 +320,17 @@
 					<span></span>
 				</div>
 				<div class="mt-4 flex flex-wrap gap-2">
-					<Button
-						onclick={() => confirm(t('machine.originConfirm')) && run(setOrigin())}
-						disabled={!canAct}
-					>
+					<Button onclick={setCorner} disabled={!canAct}>
 						<Crosshair size={16} />
 						{t('machine.origin')}
 					</Button>
 					<Button onclick={() => run(goToOrigin())} disabled={!canAct}>
 						<House size={16} />
 						{t('machine.goOrigin')}
+					</Button>
+					<Button onclick={goToStop} disabled={!canAct || !positions.anchor}>
+						<SquareParking size={16} />
+						{t('machine.goAnchor')}
 					</Button>
 				</div>
 				{#if notice}
@@ -249,120 +339,124 @@
 				<p class="mt-4 text-sm text-ink-mute">
 					{t('machine.originHint')}
 				</p>
-				<label class="mt-4 flex items-start gap-2.5 text-sm text-ink">
-					<input
-						type="checkbox"
-						class="mt-0.5 size-4 accent-primary"
-						checked={settings.invertY}
-						onchange={(event) => settings.setInvertY(event.currentTarget.checked)}
-					/>
-					<span>
-						{t('machine.invertY')}
-						<span class="block text-ink-mute">
-							{t('machine.invertYHint')}
-						</span>
-					</span>
-				</label>
 			</section>
 
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">{t('positions.title')}</h2>
-				<p class="mt-2 text-sm text-ink-mute">{t('positions.intro')}</p>
-
-				{#if !positions.parkDefined}
-					<div class="mt-4 space-y-3 rounded-md bg-surface-card p-4">
-						<p class="text-sm text-ink">{t('positions.noPark')}</p>
-						<Button
-							onclick={() => confirm(t('positions.parkConfirm')) && positions.setPark()}
-							disabled={!canAct}
-						>
-							<SquareParking size={16} />
-							{t('positions.setPark')}
-						</Button>
-					</div>
-				{:else if !positions.ready}
+				<h2 class="font-semibold text-ink">{t('setup.title')}</h2>
+				<p class="mt-2 text-sm text-ink-mute">{t('setup.anchorHint')}</p>
+				{#if !positions.anchor}
 					<div class="mt-4 space-y-3 rounded-md border border-seal/40 bg-surface-card p-4">
-						<p class="text-sm text-ink">{t('positions.confirmQuestion')}</p>
-						<Button variant="primary" onclick={() => positions.confirmPark()} disabled={!canAct}>
+						<p class="text-sm text-ink">{t('anchor.question')}</p>
+						<Button variant="primary" onclick={confirmAnchor} disabled={!canAct}>
 							<SquareParking size={16} />
-							{t('positions.confirm')}
+							{t('anchor.confirm')}
 						</Button>
 					</div>
 				{:else}
-					<div class="mt-4 flex flex-wrap gap-2">
-						<Button onclick={() => goTo({ x: 0, y: 0 })} disabled={!canAct}>
-							<SquareParking size={16} />
-							{t('positions.park')}
-						</Button>
-						<Button
-							onclick={() => confirm(t('positions.parkConfirm')) && positions.setPark()}
-							disabled={!canAct}
-						>
-							{t('positions.setParkHere')}
-						</Button>
-					</div>
+					<p class="mt-3 text-sm text-ink">{t('anchor.ok')}</p>
+				{/if}
 
-					<div class="mt-5 border-t border-hairline-soft pt-4">
-						<h3 class="text-sm font-semibold text-ink">{t('positions.area')}</h3>
-						<p class="mt-1 text-sm text-ink-mute">
-							{positions.area
-								? t('positions.areaSet', {
-										width: mm(positions.area.maxX - positions.area.minX),
-										height: mm(positions.area.maxY - positions.area.minY)
-									})
-								: t('positions.areaNone')}
+				<div class="mt-5 border-t border-hairline-soft pt-4">
+					<h3 class="text-sm font-semibold text-ink">{t('align.title')}</h3>
+					{#if alignStep === 'idle'}
+						{#if !settings.axesConfirmed}
+							<p class="mt-1 text-sm text-seal">{t('align.needed')}</p>
+						{/if}
+						<p class="mt-1 text-sm text-ink-mute">{t('align.hint')}</p>
+						<Button class="mt-3" onclick={startAlign} disabled={!canAct}>
+							<Compass size={16} />
+							{t('align.start')}
+						</Button>
+					{:else}
+						<p class="mt-1 text-sm text-ink" role="status">
+							{alignStep === 'x' ? t('align.askX') : t('align.askY')}
 						</p>
 						<div class="mt-3 flex flex-wrap gap-2">
-							<Button onclick={() => positions.setCorner()} disabled={!canAct}>
-								<SquareDashed size={16} />
-								{positions.corner ? t('positions.secondCorner') : t('positions.firstCorner')}
-							</Button>
-							{#if positions.area || positions.corner}
-								<Button onclick={() => positions.clearArea()}>{t('positions.clearArea')}</Button>
-							{/if}
+							{#each answers as [direction, Icon] (direction)}
+								<Button onclick={() => answer(direction)} disabled={!canAct}>
+									<Icon size={16} />
+									{t(`align.${direction}`)}
+								</Button>
+							{/each}
 						</div>
-					</div>
+					{/if}
+					{#if alignError}
+						<p class="mt-2 text-sm text-danger" role="alert">{alignError}</p>
+					{/if}
+				</div>
 
-					<div class="mt-5 border-t border-hairline-soft pt-4">
-						<h3 class="text-sm font-semibold text-ink">{t('positions.saved')}</h3>
-						<form class="mt-3 flex gap-2" onsubmit={savePosition} novalidate>
-							<label class="sr-only" for="position-name">{t('positions.name')}</label>
+				<div class="mt-5 border-t border-hairline-soft pt-4">
+					<h3 class="text-sm font-semibold text-ink">{t('travel.title')}</h3>
+					<p class="mt-1 text-sm text-ink-mute">{t('travel.hint')}</p>
+					<div class="mt-3 flex flex-wrap items-end gap-3">
+						<label class="text-[13px] text-ink-mute">
+							{t('travel.width')}
 							<input
-								id="position-name"
-								bind:value={positionName}
-								placeholder={t('positions.namePlaceholder')}
-								class="h-10 min-w-0 flex-1 rounded-md border border-hairline bg-canvas px-3.5 text-sm text-ink"
+								type="number"
+								min="10"
+								max={settings.defaultTravel.width}
+								value={settings.area.width}
+								onchange={(event) => setTravel('width', event)}
+								class="mt-1 block h-10 w-28 rounded-md border border-hairline bg-canvas px-3 text-sm text-ink"
 							/>
-							<Button type="submit" disabled={!connected}>
-								<MapPin size={16} />
-								{t('positions.save')}
-							</Button>
-						</form>
-						{#if positions.positions.length > 0}
-							<ul class="mt-3 divide-y divide-hairline-soft">
-								{#each positions.positions as position (position.id)}
-									<li class="flex items-center gap-2 py-1.5 text-sm">
-										<span class="min-w-0 flex-1 truncate text-ink">{position.name}</span>
-										<span class="font-mono text-[12px] text-ink-mute">
-											{mm(position.x)} · {mm(position.y)}
-										</span>
-										<Button class="h-8! px-3!" onclick={() => goTo(position)} disabled={!canAct}>
-											{t('positions.goTo')}
-										</Button>
-										<Button
-											variant="icon"
-											class="size-8!"
-											aria-label={t('positions.remove')}
-											onclick={() => positions.remove(position.id)}
-										>
-											<Trash2 size={14} />
-										</Button>
-									</li>
-								{/each}
-							</ul>
+						</label>
+						<label class="text-[13px] text-ink-mute">
+							{t('travel.height')}
+							<input
+								type="number"
+								min="10"
+								max={settings.defaultTravel.height}
+								value={settings.area.height}
+								onchange={(event) => setTravel('height', event)}
+								class="mt-1 block h-10 w-28 rounded-md border border-hairline bg-canvas px-3 text-sm text-ink"
+							/>
+						</label>
+						{#if settings.travel}
+							<Button onclick={() => (settings.travel = null)}>{t('travel.reset')}</Button>
 						{/if}
 					</div>
-				{/if}
+				</div>
+
+				<div class="mt-5 border-t border-hairline-soft pt-4">
+					<h3 class="text-sm font-semibold text-ink">{t('positions.saved')}</h3>
+					<form class="mt-3 flex gap-2" onsubmit={savePosition} novalidate>
+						<label class="sr-only" for="position-name">{t('positions.name')}</label>
+						<input
+							id="position-name"
+							bind:value={positionName}
+							placeholder={t('positions.namePlaceholder')}
+							class="h-10 min-w-0 flex-1 rounded-md border border-hairline bg-canvas px-3.5 text-sm text-ink"
+						/>
+						<Button type="submit" disabled={!positions.anchor}>
+							<MapPin size={16} />
+							{t('positions.save')}
+						</Button>
+					</form>
+					{#if positions.positions.length > 0}
+						<ul class="mt-3 divide-y divide-hairline-soft">
+							{#each positions.positions as position (position.id)}
+								<li class="flex items-center gap-2 py-1.5 text-sm">
+									<span class="min-w-0 flex-1 truncate text-ink">{position.name}</span>
+									<Button
+										class="h-8! px-3!"
+										onclick={() => goTo(position)}
+										disabled={!canAct || !positions.ready}
+									>
+										{t('positions.goTo')}
+									</Button>
+									<Button
+										variant="icon"
+										class="size-8!"
+										aria-label={t('positions.remove')}
+										onclick={() => positions.remove(position.id)}
+									>
+										<Trash2 size={14} />
+									</Button>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
 			</section>
 
 			<section class="flex min-h-80 flex-col rounded-lg border border-hairline bg-canvas p-6">

@@ -15,8 +15,8 @@
 	import SheetPreview from './SheetPreview.svelte';
 	import PathPlayer from './PathPlayer.svelte';
 	import { estimateSeconds, outsideArea, toGcode } from '../gcode/fromPolylines';
-	import { orient, type Polyline } from '../geometry/types';
-	import { REALTIME, VGX4 } from '../grbl/vgx4';
+	import { toSheet, type Polyline } from '../geometry/types';
+	import { REALTIME } from '../grbl/vgx4';
 	import { download, filenameFrom } from '../download';
 	import { toSvg } from '../geometry/svg';
 	import { plotter } from '../serial/plotter.svelte';
@@ -73,15 +73,14 @@
 	}
 
 	const outsideSheet = $derived(outsideArea(polylines, sheet.width, sheet.height));
-	const outsideMachine = $derived(outsideArea(polylines, VGX4.areaWidth, VGX4.areaHeight));
-	const outsideWorkArea = $derived(positions.outside(polylines, settings.invertY));
+	const outsideWorkArea = $derived(positions.outside(polylines));
 	const minutes = $derived(Math.ceil(estimateSeconds(polylines) / 60));
 	const running = $derived(plotter.busy || plotter.status?.state === 'Hold');
 	const canDraw = $derived(
 		plotter.connection === 'connected' &&
 			!running &&
 			polylines.length > 0 &&
-			!outsideMachine &&
+			positions.originKnown &&
 			!outsideWorkArea
 	);
 
@@ -140,7 +139,7 @@
 			height={sheet.height}
 			margin={settings.margin}
 			{polylines}
-			pen={running && plotter.position ? orient(plotter.position, settings.invertY) : undefined}
+			pen={running && plotter.position ? toSheet(plotter.position, settings.axes) : undefined}
 		/>
 	</div>
 {/if}
@@ -209,8 +208,8 @@
 	<div class="basis-full text-sm">
 		{#if polylines.length === 0}
 			<p class="text-ink-mute">{emptyHint || t('job.empty')}</p>
-		{:else if outsideMachine}
-			<p class="text-danger" role="alert">{t('job.outsideMachine')}</p>
+		{:else if plotter.connection === 'connected' && !positions.originKnown}
+			<p class="text-danger" role="alert">{t('job.needsSetup')}</p>
 		{:else if outsideWorkArea}
 			<p class="text-danger" role="alert">{t('job.outsideArea')}</p>
 		{:else}

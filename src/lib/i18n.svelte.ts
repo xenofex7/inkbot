@@ -178,7 +178,6 @@ const en = {
 	'job.outsideSheet': 'The drawing does not fit on the sheet. Reduce the size or the margin.',
 	'job.outsideSheetConfirm':
 		'The drawing does not fit on the sheet and may draw past its edge. Draw anyway?',
-	'job.outsideMachine': "The drawing reaches beyond the plotter's drawing area.",
 	'job.connectFirst': 'Connect the plotter to draw.',
 	'job.originBefore': 'The red dot is the origin. On the',
 	'job.originLink': 'machine page',
@@ -210,32 +209,42 @@ const en = {
 	'machine.move': 'Move',
 	'machine.up': 'Move up',
 	'machine.left': 'Move left',
-	'machine.origin': 'Set origin here',
+	'machine.origin': 'Set sheet corner here',
 	'machine.right': 'Move right',
 	'machine.downMove': 'Move down',
-	'machine.goOrigin': 'Go to origin',
-	'machine.originConfirm': 'Make the current pen position the origin? Drawings start from here.',
-	'positions.parkConfirm':
-		'Make the current position the park position? The work area and saved positions move along with it.',
-	'positions.title': 'Park position, work area and positions',
-	'positions.intro':
-		'The plotter has no limit switches and takes its current spot as zero after every connect. The park position is the fixed reference: park the plotter there before you switch it off.',
-	'positions.noPark':
-		'No park position yet. Drive the pen to where the plotter should rest when you switch it off.',
-	'positions.setPark': 'Set park position here',
-	'positions.confirmQuestion':
-		'Is the plotter standing in its park position? Only then do the work area and saved positions match.',
-	'positions.confirm': 'Yes, it is parked',
-	'positions.park': 'Park',
-	'positions.setParkHere': 'Make this the park position',
-	'positions.area': 'Work area',
-	'positions.areaNone':
-		'Not set. Drive to one corner, set it, then to the opposite corner. After that the arrows stop at the edge.',
-	'positions.areaSet':
-		'{width} × {height} mm. The arrows stop at the edge, drawings outside are blocked.',
-	'positions.firstCorner': 'Set first corner here',
-	'positions.secondCorner': 'Set opposite corner here',
-	'positions.clearArea': 'Remove work area',
+	'machine.goAnchor': 'Go to start stop',
+	'setup.title': 'Setup',
+	'setup.anchorHint':
+		'The plotter cannot sense where it is. Before switching it on, push the carriage by hand to the stop in the top left corner, or press "Go to start stop" before switching off. It then starts at the same point every time and all positions stay right.',
+	'align.title': 'Orientation',
+	'align.hint':
+		'Tells inkbot how the plotter stands next to the sheet, so the arrows and drawings match what you see. Move the pen to the middle first, the test drives 10 mm.',
+	'align.start': 'Check orientation',
+	'align.askX': 'Test 1 of 2: The pen just moved 10 mm. Which way, looking at the sheet?',
+	'align.askY': 'Test 2 of 2: And which way did it move this time?',
+	'align.up': 'Up',
+	'align.down': 'Down',
+	'align.left': 'Left',
+	'align.right': 'Right',
+	'align.invalid': 'Both answers point along the same edge. Please run the check again.',
+	'travel.title': 'Travel area',
+	'travel.hint':
+		'How far the pen may move from the start stop, to the right and down. Smaller than the maximum if the table is smaller.',
+	'travel.width': 'Width (mm)',
+	'travel.height': 'Height (mm)',
+	'travel.reset': 'Back to maximum',
+	'anchor.question':
+		'Is the carriage at the start stop (top left)? Every connect restarts the plotter, so inkbot asks once per session. Only then the sheet corner and travel area are restored.',
+	'anchor.confirm': 'Yes, it is at the stop',
+	'anchor.ok': 'Start stop confirmed. Sheet corner and travel area are active.',
+	'align.needed':
+		'Needed once: until the orientation is checked, the arrows move at most 10 mm and the travel area is off.',
+	'align.failed': 'The test move did not run. Check the console and try again.',
+	'job.needsSetup':
+		'Confirm the start stop on the machine page, or set the sheet corner in this session, before drawing.',
+	'machine.goOrigin': 'Go to sheet corner',
+	'machine.originConfirm':
+		'Make the current pen position the sheet corner? Drawings start here, and the plotter keeps this point after a restart.',
 	'positions.saved': 'Saved positions',
 	'positions.name': 'Name of the position',
 	'positions.namePlaceholder': 'e.g. Paper corner',
@@ -247,10 +256,7 @@ const en = {
 	'job.outsideArea':
 		'The drawing reaches beyond the work area. Move the origin or make the drawing smaller.',
 	'machine.originHint':
-		'"Set origin here" makes the current pen position the origin, "Go to origin" lifts the pen and drives back to it. Reconnecting restarts the plotter and forgets the origin, so drive back to it before you disconnect. There are no limit switches, so do not drive past the frame.',
-	'machine.invertY': 'Invert Y axis',
-	'machine.invertYHint':
-		'Turn on if text comes out upside down. Matches the VG-X4 when you read from the pen side.',
+		'Put the pen on the top left corner of the sheet and set it as sheet corner. There are no limit switches, the arrows stop at the travel area.',
 	'machine.console': 'Console',
 	'machine.command': 'G-code command',
 	'machine.commandPlaceholder': 'e.g. $$ or G0 X10',
@@ -550,7 +556,6 @@ const de: Record<Key, string> = {
 	'job.outsideSheet': 'Die Zeichnung passt nicht aufs Blatt. Grösse oder Rand verkleinern.',
 	'job.outsideSheetConfirm':
 		'Die Zeichnung passt nicht aufs Blatt und kann über den Rand hinaus zeichnen. Trotzdem zeichnen?',
-	'job.outsideMachine': 'Die Zeichnung reicht über die Zeichenfläche des Plotters hinaus.',
 	'job.connectFirst': 'Verbinde den Plotter, um zu zeichnen.',
 	'job.originBefore': 'Der rote Punkt ist der Nullpunkt. Fahre den Stift auf der',
 	'job.originLink': 'Maschinen-Seite',
@@ -583,33 +588,42 @@ const de: Record<Key, string> = {
 	'machine.move': 'Bewegen',
 	'machine.up': 'Nach oben',
 	'machine.left': 'Nach links',
-	'machine.origin': 'Nullpunkt hier setzen',
+	'machine.origin': 'Blattecke hier setzen',
 	'machine.right': 'Nach rechts',
 	'machine.downMove': 'Nach unten',
-	'machine.goOrigin': 'Zum Nullpunkt fahren',
+	'machine.goAnchor': 'Zum Anschlag fahren',
+	'setup.title': 'Einrichtung',
+	'setup.anchorHint':
+		'Der Plotter spürt nicht, wo er steht. Schieb den Schlitten vor dem Einschalten von Hand an den Anschlag oben links, oder drück vor dem Ausschalten "Zum Anschlag fahren". Dann startet er jedes Mal am selben Punkt, und alle Positionen stimmen.',
+	'align.title': 'Ausrichtung',
+	'align.hint':
+		'Sagt inkbot, wie der Plotter neben dem Blatt steht, damit Pfeile und Zeichnungen so laufen, wie Du es siehst. Fahr den Stift vorher etwas in die Mitte, der Test fährt 10 mm.',
+	'align.start': 'Ausrichtung prüfen',
+	'align.askX': 'Test 1 von 2: Der Stift ist eben 10 mm gefahren. Wohin, vom Blatt aus gesehen?',
+	'align.askY': 'Test 2 von 2: Und wohin ist er diesmal gefahren?',
+	'align.up': 'Nach oben',
+	'align.down': 'Nach unten',
+	'align.left': 'Nach links',
+	'align.right': 'Nach rechts',
+	'align.invalid': 'Beide Antworten liegen auf derselben Kante. Bitte die Prüfung nochmals machen.',
+	'travel.title': 'Fahrbereich',
+	'travel.hint':
+		'Wie weit der Stift vom Anschlag aus fahren darf, nach rechts und nach unten. Kleiner als das Maximum, wenn der Tisch kleiner ist.',
+	'travel.width': 'Breite (mm)',
+	'travel.height': 'Höhe (mm)',
+	'travel.reset': 'Zurück auf Maximum',
+	'anchor.question':
+		'Steht der Schlitten am Anschlag oben links? Jedes Verbinden startet den Plotter neu, darum fragt inkbot einmal pro Sitzung. Erst dann werden Blattecke und Fahrbereich wiederhergestellt.',
+	'anchor.confirm': 'Ja, er steht am Anschlag',
+	'anchor.ok': 'Anschlag bestätigt. Blattecke und Fahrbereich sind aktiv.',
+	'align.needed':
+		'Einmal nötig: Bis die Ausrichtung geprüft ist, fahren die Pfeile höchstens 10 mm, und der Fahrbereich ist aus.',
+	'align.failed': 'Die Testfahrt lief nicht. Schau in die Konsole und versuch es nochmals.',
+	'job.needsSetup':
+		'Bestätige vor dem Zeichnen auf der Maschinen-Seite den Anschlag, oder setz in dieser Sitzung die Blattecke.',
+	'machine.goOrigin': 'Zur Blattecke fahren',
 	'machine.originConfirm':
-		'Die aktuelle Stiftposition zum Nullpunkt machen? Zeichnungen beginnen dann hier.',
-	'positions.parkConfirm':
-		'Die aktuelle Position als Parkposition festlegen? Arbeitsfläche und gespeicherte Positionen werden mitverschoben.',
-	'positions.title': 'Parkposition, Arbeitsfläche und Positionen',
-	'positions.intro':
-		'Der Plotter hat keine Endschalter und nimmt nach jedem Verbinden seine aktuelle Stelle als Null. Die Parkposition ist der feste Bezugspunkt: Park den Plotter dort, bevor Du ihn ausschaltest.',
-	'positions.noPark':
-		'Noch keine Parkposition. Fahr den Stift dorthin, wo der Plotter beim Ausschalten stehen soll.',
-	'positions.setPark': 'Parkposition hier festlegen',
-	'positions.confirmQuestion':
-		'Steht der Plotter in der Parkposition? Erst dann stimmen Arbeitsfläche und gespeicherte Positionen.',
-	'positions.confirm': 'Ja, er steht dort',
-	'positions.park': 'Parken',
-	'positions.setParkHere': 'Hier als Parkposition festlegen',
-	'positions.area': 'Arbeitsfläche',
-	'positions.areaNone':
-		'Nicht festgelegt. Fahr in eine Ecke, setz sie, dann in die gegenüberliegende Ecke. Danach stoppen die Pfeile an der Kante.',
-	'positions.areaSet':
-		'{width} × {height} mm. Die Pfeile stoppen an der Kante, Zeichnungen ausserhalb werden blockiert.',
-	'positions.firstCorner': 'Erste Ecke hier setzen',
-	'positions.secondCorner': 'Gegenüberliegende Ecke hier setzen',
-	'positions.clearArea': 'Arbeitsfläche entfernen',
+		'Die aktuelle Stiftposition zur Blattecke machen? Zeichnungen beginnen hier, und der Plotter behält den Punkt auch nach einem Neustart.',
 	'positions.saved': 'Gespeicherte Positionen',
 	'positions.name': 'Name der Position',
 	'positions.namePlaceholder': 'z.B. Papierecke',
@@ -621,10 +635,7 @@ const de: Record<Key, string> = {
 	'job.outsideArea':
 		'Die Zeichnung reicht über die Arbeitsfläche hinaus. Nullpunkt verschieben oder Zeichnung verkleinern.',
 	'machine.originHint':
-		'"Nullpunkt hier setzen" macht die aktuelle Stiftposition zum Nullpunkt, "Zum Nullpunkt fahren" hebt den Stift und fährt dorthin zurück. Beim Neuverbinden startet der Plotter neu und vergisst den Nullpunkt, darum vor dem Trennen zurückfahren. Es gibt keine Endschalter, also nicht über den Rahmen hinausfahren.',
-	'machine.invertY': 'Y-Achse umkehren',
-	'machine.invertYHint':
-		'Einschalten, wenn Text auf dem Kopf steht. Passt zum VG-X4, wenn Du von der Stift-Seite her liest.',
+		'Stift auf die obere linke Ecke des Blatts fahren und als Blattecke setzen. Es gibt keine Endschalter, die Pfeile stoppen am Fahrbereich.',
 	'machine.console': 'Konsole',
 	'machine.command': 'G-Code-Befehl',
 	'machine.commandPlaceholder': 'z.B. $$ oder G0 X10',
