@@ -11,9 +11,8 @@ export type ProviderConfig = {
 export const OPENAI_BASE_URL = 'https://api.openai.com/v1';
 
 export const DEFAULT_PROMPT_TEMPLATE =
-	'Simple black line drawing of {prompt}. Clean single strokes of even width, ' +
-	'no shading, no fills, no gradients, no text, no frame, plain white background, ' +
-	'minimal detail, like a coloring book outline drawn with a fine pen.';
+	'Bold black and white illustration of {prompt}. Solid black filled shapes and clean ' +
+	'outlines, no gradients, no grey tones, no text, no frame, plain white background.';
 
 export function buildPrompt(template: string, prompt: string) {
 	const subject = prompt.trim();
