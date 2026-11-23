@@ -21,7 +21,7 @@ export class Plotter {
 	log = $state<LogEntry[]>([]);
 
 	position = $derived(this.status ? workPosition(this.status, this.wco) : undefined);
-	penDown = $derived(this.status?.spindleOn ?? false);
+	penDown = $state(false);
 	busy = $derived(this.status?.state === 'Run' || this.status?.state === 'Jog');
 
 	#port: SerialPort | undefined;
@@ -84,6 +84,7 @@ export class Plotter {
 		this.#writer = undefined;
 		this.connection = 'disconnected';
 		this.status = undefined;
+		this.penDown = false;
 	}
 
 	async send(line: string) {
@@ -189,6 +190,7 @@ export class Plotter {
 			case 'greeting':
 				this.greeting = message.text;
 				this.alarm = undefined;
+				this.penDown = false;
 				this.#rejectPending(new Error(t('error.reset')));
 				this.#greetingWaiter?.();
 				this.#greetingWaiter = undefined;
@@ -198,6 +200,7 @@ export class Plotter {
 				break;
 			case 'status':
 				this.status = message.report;
+				if (message.report.spindleOn !== undefined) this.penDown = message.report.spindleOn;
 				if (message.report.wco) this.wco = message.report.wco;
 				if (message.report.state === 'Alarm') this.alarm ??= 0;
 				break;

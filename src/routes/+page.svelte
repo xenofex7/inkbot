@@ -87,7 +87,7 @@
 					<dt class="text-ink-mute">{t('machine.state')}</dt>
 					<dd class="text-ink">{plotter.status?.state ?? '-'}</dd>
 					<dt class="text-ink-mute">{t('machine.firmware')}</dt>
-					<dd class="text-ink">{plotter.greeting || '-'}</dd>
+					<dd class="text-ink">{plotter.greeting.replace(/\s*\['\$' for help\]$/, '') || '-'}</dd>
 				</dl>
 				{#if plotter.alarm !== undefined}
 					<div class="mt-4 rounded-md border border-danger p-3 text-sm text-danger" role="alert">

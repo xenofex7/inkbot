@@ -37,7 +37,6 @@ describe('parseStatus', () => {
 	it('parses an idle report with WCO', () => {
 		expect(parseStatus('<Idle|MPos:0.000,-30.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>')).toEqual({
 			state: 'Idle',
-			spindleOn: false,
 			mpos: { x: 0, y: -30, z: 0 },
 			feed: 0,
 			spindle: 0,
@@ -50,6 +49,13 @@ describe('parseStatus', () => {
 		expect(report?.state).toBe('Run');
 		expect(report?.spindleOn).toBe(true);
 		expect(report?.feed).toBe(7071);
+	});
+
+	it('knows the pen is up only when the report carries override values', () => {
+		expect(parseStatus('<Idle|MPos:0.000,0.000,0.000|FS:0,0|Ov:100,100,100>')?.spindleOn).toBe(
+			false
+		);
+		expect(parseStatus('<Idle|MPos:0.000,0.000,0.000|FS:0,0>')?.spindleOn).toBeUndefined();
 	});
 
 	it('parses sub states', () => {

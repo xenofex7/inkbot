@@ -35,7 +35,7 @@ export function parseStatus(line: string): StatusReport | undefined {
 	if (!match) return undefined;
 	const [head, ...fields] = match[1].split('|');
 	const [state, sub] = head.split(':');
-	const report: StatusReport = { state: state as MachineState, spindleOn: false };
+	const report: StatusReport = { state: state as MachineState };
 	if (sub !== undefined) report.subState = Number(sub);
 	for (const field of fields) {
 		const [key, value = ''] = field.split(':');
@@ -45,7 +45,8 @@ export function parseStatus(line: string): StatusReport | undefined {
 			const [feed, spindle] = value.split(',').map(Number);
 			report.feed = feed;
 			report.spindle = spindle;
-		} else if (key === 'A') report.spindleOn = value.includes('S');
+		} else if (key === 'Ov') report.spindleOn ??= false;
+		else if (key === 'A') report.spindleOn = value.includes('S');
 	}
 	return report;
 }
