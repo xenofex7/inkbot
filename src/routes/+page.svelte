@@ -46,7 +46,7 @@
 				<img
 					src={asset('favicon.png')}
 					alt="inkbot"
-					class="mb-8 w-48 rounded-xl shadow-md md:w-64"
+					class="mb-8 w-48 rounded-[18.75%] shadow-md md:w-64"
 				/>
 				<h1 class="font-display text-4xl font-semibold tracking-[-1px] text-ink md:text-5xl">
 					{t('machine.title')}
