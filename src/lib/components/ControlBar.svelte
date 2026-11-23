@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { paperName, t } from '../i18n.svelte';
 	import { ArrowDownToLine, ArrowUpFromLine, OctagonX, Pause, Play } from '@lucide/svelte';
 	import Button from './Button.svelte';
 	import { penDown, penUp } from '../grbl/commands';
@@ -41,20 +42,22 @@
 				class="h-9! px-3!"
 				onclick={() => run(penUp())}
 				disabled={!canAct}
-				aria-label="Pen up"
+				aria-label={t('bar.penUp')}
 			>
-				<ArrowUpFromLine size={16} /> Up
+				<ArrowUpFromLine size={16} />
+				{t('bar.up')}
 			</Button>
 			<Button
 				class="h-9! px-3!"
 				onclick={() => run(penDown(settings.penDownS))}
 				disabled={!canAct}
-				aria-label="Pen down"
+				aria-label={t('bar.penDown')}
 			>
-				<ArrowDownToLine size={16} /> Down
+				<ArrowDownToLine size={16} />
+				{t('bar.down')}
 			</Button>
 			<label class="flex items-center gap-1.5 text-ink-mute" for="pen-depth">
-				Depth S
+				{t('bar.depth')}
 				<input
 					id="pen-depth"
 					type="number"
@@ -68,29 +71,29 @@
 			</label>
 		</div>
 
-		<div class="font-mono text-ink" aria-label="Pen position">
+		<div class="font-mono text-ink" aria-label={t('bar.position')}>
 			X {format(position?.x)} · Y {format(position?.y)} mm
 		</div>
 
 		<div class="flex items-center gap-2">
-			<label class="sr-only" for="bar-format">Paper format</label>
+			<label class="sr-only" for="bar-format">{t('bar.paper')}</label>
 			<select id="bar-format" bind:value={settings.formatId} class={field}>
 				{#each PAPER_FORMATS as option (option.id)}
-					<option value={option.id}>{option.name}</option>
+					<option value={option.id}>{paperName(option)}</option>
 				{/each}
 			</select>
-			<label class="sr-only" for="bar-orientation">Orientation</label>
+			<label class="sr-only" for="bar-orientation">{t('bar.orientation')}</label>
 			<select
 				id="bar-orientation"
 				value={settings.orientation}
 				onchange={(event) => (settings.orientation = event.currentTarget.value as Orientation)}
 				class={field}
 			>
-				<option value="portrait">Portrait</option>
-				<option value="landscape">Landscape</option>
+				<option value="portrait">{t('bar.portrait')}</option>
+				<option value="landscape">{t('bar.landscape')}</option>
 			</select>
 			<label class="flex items-center gap-1.5 text-ink-mute" for="bar-margin">
-				Margin
+				{t('bar.margin')}
 				<input
 					id="bar-margin"
 					type="number"
@@ -106,11 +109,13 @@
 			<div class="ml-auto flex items-center gap-2">
 				{#if plotter.status?.state === 'Hold'}
 					<Button class="h-9! px-3!" onclick={() => plotter.realtime(REALTIME.cycleStart)}>
-						<Play size={16} /> Resume
+						<Play size={16} />
+						{t('job.resume')}
 					</Button>
 				{:else}
 					<Button class="h-9! px-3!" onclick={() => plotter.realtime(REALTIME.feedHold)}>
-						<Pause size={16} /> Pause
+						<Pause size={16} />
+						{t('job.pause')}
 					</Button>
 				{/if}
 				<Button
@@ -118,7 +123,8 @@
 					class="h-9! px-3!"
 					onclick={() => plotter.realtime(REALTIME.softReset)}
 				>
-					<OctagonX size={16} /> Stop
+					<OctagonX size={16} />
+					{t('job.stop')}
 				</Button>
 			</div>
 		{/if}

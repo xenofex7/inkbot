@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '#lib/i18n.svelte.ts';
 	import './layout.css';
 	import { page } from '$app/state';
 	import { asset, resolve } from '$app/paths';
@@ -11,12 +12,16 @@
 	let { children }: LayoutProps = $props();
 
 	const nav = [
-		{ href: resolve('/'), label: 'Machine' },
-		{ href: resolve('/text'), label: 'Text' },
-		{ href: resolve('/image'), label: 'Image' },
-		{ href: resolve('/gallery'), label: 'Gallery' },
-		{ href: resolve('/settings'), label: 'Settings' }
-	];
+		{ href: resolve('/'), label: 'nav.machine' },
+		{ href: resolve('/text'), label: 'nav.text' },
+		{ href: resolve('/image'), label: 'nav.image' },
+		{ href: resolve('/gallery'), label: 'nav.gallery' },
+		{ href: resolve('/settings'), label: 'nav.settings' }
+	] as const;
+
+	$effect(() => {
+		document.documentElement.lang = i18n.locale === 'de' ? 'de-CH' : 'en';
+	});
 </script>
 
 <svelte:head>
@@ -38,7 +43,7 @@
 							: 'text-ink-mute'}"
 						aria-current={page.url.pathname === item.href ? 'page' : undefined}
 					>
-						{item.label}
+						{t(item.label)}
 					</a>
 				{/each}
 			</nav>
@@ -46,10 +51,10 @@
 				<StatusBadge />
 				{#if plotter.connection === 'disconnected'}
 					<Button variant="primary" onclick={() => plotter.connect()} disabled={!plotter.supported}>
-						Connect plotter
+						{t('connect.button')}
 					</Button>
 				{:else}
-					<Button onclick={() => plotter.disconnect()}>Disconnect</Button>
+					<Button onclick={() => plotter.disconnect()}>{t('connect.disconnect')}</Button>
 				{/if}
 			</div>
 		</div>

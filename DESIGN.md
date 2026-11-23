@@ -355,7 +355,7 @@ A single easing curve is intentional. A second one needs a reason this document 
 | Loading | Active, optimistic | "Connecting to the plotter …" |
 
 ### Language & Localisation
-- **Language:** English interface, informal and direct. A German translation is planned (Swiss orthography, `ss` instead of the sharp s, informal "Du").
+- **Languages:** English and German, switchable in the settings. German uses Swiss orthography (`ss` instead of the sharp s) and the informal "Du". All strings live in `src/lib/i18n.svelte.ts`.
 - **Dates:** `DD.MM.YYYY`, times `14:30`.
 - **Numbers and currency:** apostrophe as thousands separator, point as decimal separator - `1'234.55`, `CHF 1'234.55`.
 - **Quotes:** straight `"…"` only. No guillemets, no typographic quotes.
@@ -543,7 +543,7 @@ Two token groups do **not** reach a text threshold, and that is a constraint, no
 - **`prefers-color-scheme`:** supported - `requirements.darkMode` is true. Activation is system preference plus a `data-theme` override.
 - **Screen readers:** semantic HTML before ARIA. Buttons are `<button>`, links are `<a>`, icon-only buttons carry `aria-label`.
 - **Forms:** every field has a label wired with `for`/`id`; error messages reference it via `aria-describedby`.
-- **Language:** `<html lang="en">`; a German version would switch to `de-CH`.
+- **Language:** `<html lang>` follows the active language (`en` or `de-CH`).
 
 ### Don't
 - No `outline: none` without a visible replacement.

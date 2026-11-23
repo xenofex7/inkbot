@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t, type MessageKey } from '#lib/i18n.svelte.ts';
 	import { Download, ImageUp, RotateCcw, Sparkles } from '@lucide/svelte';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { resolve } from '$app/paths';
@@ -15,10 +16,10 @@
 	import { settings } from '#lib/settings.svelte.ts';
 	import { parseSvg } from '#lib/svg/parse.ts';
 
-	const modes: [TraceMode, string, string][] = [
-		['lines', 'Lines', 'Centre line of dark strokes, best for line art'],
-		['outline', 'Outline', 'Contour of dark areas'],
-		['hatch', 'Hatching', 'Brightness as hatching, for photos']
+	const modes: [TraceMode, MessageKey, MessageKey][] = [
+		['lines', 'image.lines', 'image.linesHint'],
+		['outline', 'image.outline', 'image.outlineHint'],
+		['hatch', 'image.hatch', 'image.hatchHint']
 	];
 
 	let mode = $state<TraceMode>('lines');
@@ -31,18 +32,10 @@
 	let loadError = $state('');
 	let fileInput = $state<HTMLInputElement>();
 	type Source = 'file' | 'ai-image' | 'ai-drawing';
-	const sources: [Source, string, string][] = [
-		['file', 'File', 'An image or SVG from your computer.'],
-		[
-			'ai-image',
-			'AI image',
-			'An image model paints a picture, inkbot then traces it into lines. More detail, lines can be a bit rough.'
-		],
-		[
-			'ai-drawing',
-			'AI drawing',
-			'A chat model draws vector lines directly. Every stroke is clean and drawn once, the style is simpler.'
-		]
+	const sources: [Source, MessageKey, MessageKey][] = [
+		['file', 'image.file', 'image.fileHint'],
+		['ai-image', 'image.aiImage', 'image.aiImageHint'],
+		['ai-drawing', 'image.aiDrawing', 'image.aiDrawingHint']
 	];
 	let source = $state<Source>('file');
 	let prompt = $state('');
@@ -86,7 +79,7 @@
 		} catch (error) {
 			generateError =
 				error instanceof TypeError
-					? 'No response from the provider. Is the URL correct and does the server allow browser requests (CORS)?'
+					? t('image.noResponse')
 					: error instanceof Error
 						? error.message
 						: String(error);
@@ -181,7 +174,7 @@
 		} else if (file.type.startsWith('image/')) {
 			imageSource.set(file, file.name);
 		} else {
-			loadError = 'That is not an image or SVG file.';
+			loadError = t('image.notImage');
 		}
 	}
 
@@ -192,10 +185,12 @@
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]"
 >
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
-		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Draw an image</h1>
+		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+			{t('image.title')}
+		</h1>
 
 		<div>
-			<span class={label}>Source</span>
+			<span class={label}>{t('image.source')}</span>
 			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
 				{#each sources as [value, name] (value)}
 					<button
@@ -206,12 +201,12 @@
 							: 'text-ink-mute'}"
 						onclick={() => (source = value)}
 					>
-						{name}
+						{t(name)}
 					</button>
 				{/each}
 			</div>
 			<p class="mt-2 text-[13px] text-ink-mute">
-				{sources.find(([value]) => value === source)?.[2]}
+				{t(sources.find(([value]) => value === source)?.[2] ?? 'image.fileHint')}
 			</p>
 		</div>
 
@@ -226,32 +221,35 @@
 				/>
 				<div class="flex items-center gap-3">
 					<Button onclick={() => fileInput?.click()}>
-						<ImageUp size={16} /> Choose file
+						<ImageUp size={16} />
+						{t('image.choose')}
 					</Button>
 					<span class="min-w-0 truncate text-[13px] text-ink-mute">
-						{imageSource.name || 'No file chosen'}
+						{imageSource.name || t('image.noFile')}
 					</span>
 				</div>
 			{:else if !aiReady}
 				<p class="rounded-md bg-surface-card p-3 text-sm text-ink">
-					Set up an AI provider{source === 'ai-drawing' ? ' and a drawing model' : ''} in the
-					<a class="text-link underline" href={resolve('/settings')}>settings</a> first.
+					{source === 'ai-drawing' ? t('image.setupDrawingBefore') : t('image.setupBefore')}
+					<a class="text-link underline" href={resolve('/settings')}>{t('image.setupLink')}</a>{t(
+						'image.setupAfter'
+					)}
 				</p>
 			{:else}
 				<label class={label} for="prompt">
-					{source === 'ai-drawing' ? 'Drawing idea' : 'Image idea'}
+					{source === 'ai-drawing' ? t('image.drawingIdea') : t('image.imageIdea')}
 				</label>
 				<textarea
 					id="prompt"
 					bind:value={prompt}
 					rows="3"
-					placeholder="e.g. a cat asleep on a stack of books"
+					placeholder={t('image.ideaPlaceholder')}
 					class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"
 				></textarea>
 				<div class="mt-2 flex items-center gap-3">
 					<Button variant="primary" onclick={generate} disabled={generating || !prompt.trim()}>
 						<Sparkles size={16} />
-						{generating ? 'Generating …' : 'Generate'}
+						{generating ? t('image.generating') : t('image.generate')}
 					</Button>
 					<span class="text-[13px] text-ink-mute">
 						{source === 'ai-drawing' ? aiSettings.drawingModel : aiSettings.model}
@@ -280,10 +278,11 @@
 							)}
 					>
 						<Download size={16} />
-						{isVector ? 'Save source SVG' : 'Save image'}
+						{isVector ? t('image.saveSource') : t('image.saveImage')}
 					</Button>
 					<Button onclick={startOver}>
-						<RotateCcw size={16} /> Start over
+						<RotateCcw size={16} />
+						{t('image.startOver')}
 					</Button>
 				</div>
 			{/if}
@@ -294,7 +293,7 @@
 
 		{#if isVector}
 			<div>
-				<label class={label} for="vector-size">Size: {sizePercent} %</label>
+				<label class={label} for="vector-size">{t('image.size', { value: sizePercent })}</label>
 				<input
 					id="vector-size"
 					type="range"
@@ -304,12 +303,12 @@
 					class="w-full accent-primary"
 				/>
 				<p class="mt-2 text-[13px] text-ink-mute">
-					Vector source: the paths are drawn exactly, no conversion needed.
+					{t('image.vectorHint')}
 				</p>
 			</div>
 		{:else}
 			<div>
-				<span class={label}>Conversion</span>
+				<span class={label}>{t('image.conversion')}</span>
 				<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
 					{#each modes as [value, name] (value)}
 						<button
@@ -320,17 +319,17 @@
 								: 'text-ink-mute'}"
 							onclick={() => (mode = value)}
 						>
-							{name}
+							{t(name)}
 						</button>
 					{/each}
 				</div>
 				<p class="mt-2 text-[13px] text-ink-mute">
-					{modes.find(([value]) => value === mode)?.[2]}
+					{t(modes.find(([value]) => value === mode)?.[2] ?? 'image.linesHint')}
 				</p>
 			</div>
 
 			<div>
-				<label class={label} for="threshold">Threshold: {threshold}</label>
+				<label class={label} for="threshold">{t('image.threshold', { value: threshold })}</label>
 				<input
 					id="threshold"
 					type="range"
@@ -342,7 +341,7 @@
 			</div>
 
 			<div>
-				<label class={label} for="size">Size: {sizePercent} %</label>
+				<label class={label} for="size">{t('image.size', { value: sizePercent })}</label>
 				<input
 					id="size"
 					type="range"
@@ -354,7 +353,7 @@
 			</div>
 
 			<div>
-				<label class={label} for="detail">Detail: {detail} px</label>
+				<label class={label} for="detail">{t('image.detail', { value: detail })}</label>
 				<input
 					id="detail"
 					type="range"
@@ -370,9 +369,9 @@
 				<label class="flex items-start gap-2.5 text-sm text-ink">
 					<input type="checkbox" class="mt-0.5 size-4 accent-primary" bind:checked={fillHatch} />
 					<span>
-						Hatch filled areas
+						{t('image.fill')}
 						<span class="block text-[13px] text-ink-mute">
-							Dark areas wider than a stroke get an outline and diagonal hatching.
+							{t('image.fillHint')}
 						</span>
 					</span>
 				</label>
@@ -380,7 +379,7 @@
 
 			{#if mode === 'hatch' || fillHatch}
 				<div>
-					<label class={label} for="spacing">Line spacing: {hatchSpacing} mm</label>
+					<label class={label} for="spacing">{t('image.spacing', { value: hatchSpacing })}</label>
 					<input
 						id="spacing"
 						type="range"
@@ -397,7 +396,7 @@
 
 	<section
 		class="flex flex-col gap-4"
-		aria-label="Preview"
+		aria-label={t('image.preview')}
 		ondragover={(event) => event.preventDefault()}
 		ondrop={(event) => {
 			event.preventDefault();
@@ -411,7 +410,7 @@
 			source={imageSource.blob
 				? { kind: isVector ? 'svg' : 'image', blob: imageSource.blob, name: imageSource.name }
 				: undefined}
-			emptyHint="Choose an image or SVG, or drop it on the preview."
+			emptyHint={t('image.empty')}
 		/>
 	</section>
 </main>

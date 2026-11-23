@@ -11,6 +11,8 @@ As of 22.11.2026. Done items are marked [x].
   (A4, A5, A6, envelopes C6/DL), alignment
 - [x] **Preview & run:** sheet preview, run time, start / pause / stop
 - [x] **Save:** drawing as SVG, source image as file
+- [x] **Languages:** English and German, switchable in the settings, follows the browser
+  language on the first visit
 - [x] **Gallery:** save drawings with their source in the browser (IndexedDB), preview,
   plot again, reopen in the editor, delete
 - [x] **SVG:** import, scale, position
@@ -40,5 +42,4 @@ As of 22.11.2026. Done items are marked [x].
 - Random variation so writing looks real (jitter, spacing, letter variants)
 - Several pens / colours with a pause to swap
 - Gallery export and import (backup or move to another browser)
-- German interface as a second language
 - Dark mode

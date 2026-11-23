@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '../i18n.svelte';
 	import type { Point, Polyline } from '../geometry/types';
 
 	let {
@@ -22,7 +23,7 @@
 	viewBox="-6 -6 {width + 12} {height + 12}"
 	class="h-auto max-h-[70vh] w-full"
 	role="img"
-	aria-label="Sheet preview, {width} × {height} mm"
+	aria-label={t('preview.label', { width, height })}
 >
 	<rect
 		x="0"

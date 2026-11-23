@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { strokes, t } from '../i18n.svelte';
 	import { BookmarkPlus, Download, OctagonX, Pause, PenLine, Play } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Button from './Button.svelte';
@@ -18,7 +19,7 @@
 		name = 'inkbot',
 		source,
 		saveable = true,
-		emptyHint = 'Nothing to draw yet.'
+		emptyHint = ''
 	}: {
 		polylines: Polyline[];
 		sheet: { width: number; height: number };
@@ -40,7 +41,7 @@
 		saveState = 'saving';
 		try {
 			await gallery.add({
-				name: name.trim() || 'Untitled',
+				name: name.trim() || t('job.untitled'),
 				formatId: settings.formatId,
 				orientation: settings.orientation,
 				margin: settings.margin,
@@ -96,50 +97,55 @@
 	{#if running}
 		{#if plotter.status?.state === 'Hold'}
 			<Button onclick={() => plotter.realtime(REALTIME.cycleStart)}>
-				<Play size={16} /> Resume
+				<Play size={16} />
+				{t('job.resume')}
 			</Button>
 		{:else}
 			<Button onclick={() => plotter.realtime(REALTIME.feedHold)}>
-				<Pause size={16} /> Pause
+				<Pause size={16} />
+				{t('job.pause')}
 			</Button>
 		{/if}
 		<Button variant="stop" onclick={() => plotter.realtime(REALTIME.softReset)}>
-			<OctagonX size={16} /> Stop
+			<OctagonX size={16} />
+			{t('job.stop')}
 		</Button>
 	{:else}
 		<Button variant="primary" onclick={draw} disabled={!canDraw}>
-			<PenLine size={16} /> Draw
+			<PenLine size={16} />
+			{t('job.draw')}
 		</Button>
 	{/if}
 	<Button onclick={saveSvg} disabled={polylines.length === 0}>
-		<Download size={16} /> Save SVG
+		<Download size={16} />
+		{t('job.saveSvg')}
 	</Button>
 	{#if saveable}
 		<Button onclick={saveToGallery} disabled={polylines.length === 0 || saveState !== 'idle'}>
 			<BookmarkPlus size={16} />
-			{saveState === 'saved' ? 'Saved' : 'Save to gallery'}
+			{saveState === 'saved' ? t('job.saved') : t('job.saveGallery')}
 		</Button>
 	{/if}
 	<span class="text-sm text-ink-mute">
-		{sheet.width} × {sheet.height} mm · {polylines.length}
-		{polylines.length === 1 ? 'stroke' : 'strokes'} · approx. {minutes} min
+		{sheet.width} × {sheet.height} mm · {strokes(polylines.length)} · {t('job.approx', { minutes })}
 	</span>
 	<div class="basis-full text-sm">
 		{#if polylines.length === 0}
-			<p class="text-ink-mute">{emptyHint}</p>
+			<p class="text-ink-mute">{emptyHint || t('job.empty')}</p>
 		{:else if outsideSheet}
 			<p class="text-danger" role="alert">
-				The drawing does not fit on the sheet. Reduce the size or the margin.
+				{t('job.outsideSheet')}
 			</p>
 		{:else if outsideMachine}
-			<p class="text-danger" role="alert">The drawing reaches beyond the plotter's drawing area.</p>
+			<p class="text-danger" role="alert">{t('job.outsideMachine')}</p>
 		{:else if plotter.connection !== 'connected'}
-			<p class="text-ink-mute">Connect the plotter to draw.</p>
+			<p class="text-ink-mute">{t('job.connectFirst')}</p>
 		{:else}
 			<p class="text-ink-mute">
-				The red dot is the origin. On the
-				<a class="text-link underline" href={resolve('/')}>machine page</a>, move the pen to the top
-				left corner of the sheet and set the origin there.
+				{t('job.originBefore')}
+				<a class="text-link underline" href={resolve('/')}>{t('job.originLink')}</a>{t(
+					'job.originAfter'
+				)}
 			</p>
 		{/if}
 		{#if drawError}

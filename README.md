@@ -26,6 +26,7 @@ Browser app to drive the VigoTec VG-X4 pen plotter (writing robot) straight from
 - Import SVG files and draw their paths exactly
 - AI image or AI drawing (SVG) from a prompt, with OpenAI or any OpenAI-compatible server such as LiteLLM, editable prompts, your key stays in the browser
 - Sheet preview with run time, pause and stop, save as SVG, gallery of saved drawings
+- English and German interface
 
 ## Requirements
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { paperName, strokes, t } from '#lib/i18n.svelte.ts';
 	import { onMount } from 'svelte';
 	import { ImageUp, Trash2 } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
@@ -54,14 +55,16 @@
 			year: 'numeric'
 		});
 	const paper = (item: GalleryItem) =>
-		`${PAPER_FORMATS.find((f) => f.id === item.formatId)?.name ?? item.formatId} ${item.orientation}`;
+		`${PAPER_FORMATS.some((f) => f.id === item.formatId) ? paperName(PAPER_FORMATS.find((f) => f.id === item.formatId)!) : item.formatId} ${t(item.orientation === 'portrait' ? 'bar.portrait' : 'bar.landscape')}`;
 </script>
 
 <main
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
 >
 	<section class="space-y-5">
-		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Gallery</h1>
+		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+			{t('gallery.title')}
+		</h1>
 
 		{#if gallery.error || actionError}
 			<p class="text-sm text-danger" role="alert">{gallery.error || actionError}</p>
@@ -69,9 +72,11 @@
 
 		{#if gallery.loaded && gallery.items.length === 0}
 			<p class="rounded-lg bg-surface-card p-6 text-ink">
-				No drawings yet. Use "Save to gallery" on the
-				<a class="text-link underline" href={resolve('/text')}>Text</a> or
-				<a class="text-link underline" href={resolve('/image')}>Image</a> page and they show up here.
+				{t('gallery.emptyBefore')}
+				<a class="text-link underline" href={resolve('/text')}>{t('nav.text')}</a>
+				{t('gallery.emptyOr')}
+				<a class="text-link underline" href={resolve('/image')}>{t('nav.image')}</a>
+				{t('gallery.emptyAfter')}
 			</p>
 		{/if}
 
@@ -95,25 +100,31 @@
 						/>
 						<span class="mt-2 block truncate text-sm font-semibold text-ink">{item.name}</span>
 						<span class="block text-[13px] text-ink-mute">
-							{date(item.createdAt)} · {paper(item)} · {item.polylines.length}
-							{item.polylines.length === 1 ? 'stroke' : 'strokes'}
+							{date(item.createdAt)} · {paper(item)} · {strokes(item.polylines.length)}
 						</span>
 					</button>
 					<div class="mt-3 flex flex-wrap gap-2">
 						{#if confirmId === item.id}
-							<span class="basis-full text-[13px] text-ink">Delete "{item.name}"?</span>
-							<Button variant="stop" class="h-8! px-3!" onclick={() => remove(item)}>Delete</Button>
-							<Button class="h-8! px-3!" onclick={() => (confirmId = undefined)}>Cancel</Button>
+							<span class="basis-full text-[13px] text-ink">
+								{t('gallery.confirm', { name: item.name })}
+							</span>
+							<Button variant="stop" class="h-8! px-3!" onclick={() => remove(item)}>
+								{t('gallery.delete')}
+							</Button>
+							<Button class="h-8! px-3!" onclick={() => (confirmId = undefined)}>
+								{t('gallery.cancel')}
+							</Button>
 						{:else}
 							{#if item.source}
 								<Button class="h-8! px-3!" onclick={() => openInEditor(item)}>
-									<ImageUp size={14} /> Open in editor
+									<ImageUp size={14} />
+									{t('gallery.open')}
 								</Button>
 							{/if}
 							<Button
 								variant="icon"
 								class="size-8!"
-								aria-label="Delete {item.name}"
+								aria-label={t('gallery.deleteLabel', { name: item.name })}
 								onclick={() => (confirmId = item.id)}
 							>
 								<Trash2 size={14} />
@@ -135,8 +146,7 @@
 			/>
 		{:else}
 			<p class="rounded-lg border border-hairline bg-canvas p-6 text-sm text-ink-mute">
-				Pick a drawing to preview and plot it. The paper in the bar switches to the one it was made
-				for.
+				{t('gallery.pick')}
 			</p>
 		{/if}
 	</section>

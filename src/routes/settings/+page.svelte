@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, LOCALES, t } from '#lib/i18n.svelte.ts';
 	import Button from '#lib/components/Button.svelte';
 	import { listModels, type ProviderId } from '#lib/ai/images.ts';
 	import { aiSettings } from '#lib/ai/settings.svelte.ts';
@@ -9,7 +10,7 @@
 
 	const providers: [ProviderId, string][] = [
 		['openai', 'OpenAI'],
-		['compatible', 'OpenAI-compatible (e.g. LiteLLM)']
+		['compatible', t('settings.compatible')]
 	];
 
 	async function test() {
@@ -18,7 +19,7 @@
 		try {
 			models = await listModels(aiSettings.config);
 			testState = 'ok';
-			testMessage = `Connected, found ${models.length} models.`;
+			testMessage = t('settings.testOk', { count: models.length });
 		} catch (error) {
 			testState = 'error';
 			testMessage = error instanceof Error ? error.message : String(error);
@@ -30,17 +31,44 @@
 </script>
 
 <main class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-2">
+	<section
+		class="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-hairline bg-canvas p-6 lg:col-span-2"
+	>
+		<div>
+			<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+				{t('settings.language')}
+			</h1>
+			<p class="mt-2 text-sm text-ink-mute">{t('settings.languageHint')}</p>
+		</div>
+		<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
+			{#each LOCALES as [value, name] (value)}
+				<button
+					role="radio"
+					aria-checked={i18n.locale === value}
+					lang={value}
+					class="rounded-pill px-3.5 py-1.5 text-sm {i18n.locale === value
+						? 'bg-canvas text-ink shadow-sm'
+						: 'text-ink-mute'}"
+					onclick={() => i18n.set(value)}
+				>
+					{name}
+				</button>
+			{/each}
+		</div>
+	</section>
+
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
 		<div>
-			<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">AI provider</h1>
+			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+				{t('settings.provider')}
+			</h2>
 			<p class="mt-2 text-sm text-ink-mute">
-				The key is stored in this browser only and goes straight to the provider, never to an inkbot
-				server.
+				{t('settings.providerHint')}
 			</p>
 		</div>
 
 		<div>
-			<label class={label} for="provider">Provider</label>
+			<label class={label} for="provider">{t('settings.providerLabel')}</label>
 			<select id="provider" bind:value={aiSettings.provider} class={field}>
 				{#each providers as [value, name] (value)}
 					<option {value}>{name}</option>
@@ -50,7 +78,7 @@
 
 		{#if aiSettings.provider === 'compatible'}
 			<div>
-				<label class={label} for="base-url">Base URL</label>
+				<label class={label} for="base-url">{t('settings.baseUrl')}</label>
 				<input
 					id="base-url"
 					bind:value={aiSettings.baseUrl}
@@ -59,14 +87,13 @@
 					autocomplete="off"
 				/>
 				<p class="mt-1.5 text-[13px] text-ink-mute">
-					The server must allow requests from the browser (CORS). LiteLLM can also route to other
-					providers such as Higgsfield.
+					{t('settings.baseUrlHint')}
 				</p>
 			</div>
 		{/if}
 
 		<div>
-			<label class={label} for="api-key">API key</label>
+			<label class={label} for="api-key">{t('settings.apiKey')}</label>
 			<input
 				id="api-key"
 				type="password"
@@ -78,7 +105,7 @@
 
 		<div class="grid grid-cols-2 gap-4">
 			<div>
-				<label class={label} for="model">Image model</label>
+				<label class={label} for="model">{t('settings.imageModel')}</label>
 				<input
 					id="model"
 					bind:value={aiSettings.model}
@@ -93,29 +120,29 @@
 				</datalist>
 			</div>
 			<div>
-				<label class={label} for="size">Image size</label>
+				<label class={label} for="size">{t('settings.imageSize')}</label>
 				<select id="size" bind:value={aiSettings.size} class={field}>
 					<option value="1024x1024">1024 × 1024</option>
-					<option value="1536x1024">1536 × 1024 (landscape)</option>
-					<option value="1024x1536">1024 × 1536 (portrait)</option>
+					<option value="1536x1024">1536 × 1024 ({t('settings.landscape')})</option>
+					<option value="1024x1536">1024 × 1536 ({t('settings.portrait')})</option>
 				</select>
 			</div>
 		</div>
 
 		<div>
-			<label class={label} for="drawing-model">Drawing model</label>
+			<label class={label} for="drawing-model">{t('settings.drawingModel')}</label>
 			<input
 				id="drawing-model"
 				bind:value={aiSettings.drawingModel}
 				list="model-list"
 				class={field}
-				placeholder="A chat model, used for AI drawings as SVG"
+				placeholder={t('settings.drawingModelPlaceholder')}
 				autocomplete="off"
 			/>
 		</div>
 
 		<div class="flex flex-wrap items-center gap-3">
-			<Button onclick={test} disabled={testState === 'testing'}>Test connection</Button>
+			<Button onclick={test} disabled={testState === 'testing'}>{t('settings.test')}</Button>
 			{#if testMessage}
 				<span
 					class="text-sm {testState === 'error' ? 'text-danger' : 'text-ink-mute'}"
@@ -129,17 +156,19 @@
 
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
 		<div>
-			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Image prompt</h2>
+			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+				{t('settings.imagePrompt')}
+			</h2>
 			<p class="mt-2 text-sm text-ink-mute">
-				Wrapped around your image idea so the result is a clean line drawing. <code
-					class="font-mono"
-				>
+				{t('settings.imagePromptHint1')}
+				<code class="font-mono">
 					{'{prompt}'}
-				</code> stands for your input.
+				</code>
+				{t('settings.imagePromptHint2')}
 			</p>
 		</div>
 		<div>
-			<label class="sr-only" for="template">Prompt template</label>
+			<label class="sr-only" for="template">{t('settings.imagePrompt')}</label>
 			<textarea
 				id="template"
 				bind:value={aiSettings.promptTemplate}
@@ -147,21 +176,23 @@
 				class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 font-mono text-sm text-ink"
 			></textarea>
 		</div>
-		<Button onclick={() => aiSettings.resetPrompt()}>Restore default</Button>
+		<Button onclick={() => aiSettings.resetPrompt()}>{t('settings.restore')}</Button>
 
 		<div class="border-t border-hairline-soft pt-5">
-			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Drawing prompt</h2>
+			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+				{t('settings.drawingPrompt')}
+			</h2>
 			<p class="mt-2 text-sm text-ink-mute">
-				Instructions for the drawing model. Your idea is sent as the message. <code
-					class="font-mono"
-				>
+				{t('settings.drawingPromptHint1')}
+				<code class="font-mono">
 					{'{width}'}
 				</code>
-				and <code class="font-mono">{'{height}'}</code> stand for the printable area in mm.
+				{t('settings.and')} <code class="font-mono">{'{height}'}</code>
+				{t('settings.drawingPromptHint2')}
 			</p>
 		</div>
 		<div>
-			<label class="sr-only" for="svg-template">Drawing prompt</label>
+			<label class="sr-only" for="svg-template">{t('settings.drawingPrompt')}</label>
 			<textarea
 				id="svg-template"
 				bind:value={aiSettings.svgTemplate}
@@ -169,6 +200,6 @@
 				class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 font-mono text-sm text-ink"
 			></textarea>
 		</div>
-		<Button onclick={() => aiSettings.resetSvgTemplate()}>Restore default</Button>
+		<Button onclick={() => aiSettings.resetSvgTemplate()}>{t('settings.restore')}</Button>
 	</section>
 </main>

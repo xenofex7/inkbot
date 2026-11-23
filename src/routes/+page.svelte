@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Crosshair, Square } from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
 	import { jog, setOrigin, testSquare } from '#lib/grbl/commands.ts';
@@ -42,16 +43,14 @@
 		<section class="grid items-center gap-10 py-10 md:grid-cols-[7fr_5fr]">
 			<div>
 				<h1 class="font-display text-4xl font-semibold tracking-[-1px] text-ink md:text-5xl">
-					Your plotter, right in the browser.
+					{t('machine.title')}
 				</h1>
 				<p class="mt-4 max-w-prose text-lg">
-					Connect the VigoTec VG-X4 via USB. No install, no server, everything runs here in the
-					browser.
+					{t('machine.lede')}
 				</p>
 				{#if !plotter.supported}
 					<p class="mt-6 rounded-lg bg-surface-card p-4 text-ink">
-						Your browser cannot talk to USB devices. Open inkbot in Chrome or Edge on a desktop
-						computer.
+						{t('machine.unsupported')}
 					</p>
 				{:else}
 					<div class="mt-8 flex flex-wrap gap-3">
@@ -60,7 +59,7 @@
 							onclick={() => plotter.connect()}
 							disabled={plotter.connection === 'connecting'}
 						>
-							Connect plotter
+							{t('connect.button')}
 						</Button>
 					</div>
 				{/if}
@@ -69,17 +68,17 @@
 				{/if}
 			</div>
 			<div class="rounded-xl border border-hairline bg-canvas p-6 shadow-md">
-				<h2 class="font-semibold text-ink">Before you connect</h2>
+				<h2 class="font-semibold text-ink">{t('machine.beforeTitle')}</h2>
 				<ul class="mt-3 space-y-3 text-[15px]">
 					<li class="border-t border-hairline-soft pt-3">
-						Plug in the power supply and turn on the <strong class="text-ink">power switch</strong> on
-						the board. Without it the plotter still answers, but nothing moves.
+						{t('machine.power1')} <strong class="text-ink">{t('machine.powerSwitch')}</strong>
+						{t('machine.power2')}
 					</li>
 					<li class="border-t border-hairline-soft pt-3">
-						Plug in the USB cable. The plotter shows up as "USB Serial" in the port picker.
+						{t('machine.usb')}
 					</li>
 					<li class="border-t border-hairline-soft pt-3">
-						Place the pen at the top left of the paper. That is where the origin goes.
+						{t('machine.pen')}
 					</li>
 				</ul>
 			</div>
@@ -87,43 +86,43 @@
 	{:else}
 		<div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">Machine</h2>
+				<h2 class="font-semibold text-ink">{t('machine.machine')}</h2>
 				<dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[15px]">
-					<dt class="text-ink-mute">State</dt>
+					<dt class="text-ink-mute">{t('machine.state')}</dt>
 					<dd class="text-ink">{plotter.status?.state ?? '-'}</dd>
-					<dt class="text-ink-mute">Firmware</dt>
+					<dt class="text-ink-mute">{t('machine.firmware')}</dt>
 					<dd class="text-ink">{plotter.greeting || '-'}</dd>
 				</dl>
 				{#if plotter.alarm !== undefined}
 					<div class="mt-4 rounded-md border border-danger p-3 text-sm text-danger" role="alert">
-						Alarm {plotter.alarm}. The machine is locked.
+						{t('machine.alarm', { code: plotter.alarm ?? '' })}
 						<button class="ml-2 font-semibold underline" onclick={() => run(['$X'])}>
-							Unlock
+							{t('machine.unlock')}
 						</button>
 					</div>
 				{/if}
 			</section>
 
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">Test</h2>
+				<h2 class="font-semibold text-ink">{t('machine.test')}</h2>
 				<div class="mt-4 flex flex-wrap gap-3">
 					<Button
 						variant="primary"
 						onclick={() => run(testSquare(20, settings))}
 						disabled={!canAct}
 					>
-						<Square size={16} /> 20 mm square
+						<Square size={16} />
+						{t('machine.square')}
 					</Button>
 				</div>
 				<p class="mt-4 text-sm text-ink-mute">
-					Pen, depth, position and paper live in the bar at the top. Pause and stop show up there
-					while a job runs.
+					{t('machine.barHint')}
 				</p>
 			</section>
 
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
 				<div class="flex items-center justify-between gap-4">
-					<h2 class="font-semibold text-ink">Move</h2>
+					<h2 class="font-semibold text-ink">{t('machine.move')}</h2>
 					<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
 						{#each steps as value (value)}
 							<button
@@ -143,7 +142,7 @@
 					<span></span>
 					<Button
 						variant="icon"
-						aria-label="Move up"
+						aria-label={t('machine.up')}
 						onclick={() => run(jog(0, -step, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -152,7 +151,7 @@
 					<span></span>
 					<Button
 						variant="icon"
-						aria-label="Move left"
+						aria-label={t('machine.left')}
 						onclick={() => run(jog(-step, 0, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -160,7 +159,7 @@
 					</Button>
 					<Button
 						variant="icon"
-						aria-label="Set origin here"
+						aria-label={t('machine.origin')}
 						onclick={() => run(setOrigin())}
 						disabled={!canAct}
 					>
@@ -168,7 +167,7 @@
 					</Button>
 					<Button
 						variant="icon"
-						aria-label="Move right"
+						aria-label={t('machine.right')}
 						onclick={() => run(jog(step, 0, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -177,7 +176,7 @@
 					<span></span>
 					<Button
 						variant="icon"
-						aria-label="Move down"
+						aria-label={t('machine.downMove')}
 						onclick={() => run(jog(0, step, settings.invertY))}
 						disabled={!canAct}
 					>
@@ -186,8 +185,7 @@
 					<span></span>
 				</div>
 				<p class="mt-4 text-sm text-ink-mute">
-					The crosshair sets the origin at the current pen position. There are no limit switches, so
-					do not drive past the frame.
+					{t('machine.originHint')}
 				</p>
 				<label class="mt-4 flex items-start gap-2.5 text-sm text-ink">
 					<input
@@ -197,17 +195,16 @@
 						onchange={(event) => settings.setInvertY(event.currentTarget.checked)}
 					/>
 					<span>
-						Invert Y axis
+						{t('machine.invertY')}
 						<span class="block text-ink-mute">
-							Turn on if text comes out upside down. Matches the VG-X4 when you read from the pen
-							side.
+							{t('machine.invertYHint')}
 						</span>
 					</span>
 				</label>
 			</section>
 
 			<section class="flex min-h-80 flex-col rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">Console</h2>
+				<h2 class="font-semibold text-ink">{t('machine.console')}</h2>
 				<div
 					bind:this={logView}
 					class="mt-4 h-56 overflow-y-auto rounded-md bg-surface-card p-3 font-mono text-[13px]"
@@ -220,16 +217,16 @@
 					{/each}
 				</div>
 				<form class="mt-3 flex gap-2" onsubmit={sendConsole} novalidate>
-					<label class="sr-only" for="console-line">G-code command</label>
+					<label class="sr-only" for="console-line">{t('machine.command')}</label>
 					<input
 						id="console-line"
 						bind:value={consoleLine}
 						class="h-10 min-w-0 flex-1 rounded-md border border-hairline bg-canvas px-3.5 font-mono text-sm text-ink focus:border-ink"
-						placeholder="e.g. $$ or G0 X10"
+						placeholder={t('machine.commandPlaceholder')}
 						autocomplete="off"
 						disabled={!connected}
 					/>
-					<Button type="submit" disabled={!connected}>Send</Button>
+					<Button type="submit" disabled={!connected}>{t('machine.send')}</Button>
 				</form>
 				{#if actionError}
 					<p class="mt-2 text-sm text-danger" role="alert">{actionError}</p>

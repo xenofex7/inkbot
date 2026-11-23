@@ -1,5 +1,6 @@
 import { parseLine, workPosition, type Position, type StatusReport } from '../grbl/parse';
 import { REALTIME, VGX4 } from '../grbl/vgx4';
+import { t } from '../i18n.svelte';
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
 export type LogEntry = { id: number; direction: 'tx' | 'rx'; text: string };
@@ -76,7 +77,7 @@ export class Plotter {
 	async disconnect() {
 		clearInterval(this.#poll);
 		this.#poll = undefined;
-		this.#rejectPending(new Error('Disconnected'));
+		this.#rejectPending(new Error(t('error.disconnected')));
 		await this.#closePort().catch(() => undefined);
 		this.#port = undefined;
 		this.#reader = undefined;
@@ -130,7 +131,7 @@ export class Plotter {
 	}
 
 	async #write(data: string) {
-		if (!this.#writer) throw new Error('Not connected');
+		if (!this.#writer) throw new Error(t('error.notConnected'));
 		await this.#writer.write(this.#encoder.encode(data));
 	}
 
@@ -141,7 +142,7 @@ export class Plotter {
 	#waitForGreeting() {
 		return new Promise<void>((resolve, reject) => {
 			const timer = setTimeout(
-				() => reject(new Error('No response from the plotter. Is it switched on?')),
+				() => reject(new Error(t('error.noPlotterResponse'))),
 				GREETING_TIMEOUT_MS
 			);
 			this.#greetingWaiter = () => {
@@ -188,7 +189,7 @@ export class Plotter {
 			case 'greeting':
 				this.greeting = message.text;
 				this.alarm = undefined;
-				this.#rejectPending(new Error('The plotter was reset'));
+				this.#rejectPending(new Error(t('error.reset')));
 				this.#greetingWaiter?.();
 				this.#greetingWaiter = undefined;
 				break;

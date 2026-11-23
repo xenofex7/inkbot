@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { t } from '#lib/i18n.svelte.ts';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
 	import { translate } from '#lib/geometry/types.ts';
 	import { settings } from '#lib/settings.svelte.ts';
 	import { fonts, layoutText, type Align } from '#lib/text/layout.ts';
 
-	let text = $state('Happy birthday!');
+	let text = $state(t('text.default'));
 	let fontId = $state(fonts[0].id);
 	let size = $state(8);
 	let lineHeight = $state(1.4);
@@ -28,10 +29,12 @@
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]"
 >
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
-		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Write text</h1>
+		<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+			{t('text.title')}
+		</h1>
 
 		<div>
-			<label class={label} for="text">Text</label>
+			<label class={label} for="text">{t('text.text')}</label>
 			<textarea
 				id="text"
 				bind:value={text}
@@ -42,7 +45,7 @@
 
 		<div class="grid grid-cols-2 gap-4">
 			<div class="col-span-2">
-				<label class={label} for="font">Font</label>
+				<label class={label} for="font">{t('text.font')}</label>
 				<select id="font" bind:value={fontId} class={field}>
 					{#each fonts as option (option.id)}
 						<option value={option.id}>{option.name}</option>
@@ -50,7 +53,7 @@
 				</select>
 			</div>
 			<div>
-				<label class={label} for="size">Size (mm)</label>
+				<label class={label} for="size">{t('text.size')}</label>
 				<input
 					id="size"
 					type="number"
@@ -62,7 +65,7 @@
 				/>
 			</div>
 			<div>
-				<label class={label} for="line-height">Line height</label>
+				<label class={label} for="line-height">{t('text.lineHeight')}</label>
 				<input
 					id="line-height"
 					type="number"
@@ -76,9 +79,9 @@
 		</div>
 
 		<div>
-			<span class={label}>Alignment</span>
+			<span class={label}>{t('text.alignment')}</span>
 			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-				{#each [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']] as [value, name] (value)}
+				{#each [['left', t('text.left')], ['center', t('text.centre')], ['right', t('text.right')]] as [value, name] (value)}
 					<button
 						role="radio"
 						aria-checked={align === value}
@@ -95,11 +98,6 @@
 	</section>
 
 	<section class="flex flex-col gap-4">
-		<DrawPanel
-			{polylines}
-			{sheet}
-			name={text}
-			emptyHint="Type some text, the preview shows it right away."
-		/>
+		<DrawPanel {polylines} {sheet} name={text} emptyHint={t('text.empty')} />
 	</section>
 </main>
