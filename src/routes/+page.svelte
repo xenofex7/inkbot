@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { asset } from '$app/paths';
 	import { t } from '#lib/i18n.svelte.ts';
 	import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Crosshair, Square } from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
@@ -42,6 +43,11 @@
 	{#if !connected}
 		<section class="grid items-center gap-10 py-10 md:grid-cols-[7fr_5fr]">
 			<div>
+				<img
+					src={asset('favicon.png')}
+					alt="inkbot"
+					class="mb-8 w-48 rounded-xl shadow-md md:w-64"
+				/>
 				<h1 class="font-display text-4xl font-semibold tracking-[-1px] text-ink md:text-5xl">
 					{t('machine.title')}
 				</h1>
