@@ -45,5 +45,6 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.77.0"
-	}
+	},
+	"license": "MIT"
 }
