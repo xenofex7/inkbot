@@ -231,7 +231,10 @@
 					<span></span>
 				</div>
 				<div class="mt-4 flex flex-wrap gap-2">
-					<Button onclick={() => run(setOrigin())} disabled={!canAct}>
+					<Button
+						onclick={() => confirm(t('machine.originConfirm')) && run(setOrigin())}
+						disabled={!canAct}
+					>
 						<Crosshair size={16} />
 						{t('machine.origin')}
 					</Button>
@@ -269,7 +272,10 @@
 				{#if !positions.parkDefined}
 					<div class="mt-4 space-y-3 rounded-md bg-surface-card p-4">
 						<p class="text-sm text-ink">{t('positions.noPark')}</p>
-						<Button onclick={() => positions.setPark()} disabled={!canAct}>
+						<Button
+							onclick={() => confirm(t('positions.parkConfirm')) && positions.setPark()}
+							disabled={!canAct}
+						>
 							<SquareParking size={16} />
 							{t('positions.setPark')}
 						</Button>
@@ -288,7 +294,10 @@
 							<SquareParking size={16} />
 							{t('positions.park')}
 						</Button>
-						<Button onclick={() => positions.setPark()} disabled={!canAct}>
+						<Button
+							onclick={() => confirm(t('positions.parkConfirm')) && positions.setPark()}
+							disabled={!canAct}
+						>
 							{t('positions.setParkHere')}
 						</Button>
 					</div>

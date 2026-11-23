@@ -214,6 +214,9 @@ const en = {
 	'machine.right': 'Move right',
 	'machine.downMove': 'Move down',
 	'machine.goOrigin': 'Go to origin',
+	'machine.originConfirm': 'Make the current pen position the origin? Drawings start from here.',
+	'positions.parkConfirm':
+		'Make the current position the park position? The work area and saved positions move along with it.',
 	'positions.title': 'Park position, work area and positions',
 	'positions.intro':
 		'The plotter has no limit switches and takes its current spot as zero after every connect. The park position is the fixed reference: park the plotter there before you switch it off.',
@@ -584,6 +587,10 @@ const de: Record<Key, string> = {
 	'machine.right': 'Nach rechts',
 	'machine.downMove': 'Nach unten',
 	'machine.goOrigin': 'Zum Nullpunkt fahren',
+	'machine.originConfirm':
+		'Die aktuelle Stiftposition zum Nullpunkt machen? Zeichnungen beginnen dann hier.',
+	'positions.parkConfirm':
+		'Die aktuelle Position als Parkposition festlegen? Arbeitsfläche und gespeicherte Positionen werden mitverschoben.',
 	'positions.title': 'Parkposition, Arbeitsfläche und Positionen',
 	'positions.intro':
 		'Der Plotter hat keine Endschalter und nimmt nach jedem Verbinden seine aktuelle Stelle als Null. Die Parkposition ist der feste Bezugspunkt: Park den Plotter dort, bevor Du ihn ausschaltest.',
