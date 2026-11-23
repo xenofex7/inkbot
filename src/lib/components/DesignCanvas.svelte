@@ -48,7 +48,7 @@
 	function moveTo(event: PointerEvent) {
 		if (!drag) return;
 		const current = toSheet(event);
-		const element = design.elements.find((e) => e.id === drag?.id);
+		const element = design.view.find((e) => e.id === drag?.id);
 		if (!element) return;
 		if (drag.mode === 'move') {
 			design.move(drag.id, {
@@ -121,7 +121,7 @@
 			</text>
 		{/each}
 	{/if}
-	{#each design.elements as element (element.id)}
+	{#each design.view as element (element.id)}
 		{@const size = extent(element.shape, element.rotation)}
 		{@const w = size.width * element.scale}
 		{@const h = size.height * element.scale}

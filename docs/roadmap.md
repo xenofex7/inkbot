@@ -42,7 +42,8 @@ As of 23.11.2026. Done items are marked [x].
 - [x] **Own handwriting:** draw each character in the browser or on an iPhone (QR code,
   share via AirDrop), or print or plot a template, fill it in and scan a photo; up to three
   variants per character, natural variation from letter to letter
-- [ ] Envelopes from an address list (CSV)
+- [x] Envelopes from an address list (CSV): placeholders like {Name} in any text, step
+  through the rows
 
 ## Version 4 - Data
 - [x] **Backup:** export and import settings, prompts, gallery and handwriting in one file

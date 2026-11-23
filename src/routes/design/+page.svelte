@@ -27,6 +27,7 @@
 		type TraceOptions
 	} from '#lib/design/store.svelte.ts';
 	import { CARD_TEMPLATES } from '#lib/design/templates.ts';
+	import MergePanel from '#lib/components/MergePanel.svelte';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { gallery } from '#lib/gallery/store.svelte.ts';
 	import { orient } from '#lib/geometry/types.ts';
@@ -295,6 +296,8 @@
 				{/if}
 			</div>
 		</section>
+
+		<MergePanel />
 
 		{#if selected}
 			<section class="space-y-4 rounded-lg border border-hairline bg-canvas p-6">

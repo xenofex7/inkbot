@@ -8,6 +8,7 @@ import { handwriting } from '../handwriting/store.svelte';
 import { fonts, layoutText, type Align } from '../text/layout';
 import {
 	centred,
+	extent,
 	normalize,
 	place,
 	rotated,
@@ -15,6 +16,7 @@ import {
 	type Rotation,
 	type Shape
 } from './model';
+import { fillPlaceholders, hasPlaceholders, type MergeList } from './merge';
 import type { Area, CardTemplate, Guides } from './templates';
 
 export type TextOptions = {
@@ -81,6 +83,23 @@ export function rasterShape(gray: Gray, trace: TraceOptions, unit: number): Shap
 	);
 }
 
+function merged(element: DesignElement, row: Record<string, string>): DesignElement {
+	if (element.kind !== 'text' || !hasPlaceholders(element.options.text)) return element;
+	const shape = textShape({
+		...element.options,
+		text: fillPlaceholders(element.options.text, row)
+	});
+	if (element.options.align !== 'center') return { ...element, shape };
+	const before = extent(element.shape, element.rotation);
+	const after = extent(shape, element.rotation);
+	return {
+		...element,
+		shape,
+		x: element.x + ((before.width - after.width) * element.scale) / 2,
+		y: element.y + ((before.height - after.height) * element.scale) / 2
+	};
+}
+
 class Design {
 	elements = $state.raw<DesignElement[]>([]);
 	selectedId = $state<string | undefined>();
@@ -88,9 +107,28 @@ class Design {
 
 	selected = $derived(this.elements.find((element) => element.id === this.selectedId));
 
+	merge = $state.raw<MergeList | undefined>();
+	mergeIndex = $state(0);
+	mergeRow = $derived(this.merge?.rows[this.mergeIndex]);
+
+	view = $derived.by(() => {
+		const row = this.mergeRow;
+		return row ? this.elements.map((element) => merged(element, row)) : this.elements;
+	});
+
 	polylines = $derived(
-		orderPaths(this.elements.flatMap((element): Polyline[] => place(element.shape, element)))
+		orderPaths(this.view.flatMap((element): Polyline[] => place(element.shape, element)))
 	);
+
+	setMerge(list: MergeList | undefined) {
+		this.merge = list;
+		this.mergeIndex = 0;
+	}
+
+	stepMerge(offset: number) {
+		const count = this.merge?.rows.length ?? 0;
+		if (count > 0) this.mergeIndex = (this.mergeIndex + offset + count) % count;
+	}
 
 	#add(element: DesignElement) {
 		this.elements = [...this.elements, element];
