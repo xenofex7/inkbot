@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Copy, ImagePlus, LibraryBig, RotateCcw, Sparkles, Trash2, Type } from '@lucide/svelte';
+	import {
+		Copy,
+		Download,
+		ImagePlus,
+		LibraryBig,
+		RotateCcw,
+		Sparkles,
+		Trash2,
+		Type
+	} from '@lucide/svelte';
 	import type { AiResult } from '#lib/ai/result.ts';
 	import AiGenerator from '#lib/components/AiGenerator.svelte';
 	import Button from '#lib/components/Button.svelte';
@@ -8,7 +17,14 @@
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
 	import RangeField from '#lib/components/RangeField.svelte';
 	import SheetPreview from '#lib/components/SheetPreview.svelte';
-	import { design, type DesignElement, type TextOptions } from '#lib/design/store.svelte.ts';
+	import {
+		design,
+		type DesignElement,
+		type RasterElement,
+		type TextOptions,
+		type TraceOptions
+	} from '#lib/design/store.svelte.ts';
+	import { download, filenameFrom } from '#lib/download.ts';
 	import { gallery } from '#lib/gallery/store.svelte.ts';
 	import { orient } from '#lib/geometry/types.ts';
 	import { t, type MessageKey } from '#lib/i18n.svelte.ts';
@@ -73,6 +89,23 @@
 		}
 	}
 
+	function retrace(element: RasterElement, change: Partial<TraceOptions>) {
+		error = '';
+		design.updateTrace(element.id, { ...element.trace, ...change }).catch(fail);
+	}
+
+	function saveSource(element: DesignElement) {
+		const blob =
+			element.kind === 'raster'
+				? element.blob
+				: element.kind === 'vector'
+					? element.source
+					: undefined;
+		if (!blob) return;
+		const extension = blob.type === 'image/svg+xml' ? 'svg' : blob.type.split('/')[1] || 'png';
+		download(blob, filenameFrom(element.name, extension));
+	}
+
 	function updateText(element: DesignElement, change: Partial<TextOptions>) {
 		if (element.kind !== 'text') return;
 		design.updateText(element.id, { ...element.options, ...change });
@@ -83,10 +116,10 @@
 		raster: 'design.kindRaster',
 		vector: 'design.kindVector'
 	};
-	const modes: [TraceMode, MessageKey][] = [
-		['lines', 'image.lines'],
-		['outline', 'image.outline'],
-		['hatch', 'image.hatch']
+	const modes: [TraceMode, MessageKey, MessageKey][] = [
+		['lines', 'image.lines', 'image.linesHint'],
+		['outline', 'image.outline', 'image.outlineHint'],
+		['hatch', 'image.hatch', 'image.hatchHint']
 	];
 	const aligns: [Align, MessageKey][] = [
 		['left', 'text.left'],
@@ -307,54 +340,88 @@
 						{/each}
 					</div>
 				{:else if selected.kind === 'raster'}
+					{@const raster = selected}
 					<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
 						{#each modes as [value, key] (value)}
 							<button
 								role="radio"
-								aria-checked={selected.trace.mode === value}
-								class={pill(selected.trace.mode === value)}
-								onclick={() => design.updateTrace(selected.id, { ...selected.trace, mode: value })}
+								aria-checked={raster.trace.mode === value}
+								class={pill(raster.trace.mode === value)}
+								onclick={() => retrace(raster, { mode: value })}
 							>
 								{t(key)}
 							</button>
 						{/each}
 					</div>
-					<div>
-						<RangeField
-							id="design-threshold"
-							label={t('image.threshold', { value: selected.trace.threshold })}
-							value={selected.trace.threshold}
-							min={20}
-							max={240}
-							buttonStep={5}
-							live={false}
-							onvalue={(value: number) => {
-								if (selected.kind === 'raster')
-									design.updateTrace(selected.id, { ...selected.trace, threshold: value });
-							}}
-						/>
-					</div>
-					{#if selected.trace.mode !== 'hatch'}
+					<p class="text-[13px] text-ink-mute">
+						{t(modes.find(([value]) => value === raster.trace.mode)?.[2] ?? 'image.linesHint')}
+					</p>
+					<RangeField
+						id="design-threshold"
+						label={t('image.threshold', { value: raster.trace.threshold })}
+						value={raster.trace.threshold}
+						min={20}
+						max={240}
+						buttonStep={5}
+						live={false}
+						onvalue={(value: number) => retrace(raster, { threshold: value })}
+					/>
+					<RangeField
+						id="design-detail"
+						label={t('image.detail', { value: raster.trace.detail })}
+						value={raster.trace.detail}
+						min={150}
+						max={800}
+						step={50}
+						live={false}
+						onvalue={(value: number) => retrace(raster, { detail: value })}
+					/>
+					{#if raster.trace.mode !== 'hatch'}
 						<label class="flex items-start gap-2.5 text-sm text-ink">
 							<input
 								type="checkbox"
 								class="mt-0.5 size-4 accent-primary"
-								checked={selected.trace.fill}
-								onchange={(event) =>
-									design.updateTrace(selected.id, {
-										...selected.trace,
-										fill: event.currentTarget.checked
-									})}
+								checked={raster.trace.fill}
+								onchange={(event) => retrace(raster, { fill: event.currentTarget.checked })}
 							/>
-							{t('image.fill')}
+							<span>
+								{t('image.fill')}
+								<span class="block text-[13px] text-ink-mute">{t('image.fillHint')}</span>
+							</span>
 						</label>
 					{/if}
+					{#if raster.trace.mode === 'hatch' || raster.trace.fill}
+						<RangeField
+							id="design-spacing"
+							label={t('image.spacing', { value: raster.trace.spacing })}
+							value={raster.trace.spacing}
+							min={0.5}
+							max={4}
+							step={0.1}
+							live={false}
+							onvalue={(value: number) => retrace(raster, { spacing: value })}
+						/>
+					{/if}
+				{/if}
+				{#if selected.kind === 'raster' || (selected.kind === 'vector' && selected.source)}
+					<Button onclick={() => saveSource(selected)}>
+						<Download size={16} />
+						{selected.kind === 'raster' ? t('image.saveImage') : t('image.saveSource')}
+					</Button>
 				{/if}
 			</section>
 		{/if}
 	</div>
 
-	<section class="flex flex-col gap-4">
+	<section
+		class="flex flex-col gap-4"
+		aria-label={t('image.preview')}
+		ondragover={(event) => event.preventDefault()}
+		ondrop={(event) => {
+			event.preventDefault();
+			void addFile(event.dataTransfer?.files);
+		}}
+	>
 		<div class="rounded-lg border border-hairline bg-canvas p-6">
 			<DesignCanvas
 				width={sheet.width}

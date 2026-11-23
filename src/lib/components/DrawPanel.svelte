@@ -11,13 +11,12 @@
 	import { toSvg } from '../geometry/svg';
 	import { plotter } from '../serial/plotter.svelte';
 	import { settings } from '../settings.svelte';
-	import { gallery, type GallerySource } from '../gallery/store.svelte';
+	import { gallery } from '../gallery/store.svelte';
 
 	let {
 		polylines,
 		sheet,
 		name = 'inkbot',
-		source,
 		saveable = true,
 		showPreview = true,
 		emptyHint = ''
@@ -25,7 +24,6 @@
 		polylines: Polyline[];
 		sheet: { width: number; height: number };
 		name?: string;
-		source?: GallerySource;
 		saveable?: boolean;
 		showPreview?: boolean;
 		emptyHint?: string;
@@ -48,8 +46,7 @@
 				orientation: settings.orientation,
 				margin: settings.margin,
 				sheet: { width: sheet.width, height: sheet.height },
-				polylines,
-				source
+				polylines
 			});
 			saveState = 'saved';
 		} catch (error) {

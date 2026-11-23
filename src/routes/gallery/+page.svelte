@@ -9,7 +9,8 @@
 	import SheetPreview from '#lib/components/SheetPreview.svelte';
 	import { gallery, type GalleryItem } from '#lib/gallery/store.svelte.ts';
 	import { PAPER_FORMATS } from '#lib/geometry/paper.ts';
-	import { imageSource } from '#lib/image/source.svelte.ts';
+	import { design } from '#lib/design/store.svelte.ts';
+	import { parseSvg } from '#lib/svg/parse.ts';
 	import { settings } from '#lib/settings.svelte.ts';
 
 	let selectedId = $state<string | undefined>();
@@ -31,10 +32,28 @@
 	}
 
 	async function openInEditor(item: GalleryItem) {
-		if (!item.source) return;
-		if (item.source.kind === 'svg') imageSource.setSvg(await item.source.blob.text(), item.name);
-		else imageSource.set(item.source.blob, item.name);
-		await goto(resolve('/image'));
+		actionError = '';
+		select(item);
+		const area = {
+			x: item.margin,
+			y: item.margin,
+			width: item.sheet.width - 2 * item.margin,
+			height: item.sheet.height - 2 * item.margin
+		};
+		try {
+			if (item.source?.kind === 'svg') {
+				design.addVector(parseSvg(await item.source.blob.text()), item.name, area, {
+					source: item.source.blob
+				});
+			} else if (item.source) {
+				await design.addRaster(item.source.blob, item.name, area);
+			} else {
+				design.addVector(item.polylines, item.name, area, { keepPosition: true });
+			}
+			await goto(resolve('/design'));
+		} catch (error) {
+			actionError = error instanceof Error ? error.message : String(error);
+		}
 	}
 
 	async function remove(item: GalleryItem) {
@@ -73,10 +92,9 @@
 		{#if gallery.loaded && gallery.items.length === 0}
 			<p class="rounded-lg bg-surface-card p-6 text-ink">
 				{t('gallery.emptyBefore')}
-				<a class="text-link underline" href={resolve('/text')}>{t('nav.text')}</a>
-				{t('gallery.emptyOr')}
-				<a class="text-link underline" href={resolve('/image')}>{t('nav.image')}</a>
-				{t('gallery.emptyAfter')}
+				<a class="text-link underline" href={resolve('/design')}>{t('nav.design')}</a>{t(
+					'gallery.emptyAfter'
+				)}
 			</p>
 		{/if}
 
@@ -115,12 +133,10 @@
 								{t('gallery.cancel')}
 							</Button>
 						{:else}
-							{#if item.source}
-								<Button class="h-8! px-3!" onclick={() => openInEditor(item)}>
-									<ImageUp size={14} />
-									{t('gallery.open')}
-								</Button>
-							{/if}
+							<Button class="h-8! px-3!" onclick={() => openInEditor(item)}>
+								<ImageUp size={14} />
+								{t('gallery.open')}
+							</Button>
 							<Button
 								variant="icon"
 								class="size-8!"

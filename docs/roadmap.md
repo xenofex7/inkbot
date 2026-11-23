@@ -34,6 +34,8 @@ As of 22.11.2026. Done items are marked [x].
 ## Version 3 - Design
 - [x] **Card designer:** place text, images, AI results and gallery drawings freely on a
   sheet, move and resize them, plot or save the whole card
+- [x] **One workspace:** text, image and SVG editing merged into the designer, AI suggests a
+  vector drawing and a traced image from one idea
 - [ ] **Card templates:** folded greeting card, envelope with address field, place card
 - [ ] Rotate elements by 90°
 - [ ] **Own handwriting:** print a template, fill it in by hand, take a photo; inkbot

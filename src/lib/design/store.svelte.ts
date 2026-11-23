@@ -14,7 +14,13 @@ export type TextOptions = {
 	align: Align;
 };
 
-export type TraceOptions = { mode: TraceMode; threshold: number; fill: boolean };
+export type TraceOptions = {
+	mode: TraceMode;
+	threshold: number;
+	fill: boolean;
+	spacing: number;
+	detail: number;
+};
 
 type Base = Placement & { id: string; name: string; shape: Shape };
 
@@ -24,13 +30,13 @@ export type RasterElement = Base & {
 	trace: TraceOptions;
 	gray: Gray;
 	unit: number;
+	blob: Blob;
 };
-export type VectorElement = Base & { kind: 'vector' };
+export type VectorElement = Base & { kind: 'vector'; source?: Blob };
 export type DesignElement = TextElement | RasterElement | VectorElement;
 
 export type Area = { x: number; y: number; width: number; height: number };
 
-const RASTER_DETAIL = 400;
 const RASTER_WIDTH_MM = 60;
 
 export function textShape(options: TextOptions): Shape {
@@ -45,10 +51,12 @@ export function rasterShape(gray: Gray, trace: TraceOptions, unit: number): Shap
 	const lines = traceImage(gray, {
 		mode: trace.mode,
 		threshold: trace.threshold,
-		hatchSpacing: 1.2 / unit,
+		hatchSpacing: trace.spacing / unit,
 		simplify: 0.8,
 		minLength: Math.max(1, 0.8 / unit),
-		fill: trace.fill ? { spacing: 1.2 / unit, minWidth: Math.max(3, 1.2 / unit) } : undefined
+		fill: trace.fill
+			? { spacing: trace.spacing / unit, minWidth: Math.max(3, 1.2 / unit) }
+			: undefined
 	});
 	return normalize(lines.map((line) => line.map((p) => ({ x: p.x * unit, y: p.y * unit }))));
 }
@@ -84,20 +92,42 @@ class Design {
 		});
 	}
 
-	addVector(lines: Polyline[], name: string, area: Area) {
+	addVector(
+		lines: Polyline[],
+		name: string,
+		area: Area,
+		options: { source?: Blob; keepPosition?: boolean } = {}
+	) {
 		const shape = normalize(lines);
-		this.#add({ kind: 'vector', id: crypto.randomUUID(), name, shape, ...centred(shape, area) });
+		const box = bounds(lines);
+		const placement =
+			options.keepPosition && box ? { x: box.minX, y: box.minY, scale: 1 } : centred(shape, area);
+		this.#add({
+			kind: 'vector',
+			id: crypto.randomUUID(),
+			name,
+			shape,
+			source: options.source,
+			...placement
+		});
 	}
 
 	async addRaster(blob: Blob, name: string, area: Area) {
-		const gray = await loadGray(blob, RASTER_DETAIL);
+		const trace: TraceOptions = {
+			mode: 'lines',
+			threshold: 140,
+			fill: false,
+			spacing: 1.2,
+			detail: 400
+		};
+		const gray = await loadGray(blob, trace.detail);
 		const unit = RASTER_WIDTH_MM / gray.width;
-		const trace: TraceOptions = { mode: 'lines', threshold: 140, fill: false };
 		const shape = rasterShape(gray, trace, unit);
 		this.#add({
 			kind: 'raster',
 			id: crypto.randomUUID(),
 			name,
+			blob,
 			gray,
 			unit,
 			trace,
@@ -108,7 +138,7 @@ class Design {
 
 	async addFile(file: File, area: Area) {
 		if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
-			this.addVector(parseSvg(await file.text()), file.name, area);
+			this.addVector(parseSvg(await file.text()), file.name, area, { source: file });
 		} else {
 			await this.addRaster(file, file.name, area);
 		}
@@ -127,25 +157,23 @@ class Design {
 		);
 	}
 
-	updateTrace(id: string, trace: TraceOptions) {
-		this.#update(id, (element) =>
-			element.kind === 'raster'
-				? { ...element, trace, shape: rasterShape(element.gray, trace, element.unit) }
-				: element
+	async updateTrace(id: string, trace: TraceOptions) {
+		const element = this.elements.find((e) => e.id === id);
+		if (element?.kind !== 'raster') return;
+		let { gray, unit } = element;
+		if (trace.detail !== element.trace.detail) {
+			gray = await loadGray(element.blob, trace.detail);
+			unit = (element.unit * element.gray.width) / gray.width;
+		}
+		this.#update(id, (current) =>
+			current.kind === 'raster'
+				? { ...current, trace, gray, unit, shape: rasterShape(gray, trace, unit) }
+				: current
 		);
 	}
 
 	move(id: string, placement: Placement) {
 		this.#update(id, (element) => ({ ...element, ...placement }));
-	}
-
-	reorder(id: string, direction: -1 | 1) {
-		const index = this.elements.findIndex((e) => e.id === id);
-		const target = index + direction;
-		if (index < 0 || target < 0 || target >= this.elements.length) return;
-		const next = [...this.elements];
-		[next[index], next[target]] = [next[target], next[index]];
-		this.elements = next;
 	}
 
 	remove(id: string) {

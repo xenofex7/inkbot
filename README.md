@@ -39,7 +39,7 @@ Browser app to drive the VigoTec VG-X4 pen plotter (writing robot) straight from
 
 1. Open [xenofex7.github.io/inkbot](https://xenofex7.github.io/inkbot/) in Chrome or Edge and click "Connect plotter".
 2. On the Machine page, move the pen to the top left corner of the sheet and set the origin.
-3. Pick paper in the control bar, write text or choose an image, then click "Draw".
+3. Pick paper in the control bar, open "Design", add text, images, SVGs, AI drawings or gallery items, arrange them and click "Draw".
 
 ## Architecture
 
