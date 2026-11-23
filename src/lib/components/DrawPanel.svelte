@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { strokes, t } from '../i18n.svelte';
-	import { BookmarkPlus, Download, OctagonX, Pause, PenLine, Play } from '@lucide/svelte';
+	import {
+		BookmarkPlus,
+		Download,
+		OctagonX,
+		Pause,
+		PenLine,
+		Play,
+		TriangleAlert
+	} from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Button from './Button.svelte';
 	import SheetPreview from './SheetPreview.svelte';
@@ -60,11 +68,7 @@
 	const minutes = $derived(Math.ceil(estimateSeconds(polylines) / 60));
 	const running = $derived(plotter.busy || plotter.status?.state === 'Hold');
 	const canDraw = $derived(
-		plotter.connection === 'connected' &&
-			!running &&
-			polylines.length > 0 &&
-			!outsideSheet &&
-			!outsideMachine
+		plotter.connection === 'connected' && !running && polylines.length > 0 && !outsideMachine
 	);
 
 	function saveSvg() {
@@ -73,6 +77,7 @@
 	}
 
 	async function draw() {
+		if (outsideSheet && !confirm(t('job.outsideSheetConfirm'))) return;
 		drawError = '';
 		try {
 			await plotter.sendAll(toGcode(polylines, settings));
@@ -133,21 +138,25 @@
 	<div class="basis-full text-sm">
 		{#if polylines.length === 0}
 			<p class="text-ink-mute">{emptyHint || t('job.empty')}</p>
-		{:else if outsideSheet}
-			<p class="text-danger" role="alert">
-				{t('job.outsideSheet')}
-			</p>
 		{:else if outsideMachine}
 			<p class="text-danger" role="alert">{t('job.outsideMachine')}</p>
-		{:else if plotter.connection !== 'connected'}
-			<p class="text-ink-mute">{t('job.connectFirst')}</p>
 		{:else}
-			<p class="text-ink-mute">
-				{t('job.originBefore')}
-				<a class="text-link underline" href={resolve('/')}>{t('job.originLink')}</a>{t(
-					'job.originAfter'
-				)}
-			</p>
+			{#if outsideSheet}
+				<p class="mb-2 flex items-center gap-2 text-ink">
+					<TriangleAlert size={16} class="shrink-0 text-warning" />
+					{t('job.outsideSheet')}
+				</p>
+			{/if}
+			{#if plotter.connection !== 'connected'}
+				<p class="text-ink-mute">{t('job.connectFirst')}</p>
+			{:else}
+				<p class="text-ink-mute">
+					{t('job.originBefore')}
+					<a class="text-link underline" href={resolve('/')}>{t('job.originLink')}</a>{t(
+						'job.originAfter'
+					)}
+				</p>
+			{/if}
 		{/if}
 		{#if drawError}
 			<p class="mt-2 text-danger" role="alert">{drawError}</p>

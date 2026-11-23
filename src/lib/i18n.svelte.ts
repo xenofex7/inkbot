@@ -69,6 +69,8 @@ const en = {
 	'job.empty': 'Nothing to draw yet.',
 	'job.approx': 'approx. {minutes} min',
 	'job.outsideSheet': 'The drawing does not fit on the sheet. Reduce the size or the margin.',
+	'job.outsideSheetConfirm':
+		'The drawing does not fit on the sheet and may draw past its edge. Draw anyway?',
 	'job.outsideMachine': "The drawing reaches beyond the plotter's drawing area.",
 	'job.connectFirst': 'Connect the plotter to draw.',
 	'job.originBefore': 'The red dot is the origin. On the',
@@ -267,6 +269,8 @@ const de: Record<Key, string> = {
 	'job.empty': 'Noch nichts zu zeichnen.',
 	'job.approx': 'ca. {minutes} min',
 	'job.outsideSheet': 'Die Zeichnung passt nicht aufs Blatt. Grösse oder Rand verkleinern.',
+	'job.outsideSheetConfirm':
+		'Die Zeichnung passt nicht aufs Blatt und kann über den Rand hinaus zeichnen. Trotzdem zeichnen?',
 	'job.outsideMachine': 'Die Zeichnung reicht über die Zeichenfläche des Plotters hinaus.',
 	'job.connectFirst': 'Verbinde den Plotter, um zu zeichnen.',
 	'job.originBefore': 'Der rote Punkt ist der Nullpunkt. Fahre den Stift auf der',
