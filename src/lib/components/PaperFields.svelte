@@ -9,15 +9,19 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-2">
-	<label class="sr-only" for="{idPrefix}-format">{t('bar.paper')}</label>
-	<select id="{idPrefix}-format" bind:value={settings.formatId} class={field}>
+	<select
+		id="{idPrefix}-format"
+		aria-label={t('bar.paper')}
+		bind:value={settings.formatId}
+		class={field}
+	>
 		{#each PAPER_FORMATS as option (option.id)}
 			<option value={option.id}>{paperName(option)}</option>
 		{/each}
 	</select>
-	<label class="sr-only" for="{idPrefix}-orientation">{t('bar.orientation')}</label>
 	<select
 		id="{idPrefix}-orientation"
+		aria-label={t('bar.orientation')}
 		value={settings.orientation}
 		onchange={(event) => (settings.orientation = event.currentTarget.value as Orientation)}
 		class={field}
