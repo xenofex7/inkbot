@@ -95,7 +95,8 @@
 						/>
 						<span class="mt-2 block truncate text-sm font-semibold text-ink">{item.name}</span>
 						<span class="block text-[13px] text-ink-mute">
-							{date(item.createdAt)} · {paper(item)} · {item.polylines.length} strokes
+							{date(item.createdAt)} · {paper(item)} · {item.polylines.length}
+							{item.polylines.length === 1 ? 'stroke' : 'strokes'}
 						</span>
 					</button>
 					<div class="mt-3 flex flex-wrap gap-2">

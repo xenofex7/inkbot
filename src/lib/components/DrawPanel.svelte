@@ -121,7 +121,8 @@
 		</Button>
 	{/if}
 	<span class="text-sm text-ink-mute">
-		{sheet.width} × {sheet.height} mm · {polylines.length} strokes · approx. {minutes} min
+		{sheet.width} × {sheet.height} mm · {polylines.length}
+		{polylines.length === 1 ? 'stroke' : 'strokes'} · approx. {minutes} min
 	</span>
 	<div class="basis-full text-sm">
 		{#if polylines.length === 0}

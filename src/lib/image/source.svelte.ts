@@ -14,6 +14,14 @@ class ImageSource {
 		this.svg = text;
 	}
 
+	clear() {
+		if (this.url) URL.revokeObjectURL(this.url);
+		this.blob = undefined;
+		this.url = undefined;
+		this.name = '';
+		this.svg = undefined;
+	}
+
 	#replace(blob: Blob, name: string) {
 		if (this.url) URL.revokeObjectURL(this.url);
 		this.blob = blob;

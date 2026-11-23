@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Download, ImageUp, Sparkles } from '@lucide/svelte';
+	import { Download, ImageUp, RotateCcw, Sparkles } from '@lucide/svelte';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { resolve } from '$app/paths';
 	import { generateSvg, svgPrompt } from '#lib/ai/drawings.ts';
@@ -31,15 +31,38 @@
 	let loadError = $state('');
 	let fileInput = $state<HTMLInputElement>();
 	type Source = 'file' | 'ai-image' | 'ai-drawing';
-	const sources: [Source, string][] = [
-		['file', 'File'],
-		['ai-image', 'AI image'],
-		['ai-drawing', 'AI drawing']
+	const sources: [Source, string, string][] = [
+		['file', 'File', 'An image or SVG from your computer.'],
+		[
+			'ai-image',
+			'AI image',
+			'An image model paints a picture, inkbot then traces it into lines. More detail, lines can be a bit rough.'
+		],
+		[
+			'ai-drawing',
+			'AI drawing',
+			'A chat model draws vector lines directly. Every stroke is clean and drawn once, the style is simpler.'
+		]
 	];
 	let source = $state<Source>('file');
 	let prompt = $state('');
 	let generating = $state(false);
 	let generateError = $state('');
+
+	function startOver() {
+		imageSource.clear();
+		gray = undefined;
+		mode = 'lines';
+		threshold = 140;
+		detail = 400;
+		sizePercent = 100;
+		hatchSpacing = 1.2;
+		fillHatch = false;
+		prompt = '';
+		loadError = '';
+		generateError = '';
+		if (fileInput) fileInput.value = '';
+	}
 
 	async function generate() {
 		const idea = prompt.trim();
@@ -187,6 +210,9 @@
 					</button>
 				{/each}
 			</div>
+			<p class="mt-2 text-[13px] text-ink-mute">
+				{sources.find(([value]) => value === source)?.[2]}
+			</p>
 		</div>
 
 		<div>
@@ -241,21 +267,25 @@
 					alt={imageSource.name}
 					class="mt-3 max-h-40 rounded-md border border-hairline"
 				/>
-				<Button
-					class="mt-3"
-					onclick={() =>
-						imageSource.blob &&
-						download(
-							imageSource.blob,
-							filenameFrom(
-								imageSource.name,
-								isVector ? 'svg' : imageSource.blob.type.split('/')[1] || 'png'
-							)
-						)}
-				>
-					<Download size={16} />
-					{isVector ? 'Save source SVG' : 'Save image'}
-				</Button>
+				<div class="mt-3 flex flex-wrap gap-2">
+					<Button
+						onclick={() =>
+							imageSource.blob &&
+							download(
+								imageSource.blob,
+								filenameFrom(
+									imageSource.name,
+									isVector ? 'svg' : imageSource.blob.type.split('/')[1] || 'png'
+								)
+							)}
+					>
+						<Download size={16} />
+						{isVector ? 'Save source SVG' : 'Save image'}
+					</Button>
+					<Button onclick={startOver}>
+						<RotateCcw size={16} /> Start over
+					</Button>
+				</div>
 			{/if}
 			{#if loadError || vector.error}
 				<p class="mt-2 text-[13px] text-danger" role="alert">{loadError || vector.error}</p>
