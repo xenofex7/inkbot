@@ -38,6 +38,7 @@
 	} from '#lib/design/store.svelte.ts';
 	import { CARD_TEMPLATES } from '#lib/design/templates.ts';
 	import MergePanel from '#lib/components/MergePanel.svelte';
+	import Panel from '#lib/components/Panel.svelte';
 	import { PENS } from '#lib/design/pens.ts';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { gallery } from '#lib/gallery/store.svelte.ts';
@@ -185,18 +186,15 @@
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]"
 >
 	<div class="flex flex-col gap-6">
-		<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
-			<div class="flex items-center justify-between gap-3">
-				<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
-					{t('design.title')}
-				</h1>
+		<Panel id="design-card" title={t('design.title')} large bodyClass="space-y-5">
+			{#snippet actions()}
 				{#if design.elements.length}
-					<Button class="h-8! px-3!" onclick={() => design.clear()}>
+					<Button class="h-8! shrink-0 px-3! whitespace-nowrap" onclick={() => design.clear()}>
 						<RotateCcw size={14} />
 						{t('design.clear')}
 					</Button>
 				{/if}
-			</div>
+			{/snippet}
 
 			<div>
 				<label class={label} for="design-template">{t('template.label')}</label>
@@ -286,11 +284,10 @@
 			{#if error}
 				<p class="text-[13px] text-danger" role="alert">{error}</p>
 			{/if}
-		</section>
+		</Panel>
 
-		<section class="space-y-3 rounded-lg border border-hairline bg-canvas p-6">
+		<Panel id="design-elements" title={t('design.elements')} bodyClass="space-y-3">
 			<div>
-				<h2 class="font-semibold text-ink">{t('design.elements')}</h2>
 				{#if design.elements.length === 0}
 					<p class="text-sm text-ink-mute">{t('design.empty')}</p>
 				{:else}
@@ -337,13 +334,10 @@
 					</ul>
 				{/if}
 			</div>
-		</section>
-
-		<MergePanel />
+		</Panel>
 
 		{#if selected}
-			<section class="space-y-4 rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">{t('design.selected')}</h2>
+			<Panel id="design-selected" title={t('design.selected')}>
 				<div>
 					<RangeField
 						id="design-scale"
@@ -535,8 +529,10 @@
 						{selected.kind === 'raster' ? t('image.saveImage') : t('image.saveSource')}
 					</Button>
 				{/if}
-			</section>
+			</Panel>
 		{/if}
+
+		<MergePanel />
 	</div>
 
 	<section

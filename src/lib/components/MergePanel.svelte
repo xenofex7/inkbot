@@ -2,6 +2,7 @@
 	import { t } from '../i18n.svelte';
 	import { ChevronLeft, ChevronRight, FileSpreadsheet, X } from '@lucide/svelte';
 	import Button from './Button.svelte';
+	import Panel from './Panel.svelte';
 	import { decodeText, hasPlaceholders, toMergeList } from '../design/merge';
 	import { design } from '../design/store.svelte';
 
@@ -42,11 +43,8 @@
 	}
 </script>
 
-<section class="space-y-4 rounded-lg border border-hairline bg-canvas p-6">
-	<div>
-		<h2 class="font-semibold text-ink">{t('merge.title')}</h2>
-		<p class="mt-1 text-sm text-ink-mute">{t('merge.intro')}</p>
-	</div>
+<Panel id="design-merge" title={t('merge.title')} open={false}>
+	<p class="text-sm text-ink-mute">{t('merge.intro')}</p>
 
 	{#if !merge}
 		<Button onclick={() => input.click()}>
@@ -108,4 +106,4 @@
 		class="hidden"
 		onchange={load}
 	/>
-</section>
+</Panel>
