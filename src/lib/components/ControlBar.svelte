@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { paperName, t } from '../i18n.svelte';
+	import { t } from '../i18n.svelte';
 	import { ArrowDownToLine, ArrowUpFromLine, OctagonX, Pause, Play } from '@lucide/svelte';
 	import Button from './Button.svelte';
+	import PaperFields from './PaperFields.svelte';
+	import StatusBadge from './StatusBadge.svelte';
 	import { penDown, penUp } from '../grbl/commands';
-	import { PAPER_FORMATS, type Orientation } from '../geometry/paper';
 	import { orient } from '../geometry/types';
 	import { REALTIME } from '../grbl/vgx4';
 	import { plotter } from '../serial/plotter.svelte';
@@ -75,38 +76,10 @@
 			X {format(position?.x)} · Y {format(position?.y)} mm
 		</div>
 
-		<div class="flex items-center gap-2">
-			<label class="sr-only" for="bar-format">{t('bar.paper')}</label>
-			<select id="bar-format" bind:value={settings.formatId} class={field}>
-				{#each PAPER_FORMATS as option (option.id)}
-					<option value={option.id}>{paperName(option)}</option>
-				{/each}
-			</select>
-			<label class="sr-only" for="bar-orientation">{t('bar.orientation')}</label>
-			<select
-				id="bar-orientation"
-				value={settings.orientation}
-				onchange={(event) => (settings.orientation = event.currentTarget.value as Orientation)}
-				class={field}
-			>
-				<option value="portrait">{t('bar.portrait')}</option>
-				<option value="landscape">{t('bar.landscape')}</option>
-			</select>
-			<label class="flex items-center gap-1.5 text-ink-mute" for="bar-margin">
-				{t('bar.margin')}
-				<input
-					id="bar-margin"
-					type="number"
-					min="0"
-					max="60"
-					bind:value={settings.margin}
-					class="{field} w-16"
-				/>
-			</label>
-		</div>
+		<PaperFields idPrefix="bar" />
 
-		{#if running}
-			<div class="ml-auto flex items-center gap-2">
+		<div class="ml-auto flex items-center gap-2">
+			{#if running}
 				{#if plotter.status?.state === 'Hold'}
 					<Button class="h-9! px-3!" onclick={() => plotter.realtime(REALTIME.cycleStart)}>
 						<Play size={16} />
@@ -126,8 +99,9 @@
 					<OctagonX size={16} />
 					{t('job.stop')}
 				</Button>
-			</div>
-		{/if}
+			{/if}
+			<StatusBadge />
+		</div>
 
 		{#if error}
 			<p class="basis-full text-danger" role="alert">{error}</p>

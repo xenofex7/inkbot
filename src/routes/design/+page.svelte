@@ -15,6 +15,7 @@
 	import Button from '#lib/components/Button.svelte';
 	import DesignCanvas from '#lib/components/DesignCanvas.svelte';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
+	import PaperFields from '#lib/components/PaperFields.svelte';
 	import RangeField from '#lib/components/RangeField.svelte';
 	import SheetPreview from '#lib/components/SheetPreview.svelte';
 	import {
@@ -148,6 +149,11 @@
 						{t('design.clear')}
 					</Button>
 				{/if}
+			</div>
+
+			<div>
+				<span class={label}>{t('bar.paper')}</span>
+				<PaperFields idPrefix="design" />
 			</div>
 
 			<div>

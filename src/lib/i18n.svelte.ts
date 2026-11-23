@@ -33,7 +33,7 @@ const en = {
 	'design.kindRaster': 'Image',
 	'design.kindVector': 'Drawing',
 	'connect.button': 'Connect plotter',
-	'connect.disconnect': 'Disconnect',
+	'connect.disconnect': 'Disconnect plotter',
 
 	'status.connecting': 'Connecting …',
 	'status.disconnected': 'Disconnected',
@@ -231,7 +231,7 @@ const de: Record<Key, string> = {
 	'design.kindRaster': 'Bild',
 	'design.kindVector': 'Zeichnung',
 	'connect.button': 'Plotter verbinden',
-	'connect.disconnect': 'Trennen',
+	'connect.disconnect': 'Plotter trennen',
 
 	'status.connecting': 'Verbinde …',
 	'status.disconnected': 'Getrennt',

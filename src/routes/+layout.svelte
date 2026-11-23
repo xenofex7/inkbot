@@ -47,7 +47,9 @@
 				{/each}
 			</nav>
 			<div class="ml-auto flex items-center gap-3">
-				<StatusBadge />
+				{#if plotter.connection !== 'connected'}
+					<StatusBadge />
+				{/if}
 				{#if plotter.connection === 'disconnected'}
 					<Button variant="primary" onclick={() => plotter.connect()} disabled={!plotter.supported}>
 						{t('connect.button')}
@@ -58,7 +60,9 @@
 			</div>
 		</div>
 	</div>
-	<ControlBar />
+	{#if plotter.connection === 'connected'}
+		<ControlBar />
+	{/if}
 </header>
 
 {@render children()}

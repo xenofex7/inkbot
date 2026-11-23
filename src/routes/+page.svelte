@@ -58,16 +58,6 @@
 					<p class="mt-6 rounded-lg bg-surface-card p-4 text-ink">
 						{t('machine.unsupported')}
 					</p>
-				{:else}
-					<div class="mt-8 flex flex-wrap gap-3">
-						<Button
-							variant="primary"
-							onclick={() => plotter.connect()}
-							disabled={plotter.connection === 'connecting'}
-						>
-							{t('connect.button')}
-						</Button>
-					</div>
 				{/if}
 				{#if plotter.lastError}
 					<p class="mt-4 text-sm text-danger" role="alert">{plotter.lastError}</p>
