@@ -207,7 +207,7 @@ const en = {
 	'machine.test': 'Test',
 	'machine.square': '20 mm square',
 	'machine.barHint':
-		'Pen, depth, position and paper live in the bar at the top. Pause and stop show up there while a job runs.',
+		'Pen, depth, position and paper live in the bar at the top. While a job runs, speed, pause and stop appear in a bar at the bottom.',
 	'machine.move': 'Move',
 	'machine.up': 'Move up',
 	'machine.left': 'Move left',
@@ -588,7 +588,7 @@ const de: Record<Key, string> = {
 	'machine.test': 'Test',
 	'machine.square': 'Quadrat 20 mm',
 	'machine.barHint':
-		'Stift, Tiefe, Position und Papier sind oben in der Leiste. Dort erscheinen während einer Fahrt auch Pause und Stopp.',
+		'Stift, Tiefe, Position und Papier sind oben in der Leiste. Während einer Fahrt erscheinen Tempo, Pause und Stopp in einer Leiste unten.',
 	'machine.move': 'Bewegen',
 	'machine.up': 'Nach oben',
 	'machine.left': 'Nach links',

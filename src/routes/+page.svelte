@@ -221,127 +221,6 @@
 	{:else}
 		<div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
 			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">{t('machine.machine')}</h2>
-				<dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[15px]">
-					<dt class="text-ink-mute">{t('machine.state')}</dt>
-					<dd class="text-ink">{plotter.status?.state ?? '-'}</dd>
-					<dt class="text-ink-mute">{t('machine.firmware')}</dt>
-					<dd class="text-ink">{plotter.greeting.replace(/\s*\['\$' for help\]$/, '') || '-'}</dd>
-				</dl>
-				{#if plotter.alarm !== undefined}
-					<div class="mt-4 rounded-md border border-danger p-3 text-sm text-danger" role="alert">
-						{t('machine.alarm', { code: plotter.alarm ?? '' })}
-						<button class="ml-2 font-semibold underline" onclick={() => run(['$X'])}>
-							{t('machine.unlock')}
-						</button>
-					</div>
-				{/if}
-			</section>
-
-			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<h2 class="font-semibold text-ink">{t('machine.test')}</h2>
-				<div class="mt-4 flex flex-wrap gap-3">
-					<Button
-						variant="primary"
-						onclick={() => run(testSquare(20, settings))}
-						disabled={!canAct}
-					>
-						<Square size={16} />
-						{t('machine.square')}
-					</Button>
-				</div>
-				<p class="mt-4 text-sm text-ink-mute">
-					{t('machine.barHint')}
-				</p>
-			</section>
-
-			<section class="rounded-lg border border-hairline bg-canvas p-6">
-				<div class="flex items-center justify-between gap-4">
-					<h2 class="font-semibold text-ink">{t('machine.move')}</h2>
-					<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-						{#each steps as value (value)}
-							<button
-								role="radio"
-								aria-checked={step === value}
-								class="rounded-pill px-3.5 py-1.5 text-sm {step === value
-									? 'bg-canvas text-ink shadow-sm'
-									: 'text-ink-mute'}"
-								onclick={() => (step = value)}
-							>
-								{value} mm
-							</button>
-						{/each}
-					</div>
-				</div>
-				<div class="mt-6 grid w-fit grid-cols-3 gap-2">
-					<span></span>
-					<Button
-						variant="icon"
-						aria-label={t('machine.up')}
-						onclick={() => jogBy(0, -jogStep)}
-						disabled={!canAct}
-					>
-						<ArrowUp size={18} />
-					</Button>
-					<span></span>
-					<Button
-						variant="icon"
-						aria-label={t('machine.left')}
-						onclick={() => jogBy(-jogStep, 0)}
-						disabled={!canAct}
-					>
-						<ArrowLeft size={18} />
-					</Button>
-					<Button
-						variant="icon"
-						aria-label={t('machine.goOrigin')}
-						onclick={() => run(goToOrigin())}
-						disabled={!canAct}
-					>
-						<House size={18} />
-					</Button>
-					<Button
-						variant="icon"
-						aria-label={t('machine.right')}
-						onclick={() => jogBy(jogStep, 0)}
-						disabled={!canAct}
-					>
-						<ArrowRight size={18} />
-					</Button>
-					<span></span>
-					<Button
-						variant="icon"
-						aria-label={t('machine.downMove')}
-						onclick={() => jogBy(0, jogStep)}
-						disabled={!canAct}
-					>
-						<ArrowDown size={18} />
-					</Button>
-					<span></span>
-				</div>
-				<div class="mt-4 flex flex-wrap gap-2">
-					<Button onclick={setCorner} disabled={!canAct}>
-						<Crosshair size={16} />
-						{t('machine.origin')}
-					</Button>
-					<Button onclick={() => run(goToOrigin())} disabled={!canAct}>
-						<House size={16} />
-						{t('machine.goOrigin')}
-					</Button>
-					<Button onclick={goToStop} disabled={!canAct || !positions.anchor}>
-						<SquareArrowUpLeft size={16} />
-						{t('machine.goAnchor')}
-					</Button>
-				</div>
-				{#if notice}
-					<p class="mt-4 text-sm text-seal" role="status">{notice}</p>
-				{/if}
-				<p class="mt-4 text-sm text-ink-mute">
-					{t('machine.originHint')}
-				</p>
-			</section>
-
-			<section class="rounded-lg border border-hairline bg-canvas p-6">
 				<h2 class="font-semibold text-ink">{t('setup.title')}</h2>
 				<p class="mt-2 text-sm text-ink-mute">{t('setup.anchorHint')}</p>
 				{#if !positions.anchor}
@@ -459,7 +338,130 @@
 				</div>
 			</section>
 
-			<section class="flex min-h-80 flex-col rounded-lg border border-hairline bg-canvas p-6">
+			<section class="rounded-lg border border-hairline bg-canvas p-6">
+				<div class="flex items-center justify-between gap-4">
+					<h2 class="font-semibold text-ink">{t('machine.move')}</h2>
+					<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
+						{#each steps as value (value)}
+							<button
+								role="radio"
+								aria-checked={step === value}
+								class="rounded-pill px-3.5 py-1.5 text-sm {step === value
+									? 'bg-canvas text-ink shadow-sm'
+									: 'text-ink-mute'}"
+								onclick={() => (step = value)}
+							>
+								{value} mm
+							</button>
+						{/each}
+					</div>
+				</div>
+				<div class="mt-6 grid w-fit grid-cols-3 gap-2">
+					<span></span>
+					<Button
+						variant="icon"
+						aria-label={t('machine.up')}
+						onclick={() => jogBy(0, -jogStep)}
+						disabled={!canAct}
+					>
+						<ArrowUp size={18} />
+					</Button>
+					<span></span>
+					<Button
+						variant="icon"
+						aria-label={t('machine.left')}
+						onclick={() => jogBy(-jogStep, 0)}
+						disabled={!canAct}
+					>
+						<ArrowLeft size={18} />
+					</Button>
+					<Button
+						variant="icon"
+						aria-label={t('machine.goOrigin')}
+						onclick={() => run(goToOrigin())}
+						disabled={!canAct}
+					>
+						<House size={18} />
+					</Button>
+					<Button
+						variant="icon"
+						aria-label={t('machine.right')}
+						onclick={() => jogBy(jogStep, 0)}
+						disabled={!canAct}
+					>
+						<ArrowRight size={18} />
+					</Button>
+					<span></span>
+					<Button
+						variant="icon"
+						aria-label={t('machine.downMove')}
+						onclick={() => jogBy(0, jogStep)}
+						disabled={!canAct}
+					>
+						<ArrowDown size={18} />
+					</Button>
+					<span></span>
+				</div>
+				<div class="mt-4 flex flex-wrap gap-2">
+					<Button onclick={setCorner} disabled={!canAct}>
+						<Crosshair size={16} />
+						{t('machine.origin')}
+					</Button>
+					<Button onclick={() => run(goToOrigin())} disabled={!canAct}>
+						<House size={16} />
+						{t('machine.goOrigin')}
+					</Button>
+					<Button onclick={goToStop} disabled={!canAct || !positions.anchor}>
+						<SquareArrowUpLeft size={16} />
+						{t('machine.goAnchor')}
+					</Button>
+				</div>
+				{#if notice}
+					<p class="mt-4 text-sm text-seal" role="status">{notice}</p>
+				{/if}
+				<p class="mt-4 text-sm text-ink-mute">
+					{t('machine.originHint')}
+				</p>
+			</section>
+
+			<section class="rounded-lg border border-hairline bg-canvas p-6">
+				<h2 class="font-semibold text-ink">{t('machine.machine')}</h2>
+				<dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[15px]">
+					<dt class="text-ink-mute">{t('machine.state')}</dt>
+					<dd class="text-ink">{plotter.status?.state ?? '-'}</dd>
+					<dt class="text-ink-mute">{t('machine.firmware')}</dt>
+					<dd class="text-ink">{plotter.greeting.replace(/\s*\['\$' for help\]$/, '') || '-'}</dd>
+				</dl>
+				{#if plotter.alarm !== undefined}
+					<div class="mt-4 rounded-md border border-danger p-3 text-sm text-danger" role="alert">
+						{t('machine.alarm', { code: plotter.alarm ?? '' })}
+						<button class="ml-2 font-semibold underline" onclick={() => run(['$X'])}>
+							{t('machine.unlock')}
+						</button>
+					</div>
+				{/if}
+			</section>
+
+			<section class="rounded-lg border border-hairline bg-canvas p-6">
+				<h2 class="font-semibold text-ink">{t('machine.test')}</h2>
+				<div class="mt-4 flex flex-wrap gap-3">
+					<Button
+						variant="primary"
+						onclick={() => run(testSquare(20, settings))}
+						disabled={!canAct}
+					>
+						<Square size={16} />
+						{t('machine.square')}
+					</Button>
+				</div>
+				<p class="mt-4 text-sm text-ink-mute">
+					{t('machine.barHint')}
+				</p>
+			</section>
+
+			<section
+				class="flex min-h-80 flex-col rounded-lg border border-hairline bg-canvas p-6 lg:col-span-2"
+			>
 				<h2 class="font-semibold text-ink">{t('machine.console')}</h2>
 				<div
 					bind:this={logView}
