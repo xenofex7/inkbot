@@ -6,12 +6,12 @@
 		if (plotter.connection === 'connecting')
 			return { text: t('status.connecting'), tone: 'default' };
 		if (plotter.connection === 'disconnected')
-			return { text: t('status.disconnected'), tone: 'default' };
+			return { text: t('status.disconnected'), tone: 'offline' };
 		if (plotter.alarm !== undefined) return { text: t('status.alarm'), tone: 'danger' };
 		if (plotter.penDown) return { text: t('status.penDown'), tone: 'seal' };
 		if (plotter.status?.state === 'Hold') return { text: t('status.paused'), tone: 'warning' };
 		if (plotter.busy) return { text: t('status.moving'), tone: 'brand' };
-		return { text: t('status.connected'), tone: 'brand' };
+		return { text: t('status.connected'), tone: 'online' };
 	});
 
 	const tones: Record<string, string> = {
@@ -19,7 +19,9 @@
 		brand: 'bg-steel-50 text-ink',
 		warning: 'bg-surface-card text-ink',
 		danger: 'bg-danger text-on-primary',
-		seal: 'bg-seal text-on-primary'
+		seal: 'bg-seal text-on-primary',
+		online: 'bg-steel-50 text-ink',
+		offline: 'bg-surface-card text-ink'
 	};
 
 	const dots: Record<string, string> = {
@@ -27,7 +29,9 @@
 		brand: 'bg-steel-600',
 		warning: 'bg-warning',
 		danger: 'bg-on-primary',
-		seal: 'bg-on-primary'
+		seal: 'bg-on-primary',
+		online: 'bg-success',
+		offline: 'bg-danger'
 	};
 </script>
 
