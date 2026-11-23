@@ -232,6 +232,9 @@ const en = {
 	'text.centre': 'Centre',
 	'text.right': 'Right',
 
+	'ai.multicolour': 'Multicoloured (pens 1 to 4)',
+	'ai.multicolourHint':
+		'The vector drawing may use the four pen colours, each colour becomes its own element with that pen.',
 	'ai.hint':
 		'One idea, two suggestions: a clean vector drawing and a traced image. Use one or keep both.',
 	'ai.idea': 'Idea',
@@ -570,6 +573,9 @@ const de: Record<Key, string> = {
 	'text.centre': 'Mitte',
 	'text.right': 'Rechts',
 
+	'ai.multicolour': 'Mehrfarbig (Stifte 1 bis 4)',
+	'ai.multicolourHint':
+		'Die Vektorzeichnung darf die vier Stiftfarben nutzen, jede Farbe wird ein eigenes Element mit diesem Stift.',
 	'ai.hint':
 		'Eine Idee, zwei Vorschläge: eine saubere Vektorzeichnung und ein nachgezeichnetes Bild. Nimm eines oder behalte beide.',
 	'ai.idea': 'Idee',

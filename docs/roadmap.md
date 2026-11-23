@@ -48,6 +48,8 @@ As of 23.11.2026. Done items are marked [x].
 - [x] Envelopes from an address list (CSV): placeholders like {Name} in any text, step
   through the rows
 - [x] **Several pens:** up to four pens per card, drawn pen by pen with a prompt to swap
+- [x] **Colours from SVG and AI:** stroke colours in SVG files and multicoloured AI drawings
+  are split into one element per pen
 - [x] **Path preview and resume:** play the pen path stroke by stroke, continue an
   interrupted drawing from any stroke
 

@@ -46,7 +46,7 @@
 	import type { TraceMode } from '#lib/image/trace.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { settings } from '#lib/settings.svelte.ts';
-	import { parseSvg } from '#lib/svg/parse.ts';
+	import { parseSvgStrokes } from '#lib/svg/parse.ts';
 	import { fonts, type Align } from '#lib/text/layout.ts';
 	import { handwriting } from '#lib/handwriting/store.svelte.ts';
 
@@ -108,7 +108,7 @@
 	async function useAi(result: AiResult) {
 		error = '';
 		try {
-			if (result.kind === 'svg') design.addVector(parseSvg(result.svg), result.name, area);
+			if (result.kind === 'svg') design.addStrokes(parseSvgStrokes(result.svg), result.name, area);
 			else await design.addRaster(result.blob, result.name, area);
 			panel = 'none';
 		} catch (e) {

@@ -314,21 +314,34 @@ const SKIP = new Set([
 	'text'
 ]);
 
-export function parseSvg(source: string): Polyline[] {
+export type Stroke = { line: Polyline; color: string };
+
+function strokeOf(element: Element, inherited: string) {
+	const style = /(?:^|;)\s*stroke\s*:\s*([^;]+)/.exec(element.attrs.style ?? '')?.[1];
+	const value = (style ?? element.attrs.stroke ?? '').trim();
+	return value && value !== 'inherit' ? value : inherited;
+}
+
+export function parseSvgStrokes(source: string): Stroke[] {
 	const root = parseXml(source);
 	const svg = root.children.find((child) => child.name === 'svg');
 	if (!svg) throw new Error('No <svg> element found.');
-	const lines: Polyline[] = [];
-	const walk = (element: Element, matrix: Matrix) => {
+	const strokes: Stroke[] = [];
+	const walk = (element: Element, matrix: Matrix, inherited: string) => {
 		if (SKIP.has(element.name) || element.attrs.display === 'none') return;
 		const own = multiply(matrix, parseTransform(element.attrs.transform));
+		const color = strokeOf(element, inherited);
 		for (const line of shape(element)) {
-			if (line.length > 1) lines.push(line.map((p) => apply(own, p)));
+			if (line.length > 1) strokes.push({ line: line.map((p) => apply(own, p)), color });
 		}
-		for (const child of element.children) walk(child, own);
+		for (const child of element.children) walk(child, own, color);
 	};
-	for (const child of svg.children) walk(child, IDENTITY);
-	return lines;
+	for (const child of svg.children) walk(child, IDENTITY, strokeOf(svg, 'black'));
+	return strokes;
+}
+
+export function parseSvg(source: string): Polyline[] {
+	return parseSvgStrokes(source).map((stroke) => stroke.line);
 }
 
 export function extractSvg(text: string): string {

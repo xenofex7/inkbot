@@ -2,7 +2,8 @@
 	import { BookmarkPlus, Check, Sparkles } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Button from './Button.svelte';
-	import { generateSvg, svgPrompt } from '../ai/drawings';
+	import { colourPrompt, generateSvg, svgPrompt } from '../ai/drawings';
+	import { PENS } from '../design/pens';
 	import type { AiResult } from '../ai/result';
 	import { buildPrompt, generateImage } from '../ai/images';
 	import { aiSettings } from '../ai/settings.svelte';
@@ -24,6 +25,7 @@
 	type Slot = { result?: AiResult; error?: string; busy: boolean };
 
 	let idea = $state('');
+	let multicolour = $state(false);
 	let drawing = $state<Slot>({ busy: false });
 	let image = $state<Slot>({ busy: false });
 	let saved = $state(false);
@@ -43,7 +45,8 @@
 	}
 
 	async function makeDrawing(text: string): Promise<AiResult> {
-		const system = svgPrompt(aiSettings.svgTemplate, area.width, area.height);
+		const base = svgPrompt(aiSettings.svgTemplate, area.width, area.height);
+		const system = multicolour ? `${base} ${colourPrompt(PENS.map((pen) => pen.hex))}` : base;
 		const svg = await generateSvg(aiSettings.drawingConfig, system, text);
 		return { kind: 'svg', name: text, svg, shape: normalize(parseSvg(svg)) };
 	}
@@ -143,6 +146,15 @@
 			rows="3"
 			placeholder={t('image.ideaPlaceholder')}
 			class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"></textarea>
+		{#if aiSettings.drawingReady}
+			<label class="flex items-start gap-2.5 text-sm text-ink">
+				<input type="checkbox" class="mt-0.5 size-4 accent-primary" bind:checked={multicolour} />
+				<span>
+					{t('ai.multicolour')}
+					<span class="block text-[13px] text-ink-mute">{t('ai.multicolourHint')}</span>
+				</span>
+			</label>
+		{/if}
 		<Button variant="primary" onclick={generate} disabled={busy || !idea.trim()}>
 			<Sparkles size={16} />
 			{busy ? t('image.generating') : t('image.generate')}

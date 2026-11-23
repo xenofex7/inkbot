@@ -8,6 +8,14 @@ export const DEFAULT_SVG_PROMPT =
 	'stroke, no doubled outlines, no fills, no gradients, no text, no images, no frame. ' +
 	'Keep it simple and elegant with a moderate number of strokes.';
 
+export function colourPrompt(colours: readonly string[]) {
+	const list = colours.map((colour, index) => `stroke="${colour}" for pen ${index + 1}`).join(', ');
+	return (
+		`Instead of black, you may use these pen colours: ${list}. Draw the main lines with pen 1 ` +
+		'and use the other colours for accents where they help the idea.'
+	);
+}
+
 export function svgPrompt(template: string, width: number, height: number) {
 	return template
 		.replaceAll('{width}', String(Math.round(width)))

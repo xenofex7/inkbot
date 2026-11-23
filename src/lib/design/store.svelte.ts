@@ -3,7 +3,8 @@ import { bounds, type Point, type Polyline } from '../geometry/types';
 import { loadGray } from '../image/load';
 import { traceImage, type Gray, type TraceMode } from '../image/trace';
 import { orderPaths } from '../optimize/order';
-import { parseSvg } from '../svg/parse';
+import { parseSvgStrokes, type Stroke } from '../svg/parse';
+import { penForColor } from './pens';
 import { handwriting } from '../handwriting/store.svelte';
 import { fonts, layoutText, type Align } from '../text/layout';
 import {
@@ -303,6 +304,42 @@ class Design {
 		});
 	}
 
+	addStrokes(strokes: Stroke[], name: string, area: Area, source?: Blob) {
+		const byPen: Record<number, Polyline[]> = {};
+		for (const stroke of strokes) (byPen[penForColor(stroke.color)] ??= []).push(stroke.line);
+		const pens = Object.keys(byPen)
+			.map(Number)
+			.sort((a, b) => a - b);
+		if (pens.length <= 1) {
+			this.addVector(
+				strokes.map((stroke) => stroke.line),
+				name,
+				area,
+				{ source }
+			);
+			if (pens[0] && pens[0] !== 1 && this.selectedId) this.setPen(this.selectedId, pens[0]);
+			return;
+		}
+		const all = strokes.map((stroke) => stroke.line);
+		const whole = bounds(all)!;
+		const placement = centred(normalize(all), area);
+		for (const pen of pens) {
+			const lines = byPen[pen];
+			const box = bounds(lines)!;
+			this.#add({
+				kind: 'vector',
+				id: crypto.randomUUID(),
+				name: `${name} · ${pen}`,
+				shape: normalize(lines),
+				source: pen === pens[0] ? source : undefined,
+				pen,
+				scale: placement.scale,
+				x: placement.x + (box.minX - whole.minX) * placement.scale,
+				y: placement.y + (box.minY - whole.minY) * placement.scale
+			});
+		}
+	}
+
 	async addRaster(blob: Blob, name: string, area: Area) {
 		const trace: TraceOptions = {
 			mode: 'lines',
@@ -329,7 +366,7 @@ class Design {
 
 	async addFile(file: File, area: Area) {
 		if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
-			this.addVector(parseSvg(await file.text()), file.name, area, { source: file });
+			this.addStrokes(parseSvgStrokes(await file.text()), file.name, area, file);
 		} else {
 			await this.addRaster(file, file.name, area);
 		}
