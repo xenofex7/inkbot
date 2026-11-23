@@ -10,7 +10,7 @@
 		House,
 		Compass,
 		MapPin,
-		SquareParking,
+		SquareArrowUpLeft,
 		Square,
 		Trash2
 	} from '@lucide/svelte';
@@ -329,7 +329,7 @@
 						{t('machine.goOrigin')}
 					</Button>
 					<Button onclick={goToStop} disabled={!canAct || !positions.anchor}>
-						<SquareParking size={16} />
+						<SquareArrowUpLeft size={16} />
 						{t('machine.goAnchor')}
 					</Button>
 				</div>
@@ -348,7 +348,7 @@
 					<div class="mt-4 space-y-3 rounded-md border border-seal/40 bg-surface-card p-4">
 						<p class="text-sm text-ink">{t('anchor.question')}</p>
 						<Button variant="primary" onclick={confirmAnchor} disabled={!canAct}>
-							<SquareParking size={16} />
+							<SquareArrowUpLeft size={16} />
 							{t('anchor.confirm')}
 						</Button>
 					</div>
