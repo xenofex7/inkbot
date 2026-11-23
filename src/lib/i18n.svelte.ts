@@ -181,9 +181,10 @@ const en = {
 	'job.outsideSheetConfirm':
 		'The drawing does not fit on the sheet and may draw past its edge. Draw anyway?',
 	'job.connectFirst': 'Connect the plotter to draw.',
-	'job.originBefore': 'The red dot is the origin. On the',
+	'job.originBefore': 'The red dot is the sheet corner. On the',
 	'job.originLink': 'machine page',
-	'job.originAfter': ', move the pen to the top left corner of the sheet and set the origin there.',
+	'job.originAfter':
+		', move the pen to the top left corner of the sheet and set it as sheet corner.',
 	'preview.label': 'Sheet preview, {width} × {height} mm',
 	'range.less': 'Less',
 	'range.more': 'More',
@@ -561,9 +562,9 @@ const de: Record<Key, string> = {
 	'job.outsideSheetConfirm':
 		'Die Zeichnung passt nicht aufs Blatt und kann über den Rand hinaus zeichnen. Trotzdem zeichnen?',
 	'job.connectFirst': 'Verbinde den Plotter, um zu zeichnen.',
-	'job.originBefore': 'Der rote Punkt ist der Nullpunkt. Fahre den Stift auf der',
+	'job.originBefore': 'Der rote Punkt ist die Blattecke. Fahre den Stift auf der',
 	'job.originLink': 'Maschinen-Seite',
-	'job.originAfter': 'an die obere linke Ecke des Blatts und setze dort den Nullpunkt.',
+	'job.originAfter': ' an die obere linke Ecke des Blatts und setze dort die Blattecke.',
 	'preview.label': 'Vorschau des Blatts, {width} × {height} mm',
 	'range.less': 'Weniger',
 	'range.more': 'Mehr',
