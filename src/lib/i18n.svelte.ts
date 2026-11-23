@@ -210,6 +210,13 @@ const en = {
 	'settings.baseUrlHint':
 		'The server must allow requests from the browser (CORS). LiteLLM can also route to other providers such as Higgsfield.',
 	'settings.apiKey': 'API key',
+	'backup.title': 'Backup',
+	'backup.hint':
+		'Saves settings, AI settings and prompts, the gallery and all handwriting in one file. The API key is not included.',
+	'backup.export': 'Export everything',
+	'backup.import': 'Import backup',
+	'backup.confirm':
+		'Import this backup? Settings and prompts are replaced, gallery and handwriting are added. The page reloads afterwards.',
 	'settings.showKeyStart': 'Show the start of the key',
 	'settings.keyStart': 'Starts with',
 	'settings.imageModel': 'Image model',
@@ -448,6 +455,13 @@ const de: Record<Key, string> = {
 	'settings.baseUrlHint':
 		'Der Server muss Anfragen aus dem Browser erlauben (CORS). Über LiteLLM lassen sich auch andere Anbieter wie Higgsfield einbinden.',
 	'settings.apiKey': 'API-Schlüssel',
+	'backup.title': 'Sicherung',
+	'backup.hint':
+		'Speichert Einstellungen, KI-Einstellungen und Prompts, die Galerie und alle Handschriften in einer Datei. Der API-Schlüssel wird nicht mitgesichert.',
+	'backup.export': 'Alles exportieren',
+	'backup.import': 'Sicherung importieren',
+	'backup.confirm':
+		'Diese Sicherung importieren? Einstellungen und Prompts werden ersetzt, Galerie und Handschriften ergänzt. Danach lädt die Seite neu.',
 	'settings.showKeyStart': 'Anfang des Schlüssels zeigen',
 	'settings.keyStart': 'Beginnt mit',
 	'settings.imageModel': 'Bildmodell',

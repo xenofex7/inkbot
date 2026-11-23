@@ -72,6 +72,11 @@ class Gallery {
 		return entry;
 	}
 
+	async restore(items: GalleryItem[]) {
+		for (const item of items) await transaction('readwrite', (store) => store.put(item));
+		await this.load();
+	}
+
 	async remove(id: string) {
 		await transaction('readwrite', (store) => store.delete(id));
 		this.items = this.items.filter((item) => item.id !== id);

@@ -86,7 +86,7 @@ function isGlyph(value: unknown): value is Glyph {
 	);
 }
 
-function parseItem(item: Partial<Handwriting>): Handwriting {
+export function parseHandwriting(item: Partial<Handwriting>): Handwriting {
 	if (typeof item.id !== 'string') throw new Error('Not an inkbot handwriting file');
 	const glyphs = Object.fromEntries(
 		Object.entries(item.glyphs ?? {}).map(([char, list]) => [
@@ -113,5 +113,5 @@ export function fromFile(text: string): Handwriting[] {
 	if (data.format !== FILE_FORMAT || !Array.isArray(items) || items.length === 0) {
 		throw new Error('Not an inkbot handwriting file');
 	}
-	return items.map(parseItem);
+	return items.map(parseHandwriting);
 }

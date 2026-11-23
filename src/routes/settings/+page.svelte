@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { i18n, LOCALES, t } from '#lib/i18n.svelte.ts';
-	import { Eye, EyeOff } from '@lucide/svelte';
+	import { Download, Eye, EyeOff, Upload } from '@lucide/svelte';
+	import { createBackup, restoreBackup } from '#lib/backup.svelte.ts';
+	import { download } from '#lib/download.ts';
 	import Button from '#lib/components/Button.svelte';
 	import { listModels, type ProviderId } from '#lib/ai/images.ts';
 	import { aiSettings } from '#lib/ai/settings.svelte.ts';
@@ -9,6 +11,32 @@
 	let testState = $state<'idle' | 'testing' | 'ok' | 'error'>('idle');
 	let testMessage = $state('');
 	let showKeyStart = $state(false);
+	let backupError = $state('');
+	let backupInput: HTMLInputElement;
+
+	async function exportBackup() {
+		backupError = '';
+		try {
+			const date = new Date().toISOString().slice(0, 10);
+			const blob = new Blob([await createBackup()], { type: 'application/json' });
+			download(blob, `inkbot-backup-${date}.json`);
+		} catch (error) {
+			backupError = error instanceof Error ? error.message : String(error);
+		}
+	}
+
+	async function importBackup(event: Event & { currentTarget: HTMLInputElement }) {
+		const file = event.currentTarget.files?.[0];
+		event.currentTarget.value = '';
+		if (!file || !confirm(t('backup.confirm'))) return;
+		backupError = '';
+		try {
+			await restoreBackup(await file.text());
+			location.reload();
+		} catch (error) {
+			backupError = error instanceof Error ? error.message : String(error);
+		}
+	}
 
 	const providers: [ProviderId, string][] = [
 		['openai', 'OpenAI'],
@@ -220,5 +248,34 @@
 			></textarea>
 		</div>
 		<Button onclick={() => aiSettings.resetSvgTemplate()}>{t('settings.restore')}</Button>
+	</section>
+
+	<section class="space-y-4 rounded-lg border border-hairline bg-canvas p-6 lg:col-span-2">
+		<div>
+			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+				{t('backup.title')}
+			</h2>
+			<p class="mt-2 text-sm text-ink-mute">{t('backup.hint')}</p>
+		</div>
+		<div class="flex flex-wrap gap-2">
+			<Button onclick={exportBackup}>
+				<Download size={16} />
+				{t('backup.export')}
+			</Button>
+			<Button onclick={() => backupInput.click()}>
+				<Upload size={16} />
+				{t('backup.import')}
+			</Button>
+			<input
+				bind:this={backupInput}
+				type="file"
+				accept="application/json,.json"
+				class="hidden"
+				onchange={importBackup}
+			/>
+		</div>
+		{#if backupError}
+			<p class="text-sm text-danger" role="alert">{backupError}</p>
+		{/if}
 	</section>
 </main>
