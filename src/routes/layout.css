@@ -43,6 +43,34 @@
 	--focus-ring-dark: var(--steel-400);
 	--emphasis-hover-dark: var(--steel-100);
 	--danger-dark: #e59a86;
+
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--steel-50: #2f4157;
+		--primary: var(--on-dark);
+		--primary-active: var(--steel-100);
+		--on-primary: var(--steel-900);
+		--canvas: var(--surface-dark);
+		--surface: var(--surface-dark);
+		--surface-card: var(--surface-dark-elevated);
+		--surface-soft: var(--surface-dark-soft);
+		--surface-strong: #3a4158;
+		--hairline: var(--hairline-dark);
+		--hairline-soft: rgb(250 248 240 / 0.06);
+		--ink: var(--on-dark);
+		--ink-soft: var(--on-dark-soft);
+		--ink-mute: var(--on-dark-mute);
+		--link: var(--link-dark);
+		--focus-ring: var(--focus-ring-dark);
+		--selection-bg: var(--steel-800);
+		--selection-text: var(--on-dark);
+		--danger: var(--danger-dark);
+
+		color-scheme: dark;
+	}
 }
 
 @theme inline {

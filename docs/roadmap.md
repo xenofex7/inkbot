@@ -50,10 +50,8 @@ As of 23.11.2026. Done items are marked [x].
   interrupted drawing from any stroke
 
 ## Version 4 - Data
+- [x] **Dark mode:** follows the system setting, night ink surfaces from the design system
 - [x] **Backup:** export and import settings, prompts, gallery and handwriting in one file
   (without the API key)
 - [x] **Automatic backup:** write the backup file into a chosen folder (e.g. iCloud Drive)
   after every change, Chrome and Edge on a computer
-
-## Later
-- Dark mode
