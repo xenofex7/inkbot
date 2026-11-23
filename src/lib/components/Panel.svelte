@@ -48,7 +48,7 @@
 	}
 </script>
 
-<section class="rounded-lg border border-hairline bg-canvas p-6">
+<section class="rounded-lg border border-hairline bg-canvas py-6 pr-6 pl-9">
 	<div class="flex items-center justify-between gap-3">
 		<button
 			type="button"
