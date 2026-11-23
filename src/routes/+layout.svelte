@@ -18,6 +18,8 @@
 		{ href: resolve('/settings'), label: 'nav.settings' }
 	] as const;
 
+	const repo = 'https://github.com/xenofex7/inkbot';
+
 	$effect(() => {
 		document.documentElement.lang = i18n.locale === 'de' ? 'de-CH' : 'en';
 	});
@@ -66,3 +68,11 @@
 </header>
 
 {@render children()}
+
+<footer class="mx-auto flex max-w-[1200px] items-center gap-2 px-4 py-8 text-xs text-ink-mute">
+	<a href={repo} target="_blank" rel="noopener" class="hover:text-ink">inkbot v{__APP_VERSION__}</a>
+	<span aria-hidden="true">·</span>
+	<a href="{repo}/commits/main" target="_blank" rel="noopener" class="font-mono hover:text-ink">
+		{__COMMIT__}
+	</a>
+</footer>
