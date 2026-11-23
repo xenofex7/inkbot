@@ -6,6 +6,7 @@
 	import Button from '#lib/components/Button.svelte';
 	import DesignCanvas from '#lib/components/DesignCanvas.svelte';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
+	import RangeField from '#lib/components/RangeField.svelte';
 	import SheetPreview from '#lib/components/SheetPreview.svelte';
 	import { design, type DesignElement, type TextOptions } from '#lib/design/store.svelte.ts';
 	import { gallery } from '#lib/gallery/store.svelte.ts';
@@ -228,21 +229,14 @@
 			<section class="space-y-4 rounded-lg border border-hairline bg-canvas p-6">
 				<h2 class="font-semibold text-ink">{t('design.selected')}</h2>
 				<div>
-					<label class={label} for="design-scale">
-						{t('design.scale', { value: Math.round(selected.scale * 100) })}
-					</label>
-					<input
+					<RangeField
 						id="design-scale"
-						type="range"
-						min="5"
-						max="400"
+						label={t('design.scale', { value: Math.round(selected.scale * 100) })}
 						value={Math.round(selected.scale * 100)}
-						oninput={(event) =>
-							design.move(selected.id, {
-								...selected,
-								scale: Number(event.currentTarget.value) / 100
-							})}
-						class="w-full accent-primary"
+						min={5}
+						max={400}
+						buttonStep={5}
+						onvalue={(value) => design.move(selected.id, { ...selected, scale: value / 100 })}
 					/>
 				</div>
 
@@ -326,21 +320,18 @@
 						{/each}
 					</div>
 					<div>
-						<label class={label} for="design-threshold">
-							{t('image.threshold', { value: selected.trace.threshold })}
-						</label>
-						<input
+						<RangeField
 							id="design-threshold"
-							type="range"
-							min="20"
-							max="240"
+							label={t('image.threshold', { value: selected.trace.threshold })}
 							value={selected.trace.threshold}
-							onchange={(event) =>
-								design.updateTrace(selected.id, {
-									...selected.trace,
-									threshold: Number(event.currentTarget.value)
-								})}
-							class="w-full accent-primary"
+							min={20}
+							max={240}
+							buttonStep={5}
+							live={false}
+							onvalue={(value: number) => {
+								if (selected.kind === 'raster')
+									design.updateTrace(selected.id, { ...selected.trace, threshold: value });
+							}}
 						/>
 					</div>
 					{#if selected.trace.mode !== 'hatch'}

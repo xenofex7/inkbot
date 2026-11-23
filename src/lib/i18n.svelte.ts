@@ -76,6 +76,8 @@ const en = {
 	'job.originLink': 'machine page',
 	'job.originAfter': ', move the pen to the top left corner of the sheet and set the origin there.',
 	'preview.label': 'Sheet preview, {width} × {height} mm',
+	'range.less': 'Less',
+	'range.more': 'More',
 
 	'machine.title': 'Your plotter, right in the browser.',
 	'machine.lede':
@@ -291,6 +293,8 @@ const de: Record<Key, string> = {
 	'job.originLink': 'Maschinen-Seite',
 	'job.originAfter': 'an die obere linke Ecke des Blatts und setze dort den Nullpunkt.',
 	'preview.label': 'Vorschau des Blatts, {width} × {height} mm',
+	'range.less': 'Weniger',
+	'range.more': 'Mehr',
 
 	'machine.title': 'Dein Plotter, direkt im Browser.',
 	'machine.lede':

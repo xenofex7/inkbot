@@ -6,6 +6,7 @@
 	import AiGenerator from '#lib/components/AiGenerator.svelte';
 	import Button from '#lib/components/Button.svelte';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
+	import RangeField from '#lib/components/RangeField.svelte';
 	import { bounds, type Polyline } from '#lib/geometry/types.ts';
 	import { loadGray } from '#lib/image/load.ts';
 	import { imageSource } from '#lib/image/source.svelte.ts';
@@ -228,14 +229,13 @@
 
 		{#if isVector}
 			<div>
-				<label class={label} for="vector-size">{t('image.size', { value: sizePercent })}</label>
-				<input
+				<RangeField
 					id="vector-size"
-					type="range"
-					min="10"
-					max="100"
+					label={t('image.size', { value: sizePercent })}
 					bind:value={sizePercent}
-					class="w-full accent-primary"
+					min={10}
+					max={100}
+					buttonStep={5}
 				/>
 				<p class="mt-2 text-[13px] text-ink-mute">
 					{t('image.vectorHint')}
@@ -264,39 +264,35 @@
 			</div>
 
 			<div>
-				<label class={label} for="threshold">{t('image.threshold', { value: threshold })}</label>
-				<input
+				<RangeField
 					id="threshold"
-					type="range"
-					min="20"
-					max="240"
+					label={t('image.threshold', { value: threshold })}
 					bind:value={threshold}
-					class="w-full accent-primary"
+					min={20}
+					max={240}
+					buttonStep={5}
 				/>
 			</div>
 
 			<div>
-				<label class={label} for="size">{t('image.size', { value: sizePercent })}</label>
-				<input
+				<RangeField
 					id="size"
-					type="range"
-					min="10"
-					max="100"
+					label={t('image.size', { value: sizePercent })}
 					bind:value={sizePercent}
-					class="w-full accent-primary"
+					min={10}
+					max={100}
+					buttonStep={5}
 				/>
 			</div>
 
 			<div>
-				<label class={label} for="detail">{t('image.detail', { value: detail })}</label>
-				<input
+				<RangeField
 					id="detail"
-					type="range"
-					min="150"
-					max="800"
-					step="50"
+					label={t('image.detail', { value: detail })}
 					bind:value={detail}
-					class="w-full accent-primary"
+					min={150}
+					max={800}
+					step={50}
 				/>
 			</div>
 
@@ -314,15 +310,13 @@
 
 			{#if mode === 'hatch' || fillHatch}
 				<div>
-					<label class={label} for="spacing">{t('image.spacing', { value: hatchSpacing })}</label>
-					<input
+					<RangeField
 						id="spacing"
-						type="range"
-						min="0.5"
-						max="4"
-						step="0.1"
+						label={t('image.spacing', { value: hatchSpacing })}
 						bind:value={hatchSpacing}
-						class="w-full accent-primary"
+						min={0.5}
+						max={4}
+						step={0.1}
 					/>
 				</div>
 			{/if}
