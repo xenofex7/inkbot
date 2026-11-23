@@ -1,9 +1,17 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
 	import { t } from '#lib/i18n.svelte.ts';
-	import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Crosshair, Square } from '@lucide/svelte';
+	import {
+		ArrowDown,
+		ArrowLeft,
+		ArrowRight,
+		ArrowUp,
+		Crosshair,
+		House,
+		Square
+	} from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
-	import { jog, setOrigin, testSquare } from '#lib/grbl/commands.ts';
+	import { goToOrigin, jog, setOrigin, testSquare } from '#lib/grbl/commands.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { settings } from '#lib/settings.svelte.ts';
 
@@ -155,11 +163,11 @@
 					</Button>
 					<Button
 						variant="icon"
-						aria-label={t('machine.origin')}
-						onclick={() => run(setOrigin())}
+						aria-label={t('machine.goOrigin')}
+						onclick={() => run(goToOrigin())}
 						disabled={!canAct}
 					>
-						<Crosshair size={18} />
+						<House size={18} />
 					</Button>
 					<Button
 						variant="icon"
@@ -179,6 +187,16 @@
 						<ArrowDown size={18} />
 					</Button>
 					<span></span>
+				</div>
+				<div class="mt-4 flex flex-wrap gap-2">
+					<Button onclick={() => run(setOrigin())} disabled={!canAct}>
+						<Crosshair size={16} />
+						{t('machine.origin')}
+					</Button>
+					<Button onclick={() => run(goToOrigin())} disabled={!canAct}>
+						<House size={16} />
+						{t('machine.goOrigin')}
+					</Button>
 				</div>
 				<p class="mt-4 text-sm text-ink-mute">
 					{t('machine.originHint')}

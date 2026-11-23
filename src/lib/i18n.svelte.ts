@@ -156,8 +156,9 @@ const en = {
 	'machine.origin': 'Set origin here',
 	'machine.right': 'Move right',
 	'machine.downMove': 'Move down',
+	'machine.goOrigin': 'Go to origin',
 	'machine.originHint':
-		'The crosshair sets the origin at the current pen position. There are no limit switches, so do not drive past the frame.',
+		'"Set origin here" makes the current pen position the origin, "Go to origin" lifts the pen and drives back to it. Reconnecting restarts the plotter and forgets the origin, so drive back to it before you disconnect. There are no limit switches, so do not drive past the frame.',
 	'machine.invertY': 'Invert Y axis',
 	'machine.invertYHint':
 		'Turn on if text comes out upside down. Matches the VG-X4 when you read from the pen side.',
@@ -416,8 +417,9 @@ const de: Record<Key, string> = {
 	'machine.origin': 'Nullpunkt hier setzen',
 	'machine.right': 'Nach rechts',
 	'machine.downMove': 'Nach unten',
+	'machine.goOrigin': 'Zum Nullpunkt fahren',
 	'machine.originHint':
-		'Das Fadenkreuz setzt den Nullpunkt an die aktuelle Stiftposition. Es gibt keine Endschalter, also nicht über den Rahmen hinausfahren.',
+		'"Nullpunkt hier setzen" macht die aktuelle Stiftposition zum Nullpunkt, "Zum Nullpunkt fahren" hebt den Stift und fährt dorthin zurück. Beim Neuverbinden startet der Plotter neu und vergisst den Nullpunkt, darum vor dem Trennen zurückfahren. Es gibt keine Endschalter, also nicht über den Rahmen hinausfahren.',
 	'machine.invertY': 'Y-Achse umkehren',
 	'machine.invertYHint':
 		'Einschalten, wenn Text auf dem Kopf steht. Passt zum VG-X4, wenn Du von der Stift-Seite her liest.',

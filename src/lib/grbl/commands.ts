@@ -12,6 +12,8 @@ export const penDown = (s: number = VGX4.penDownS) => [`M3 S${Math.round(s)}`, d
 
 export const setOrigin = () => ['G92 X0 Y0'];
 
+export const goToOrigin = () => [...penUp(), 'G21', 'G90', 'G0 X0 Y0'];
+
 export function jog(dx: number, dy: number, invertY = false, feed: number = VGX4.jogFeed) {
 	const { x, y } = orient({ x: dx, y: dy }, invertY);
 	const axes = [x ? `X${mm(x)}` : '', y ? `Y${mm(y)}` : ''].filter(Boolean).join(' ');
