@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PrintableArea from './PrintableArea.svelte';
 	import { extent, place, scaleFromCorner, type Placement } from '../design/model';
 	import { design, type DesignElement } from '../design/store.svelte';
 	import type { Point } from '../geometry/types';
@@ -141,6 +142,7 @@
 		stroke-width="0.3"
 		stroke-dasharray="1.5 1.5"
 	/>
+	<PrintableArea {width} {height} />
 	{#if guides}
 		{#each guides.lines as line, index (index)}
 			<polyline

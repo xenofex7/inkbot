@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PrintableArea from './PrintableArea.svelte';
 	import { t } from '../i18n.svelte';
 	import type { Point, Polyline } from '../geometry/types';
 
@@ -43,6 +44,7 @@
 		stroke-width="0.3"
 		stroke-dasharray="1.5 1.5"
 	/>
+	<PrintableArea {width} {height} />
 	{#each polylines as line, index (index)}
 		<polyline
 			points={toPoints(line)}

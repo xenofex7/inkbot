@@ -1,4 +1,4 @@
-import { toMachine, type Point, type Polyline } from '../geometry/types';
+import { toMachine, toSheet, type Point, type Polyline } from '../geometry/types';
 import { plotter } from '../serial/plotter.svelte';
 import { settings } from '../settings.svelte';
 
@@ -41,6 +41,20 @@ class Positions {
 			maxX: a.x + Math.max(0, far.x),
 			minY: a.y + Math.min(0, far.y),
 			maxY: a.y + Math.max(0, far.y)
+		};
+	});
+
+	printable = $derived.by(() => {
+		const corner = settings.corner;
+		if (!corner) return undefined;
+		const far = toMachine({ x: settings.area.width, y: settings.area.height }, settings.axes);
+		const a = toSheet({ x: -corner.x, y: -corner.y }, settings.axes);
+		const b = toSheet({ x: far.x - corner.x, y: far.y - corner.y }, settings.axes);
+		return {
+			minX: Math.min(a.x, b.x),
+			maxX: Math.max(a.x, b.x),
+			minY: Math.min(a.y, b.y),
+			maxY: Math.max(a.y, b.y)
 		};
 	});
 
@@ -128,7 +142,19 @@ class Positions {
 	}
 
 	outside(polylines: Polyline[]): boolean {
-		if (!this.ready) return false;
+		const area = this.printable;
+		if (!this.ready) {
+			if (!area) return false;
+			return polylines.some((line) =>
+				line.some(
+					(p) =>
+						p.x < area.minX - 0.01 ||
+						p.x > area.maxX + 0.01 ||
+						p.y < area.minY - 0.01 ||
+						p.y > area.maxY + 0.01
+				)
+			);
+		}
 		const { minX, maxX, minY, maxY } = this.box;
 		const { x: wx, y: wy } = plotter.wco;
 		return polylines.some((line) =>
