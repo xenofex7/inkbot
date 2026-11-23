@@ -2,16 +2,18 @@
 	import { Download, ImageUp, Sparkles } from '@lucide/svelte';
 	import { download, filenameFrom } from '#lib/download.ts';
 	import { resolve } from '$app/paths';
+	import { generateSvg, svgPrompt } from '#lib/ai/drawings.ts';
 	import { buildPrompt, generateImage } from '#lib/ai/images.ts';
 	import { aiSettings } from '#lib/ai/settings.svelte.ts';
 	import Button from '#lib/components/Button.svelte';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
-	import type { Polyline } from '#lib/geometry/types.ts';
+	import { bounds, type Polyline } from '#lib/geometry/types.ts';
 	import { loadGray } from '#lib/image/load.ts';
 	import { imageSource } from '#lib/image/source.svelte.ts';
 	import { traceImage, type Gray, type TraceMode } from '#lib/image/trace.ts';
 	import { orderPaths } from '#lib/optimize/order.ts';
 	import { settings } from '#lib/settings.svelte.ts';
+	import { parseSvg } from '#lib/svg/parse.ts';
 
 	const modes: [TraceMode, string, string][] = [
 		['lines', 'Lines', 'Centre line of dark strokes, best for line art'],
@@ -28,7 +30,13 @@
 	let gray = $state<Gray | undefined>();
 	let loadError = $state('');
 	let fileInput = $state<HTMLInputElement>();
-	let source = $state<'file' | 'ai'>('file');
+	type Source = 'file' | 'ai-image' | 'ai-drawing';
+	const sources: [Source, string][] = [
+		['file', 'File'],
+		['ai-image', 'AI image'],
+		['ai-drawing', 'AI drawing']
+	];
+	let source = $state<Source>('file');
 	let prompt = $state('');
 	let generating = $state(false);
 	let generateError = $state('');
@@ -39,11 +47,19 @@
 		generating = true;
 		generateError = '';
 		try {
-			const blob = await generateImage(
-				aiSettings.config,
-				buildPrompt(aiSettings.promptTemplate, idea)
-			);
-			imageSource.set(blob, `AI: ${idea}`);
+			if (source === 'ai-drawing') {
+				const system = svgPrompt(aiSettings.svgTemplate, printable.width, printable.height);
+				imageSource.setSvg(
+					await generateSvg(aiSettings.drawingConfig, system, idea),
+					`AI: ${idea}`
+				);
+			} else {
+				const blob = await generateImage(
+					aiSettings.config,
+					buildPrompt(aiSettings.promptTemplate, idea)
+				);
+				imageSource.set(blob, `AI: ${idea}`);
+			}
 		} catch (error) {
 			generateError =
 				error instanceof TypeError
@@ -62,10 +78,24 @@
 		height: Math.max(0, sheet.height - 2 * settings.margin)
 	});
 
+	const isVector = $derived(imageSource.svg !== undefined);
+	const aiReady = $derived(
+		source === 'ai-drawing' ? aiSettings.drawingReady : source === 'ai-image' && aiSettings.ready
+	);
+
+	const vector = $derived.by((): { lines: Polyline[]; error: string } => {
+		if (imageSource.svg === undefined) return { lines: [], error: '' };
+		try {
+			return { lines: parseSvg(imageSource.svg), error: '' };
+		} catch (error) {
+			return { lines: [], error: error instanceof Error ? error.message : String(error) };
+		}
+	});
+
 	$effect(() => {
 		const blob = imageSource.blob;
 		const side = detail;
-		if (!blob) return;
+		if (!blob || imageSource.svg !== undefined) return;
 		loadError = '';
 		loadGray(blob, side)
 			.then((result) => (gray = result))
@@ -80,7 +110,27 @@
 			: 1
 	);
 
+	function fitVector(lines: Polyline[]): Polyline[] {
+		const box = bounds(lines);
+		if (!box) return [];
+		const width = Math.max(box.maxX - box.minX, 0.001);
+		const height = Math.max(box.maxY - box.minY, 0.001);
+		const factor =
+			(Math.min(printable.width / width, printable.height / height) * sizePercent) / 100;
+		const offsetX = settings.margin + (printable.width - width * factor) / 2;
+		const offsetY = settings.margin;
+		return orderPaths(
+			lines.map((line) =>
+				line.map((p) => ({
+					x: offsetX + (p.x - box.minX) * factor,
+					y: offsetY + (p.y - box.minY) * factor
+				}))
+			)
+		);
+	}
+
 	const polylines = $derived.by((): Polyline[] => {
+		if (isVector) return fitVector(vector.lines);
 		if (!gray) return [];
 		const lines = traceImage(gray, {
 			mode,
@@ -99,14 +149,17 @@
 		);
 	});
 
-	function pick(files: FileList | null | undefined) {
+	async function pick(files: FileList | null | undefined) {
 		const file = files?.[0];
 		if (!file) return;
-		if (!file.type.startsWith('image/')) {
-			loadError = 'That is not an image file.';
-			return;
+		loadError = '';
+		if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
+			imageSource.setSvg(await file.text(), file.name);
+		} else if (file.type.startsWith('image/')) {
+			imageSource.set(file, file.name);
+		} else {
+			loadError = 'That is not an image or SVG file.';
 		}
-		imageSource.set(file, file.name);
 	}
 
 	const label = 'mb-1.5 block text-[13px] font-medium text-ink-mute';
@@ -121,14 +174,14 @@
 		<div>
 			<span class={label}>Source</span>
 			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-				{#each [['file', 'File'], ['ai', 'AI']] as [value, name] (value)}
+				{#each sources as [value, name] (value)}
 					<button
 						role="radio"
 						aria-checked={source === value}
 						class="rounded-pill px-3.5 py-1.5 text-sm {source === value
 							? 'bg-canvas text-ink shadow-sm'
 							: 'text-ink-mute'}"
-						onclick={() => (source = value as 'file' | 'ai')}
+						onclick={() => (source = value)}
 					>
 						{name}
 					</button>
@@ -141,9 +194,9 @@
 				<input
 					bind:this={fileInput}
 					type="file"
-					accept="image/*"
+					accept="image/*,.svg"
 					class="hidden"
-					onchange={(event) => pick(event.currentTarget.files)}
+					onchange={(event) => void pick(event.currentTarget.files)}
 				/>
 				<div class="flex items-center gap-3">
 					<Button onclick={() => fileInput?.click()}>
@@ -153,13 +206,15 @@
 						{imageSource.name || 'No file chosen'}
 					</span>
 				</div>
-			{:else if !aiSettings.ready}
+			{:else if !aiReady}
 				<p class="rounded-md bg-surface-card p-3 text-sm text-ink">
-					Set up an AI provider in the
+					Set up an AI provider{source === 'ai-drawing' ? ' and a drawing model' : ''} in the
 					<a class="text-link underline" href={resolve('/settings')}>settings</a> first.
 				</p>
 			{:else}
-				<label class={label} for="prompt">Image idea</label>
+				<label class={label} for="prompt">
+					{source === 'ai-drawing' ? 'Drawing idea' : 'Image idea'}
+				</label>
 				<textarea
 					id="prompt"
 					bind:value={prompt}
@@ -172,7 +227,9 @@
 						<Sparkles size={16} />
 						{generating ? 'Generating …' : 'Generate'}
 					</Button>
-					<span class="text-[13px] text-ink-mute">{aiSettings.model}</span>
+					<span class="text-[13px] text-ink-mute">
+						{source === 'ai-drawing' ? aiSettings.drawingModel : aiSettings.model}
+					</span>
 				</div>
 				{#if generateError}
 					<p class="mt-2 text-[13px] text-danger" role="alert">{generateError}</p>
@@ -190,100 +247,121 @@
 						imageSource.blob &&
 						download(
 							imageSource.blob,
-							filenameFrom(imageSource.name, imageSource.blob.type.split('/')[1] || 'png')
+							filenameFrom(
+								imageSource.name,
+								isVector ? 'svg' : imageSource.blob.type.split('/')[1] || 'png'
+							)
 						)}
 				>
-					<Download size={16} /> Save image
+					<Download size={16} />
+					{isVector ? 'Save source SVG' : 'Save image'}
 				</Button>
 			{/if}
-			{#if loadError}
-				<p class="mt-2 text-[13px] text-danger" role="alert">{loadError}</p>
+			{#if loadError || vector.error}
+				<p class="mt-2 text-[13px] text-danger" role="alert">{loadError || vector.error}</p>
 			{/if}
 		</div>
 
-		<div>
-			<span class={label}>Conversion</span>
-			<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-				{#each modes as [value, name] (value)}
-					<button
-						role="radio"
-						aria-checked={mode === value}
-						class="rounded-pill px-3.5 py-1.5 text-sm {mode === value
-							? 'bg-canvas text-ink shadow-sm'
-							: 'text-ink-mute'}"
-						onclick={() => (mode = value)}
-					>
-						{name}
-					</button>
-				{/each}
-			</div>
-			<p class="mt-2 text-[13px] text-ink-mute">
-				{modes.find(([value]) => value === mode)?.[2]}
-			</p>
-		</div>
-
-		<div>
-			<label class={label} for="threshold">Threshold: {threshold}</label>
-			<input
-				id="threshold"
-				type="range"
-				min="20"
-				max="240"
-				bind:value={threshold}
-				class="w-full accent-primary"
-			/>
-		</div>
-
-		<div>
-			<label class={label} for="size">Size: {sizePercent} %</label>
-			<input
-				id="size"
-				type="range"
-				min="10"
-				max="100"
-				bind:value={sizePercent}
-				class="w-full accent-primary"
-			/>
-		</div>
-
-		<div>
-			<label class={label} for="detail">Detail: {detail} px</label>
-			<input
-				id="detail"
-				type="range"
-				min="150"
-				max="800"
-				step="50"
-				bind:value={detail}
-				class="w-full accent-primary"
-			/>
-		</div>
-
-		{#if mode !== 'hatch'}
-			<label class="flex items-start gap-2.5 text-sm text-ink">
-				<input type="checkbox" class="mt-0.5 size-4 accent-primary" bind:checked={fillHatch} />
-				<span>
-					Hatch filled areas
-					<span class="block text-[13px] text-ink-mute">
-						Dark areas wider than a stroke get an outline and diagonal hatching.
-					</span>
-				</span>
-			</label>
-		{/if}
-
-		{#if mode === 'hatch' || fillHatch}
+		{#if isVector}
 			<div>
-				<label class={label} for="spacing">Line spacing: {hatchSpacing} mm</label>
+				<label class={label} for="vector-size">Size: {sizePercent} %</label>
 				<input
-					id="spacing"
+					id="vector-size"
 					type="range"
-					min="0.5"
-					max="4"
-					step="0.1"
-					bind:value={hatchSpacing}
+					min="10"
+					max="100"
+					bind:value={sizePercent}
+					class="w-full accent-primary"
+				/>
+				<p class="mt-2 text-[13px] text-ink-mute">
+					Vector source: the paths are drawn exactly, no conversion needed.
+				</p>
+			</div>
+		{:else}
+			<div>
+				<span class={label}>Conversion</span>
+				<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
+					{#each modes as [value, name] (value)}
+						<button
+							role="radio"
+							aria-checked={mode === value}
+							class="rounded-pill px-3.5 py-1.5 text-sm {mode === value
+								? 'bg-canvas text-ink shadow-sm'
+								: 'text-ink-mute'}"
+							onclick={() => (mode = value)}
+						>
+							{name}
+						</button>
+					{/each}
+				</div>
+				<p class="mt-2 text-[13px] text-ink-mute">
+					{modes.find(([value]) => value === mode)?.[2]}
+				</p>
+			</div>
+
+			<div>
+				<label class={label} for="threshold">Threshold: {threshold}</label>
+				<input
+					id="threshold"
+					type="range"
+					min="20"
+					max="240"
+					bind:value={threshold}
 					class="w-full accent-primary"
 				/>
 			</div>
+
+			<div>
+				<label class={label} for="size">Size: {sizePercent} %</label>
+				<input
+					id="size"
+					type="range"
+					min="10"
+					max="100"
+					bind:value={sizePercent}
+					class="w-full accent-primary"
+				/>
+			</div>
+
+			<div>
+				<label class={label} for="detail">Detail: {detail} px</label>
+				<input
+					id="detail"
+					type="range"
+					min="150"
+					max="800"
+					step="50"
+					bind:value={detail}
+					class="w-full accent-primary"
+				/>
+			</div>
+
+			{#if mode !== 'hatch'}
+				<label class="flex items-start gap-2.5 text-sm text-ink">
+					<input type="checkbox" class="mt-0.5 size-4 accent-primary" bind:checked={fillHatch} />
+					<span>
+						Hatch filled areas
+						<span class="block text-[13px] text-ink-mute">
+							Dark areas wider than a stroke get an outline and diagonal hatching.
+						</span>
+					</span>
+				</label>
+			{/if}
+
+			{#if mode === 'hatch' || fillHatch}
+				<div>
+					<label class={label} for="spacing">Line spacing: {hatchSpacing} mm</label>
+					<input
+						id="spacing"
+						type="range"
+						min="0.5"
+						max="4"
+						step="0.1"
+						bind:value={hatchSpacing}
+						class="w-full accent-primary"
+					/>
+				</div>
+			{/if}
 		{/if}
 	</section>
 
@@ -293,14 +371,14 @@
 		ondragover={(event) => event.preventDefault()}
 		ondrop={(event) => {
 			event.preventDefault();
-			pick(event.dataTransfer?.files);
+			void pick(event.dataTransfer?.files);
 		}}
 	>
 		<DrawPanel
 			{polylines}
 			{sheet}
 			name={imageSource.name}
-			emptyHint="Choose an image or drop it on the preview."
+			emptyHint="Choose an image or SVG, or drop it on the preview."
 		/>
 	</section>
 </main>

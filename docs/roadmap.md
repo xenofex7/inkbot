@@ -11,7 +11,7 @@ As of 22.11.2026. Done items are marked [x].
   (A4, A5, A6, envelopes C6/DL), alignment
 - [x] **Preview & run:** sheet preview, run time, start / pause / stop
 - [x] **Save:** drawing as SVG, source image as file
-- [ ] **SVG:** import, scale, position
+- [x] **SVG:** import, scale, position
 - [ ] **Live speed** via feed override
 - [ ] **GitHub Pages:** put inkbot online, usable without a local server
 
@@ -22,7 +22,7 @@ As of 22.11.2026. Done items are marked [x].
   OpenAI-compatible (e.g. LiteLLM, which can also route to Higgsfield), editable prompt
   template
 - [x] Bring your own key: the API key stays in the browser
-- [ ] **AI draws directly:** a language model returns an SVG of single lines, no
+- [x] **AI draws directly:** a language model returns an SVG of single lines, no
   conversion needed (cards, patterns, decorations)
 - [ ] **AI redraws:** photo to simplified line drawing (image to image)
 - [ ] **One continuous line** (TSP art)

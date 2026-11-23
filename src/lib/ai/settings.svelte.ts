@@ -1,8 +1,13 @@
+import { DEFAULT_SVG_PROMPT } from './drawings';
 import { DEFAULT_PROMPT_TEMPLATE, type ProviderConfig, type ProviderId } from './images';
 
 const STORAGE_KEY = 'inkbot.ai';
 
-type Stored = ProviderConfig & { promptTemplate: string };
+type Stored = ProviderConfig & {
+	promptTemplate: string;
+	drawingModel: string;
+	svgTemplate: string;
+};
 
 const DEFAULTS: Stored = {
 	provider: 'openai',
@@ -10,7 +15,9 @@ const DEFAULTS: Stored = {
 	apiKey: '',
 	model: 'gpt-image-2',
 	size: '1024x1024',
-	promptTemplate: DEFAULT_PROMPT_TEMPLATE
+	promptTemplate: DEFAULT_PROMPT_TEMPLATE,
+	drawingModel: '',
+	svgTemplate: DEFAULT_SVG_PROMPT
 };
 
 function load(): Stored {
@@ -29,6 +36,8 @@ class AiSettings {
 	model = $state(DEFAULTS.model);
 	size = $state(DEFAULTS.size);
 	promptTemplate = $state(DEFAULTS.promptTemplate);
+	drawingModel = $state(DEFAULTS.drawingModel);
+	svgTemplate = $state(DEFAULTS.svgTemplate);
 
 	config = $derived<ProviderConfig>({
 		provider: this.provider,
@@ -38,17 +47,27 @@ class AiSettings {
 		size: this.size
 	});
 
-	ready = $derived(
-		this.model.trim() !== '' &&
-			(this.provider === 'openai' ? this.apiKey.trim() !== '' : this.baseUrl.trim() !== '')
+	connected = $derived(
+		this.provider === 'openai' ? this.apiKey.trim() !== '' : this.baseUrl.trim() !== ''
 	);
+
+	ready = $derived(this.connected && this.model.trim() !== '');
+
+	drawingReady = $derived(this.connected && this.drawingModel.trim() !== '');
+
+	drawingConfig = $derived<ProviderConfig>({ ...this.config, model: this.drawingModel });
 
 	constructor() {
 		if (typeof localStorage === 'undefined') return;
 		Object.assign(this, load());
 		$effect.root(() => {
 			$effect(() => {
-				const snapshot: Stored = { ...this.config, promptTemplate: this.promptTemplate };
+				const snapshot: Stored = {
+					...this.config,
+					promptTemplate: this.promptTemplate,
+					drawingModel: this.drawingModel,
+					svgTemplate: this.svgTemplate
+				};
 				try {
 					localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
 				} catch {
@@ -60,6 +79,10 @@ class AiSettings {
 
 	resetPrompt() {
 		this.promptTemplate = DEFAULT_PROMPT_TEMPLATE;
+	}
+
+	resetSvgTemplate() {
+		this.svgTemplate = DEFAULT_SVG_PROMPT;
 	}
 }
 

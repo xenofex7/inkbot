@@ -27,14 +27,14 @@ export function baseUrlFor(config: ProviderConfig) {
 	return url.trim().replace(/\/+$/, '');
 }
 
-function headers(config: ProviderConfig) {
+export function headers(config: ProviderConfig) {
 	return {
 		'Content-Type': 'application/json',
 		...(config.apiKey ? { Authorization: `Bearer ${config.apiKey.trim()}` } : {})
 	};
 }
 
-async function errorMessage(response: Response) {
+export async function errorMessage(response: Response) {
 	try {
 		const body = (await response.json()) as { error?: { message?: string } | string };
 		const message = typeof body.error === 'string' ? body.error : body.error?.message;

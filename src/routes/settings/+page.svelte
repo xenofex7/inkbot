@@ -78,7 +78,7 @@
 
 		<div class="grid grid-cols-2 gap-4">
 			<div>
-				<label class={label} for="model">Model</label>
+				<label class={label} for="model">Image model</label>
 				<input
 					id="model"
 					bind:value={aiSettings.model}
@@ -102,6 +102,18 @@
 			</div>
 		</div>
 
+		<div>
+			<label class={label} for="drawing-model">Drawing model</label>
+			<input
+				id="drawing-model"
+				bind:value={aiSettings.drawingModel}
+				list="model-list"
+				class={field}
+				placeholder="A chat model, used for AI drawings as SVG"
+				autocomplete="off"
+			/>
+		</div>
+
 		<div class="flex flex-wrap items-center gap-3">
 			<Button onclick={test} disabled={testState === 'testing'}>Test connection</Button>
 			{#if testMessage}
@@ -117,9 +129,7 @@
 
 	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
 		<div>
-			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
-				Prompt template
-			</h2>
+			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Image prompt</h2>
 			<p class="mt-2 text-sm text-ink-mute">
 				Wrapped around your image idea so the result is a clean line drawing. <code
 					class="font-mono"
@@ -138,5 +148,27 @@
 			></textarea>
 		</div>
 		<Button onclick={() => aiSettings.resetPrompt()}>Restore default</Button>
+
+		<div class="border-t border-hairline-soft pt-5">
+			<h2 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">Drawing prompt</h2>
+			<p class="mt-2 text-sm text-ink-mute">
+				Instructions for the drawing model. Your idea is sent as the message. <code
+					class="font-mono"
+				>
+					{'{width}'}
+				</code>
+				and <code class="font-mono">{'{height}'}</code> stand for the printable area in mm.
+			</p>
+		</div>
+		<div>
+			<label class="sr-only" for="svg-template">Drawing prompt</label>
+			<textarea
+				id="svg-template"
+				bind:value={aiSettings.svgTemplate}
+				rows="9"
+				class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 font-mono text-sm text-ink"
+			></textarea>
+		</div>
+		<Button onclick={() => aiSettings.resetSvgTemplate()}>Restore default</Button>
 	</section>
 </main>
