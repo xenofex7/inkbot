@@ -6,7 +6,7 @@ import { orderPaths } from '../optimize/order';
 import { parseSvg } from '../svg/parse';
 import { handwriting } from '../handwriting/store.svelte';
 import { fonts, layoutText, type Align } from '../text/layout';
-import { centred, normalize, place, type Placement, type Shape } from './model';
+import { centred, normalize, place, rotated, type Placement, type Shape } from './model';
 
 export type TextOptions = {
 	text: string;
@@ -185,6 +185,10 @@ class Design {
 
 	move(id: string, placement: Placement) {
 		this.#update(id, (element) => ({ ...element, ...placement }));
+	}
+
+	rotate(id: string) {
+		this.#update(id, (element) => ({ ...element, ...rotated(element.shape, element) }));
 	}
 
 	remove(id: string) {

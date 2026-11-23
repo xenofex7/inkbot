@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { place, scaleFromCorner, type Placement } from '../design/model';
+	import { extent, place, scaleFromCorner, type Placement } from '../design/model';
 	import { design, type DesignElement } from '../design/store.svelte';
 	import type { Point } from '../geometry/types';
 	import { t } from '../i18n.svelte';
@@ -31,7 +31,7 @@
 			id: element.id,
 			mode,
 			start: toSheet(event),
-			origin: { x: element.x, y: element.y, scale: element.scale }
+			origin: { x: element.x, y: element.y, scale: element.scale, rotation: element.rotation }
 		};
 		svg?.setPointerCapture(event.pointerId);
 	}
@@ -90,8 +90,9 @@
 		stroke-dasharray="1.5 1.5"
 	/>
 	{#each design.elements as element (element.id)}
-		{@const w = element.shape.width * element.scale}
-		{@const h = element.shape.height * element.scale}
+		{@const size = extent(element.shape, element.rotation)}
+		{@const w = size.width * element.scale}
+		{@const h = size.height * element.scale}
 		<g>
 			{#each place(element.shape, element) as line, index (index)}
 				<polyline

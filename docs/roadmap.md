@@ -38,7 +38,7 @@ As of 23.11.2026. Done items are marked [x].
 - [x] **One workspace:** text, image and SVG editing merged into the designer, AI suggests a
   vector drawing and a traced image from one idea
 - [ ] **Card templates:** folded greeting card, envelope with address field, place card
-- [ ] Rotate elements by 90°
+- [x] Rotate elements by 90°
 - [x] **Own handwriting:** draw each character in the browser or on an iPhone (QR code,
   share via AirDrop), or print or plot a template, fill it in and scan a photo; up to three
   variants per character, natural variation from letter to letter

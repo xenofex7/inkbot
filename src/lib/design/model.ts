@@ -1,6 +1,8 @@
-import { bounds, type Polyline } from '../geometry/types';
+import { bounds, type Point, type Polyline } from '../geometry/types';
 
-export type Placement = { x: number; y: number; scale: number };
+export type Rotation = 0 | 90 | 180 | 270;
+
+export type Placement = { x: number; y: number; scale: number; rotation?: Rotation };
 
 export type Shape = { lines: Polyline[]; width: number; height: number };
 
@@ -14,9 +16,39 @@ export function normalize(lines: Polyline[]): Shape {
 	};
 }
 
+export function extent(shape: Shape, rotation: Rotation = 0) {
+	return rotation % 180 === 0
+		? { width: shape.width, height: shape.height }
+		: { width: shape.height, height: shape.width };
+}
+
+function turn(p: Point, shape: Shape, rotation: Rotation): Point {
+	if (rotation === 90) return { x: shape.height - p.y, y: p.x };
+	if (rotation === 180) return { x: shape.width - p.x, y: shape.height - p.y };
+	if (rotation === 270) return { x: p.y, y: shape.width - p.x };
+	return p;
+}
+
 export function place(shape: Shape, placement: Placement): Polyline[] {
-	const { x, y, scale } = placement;
-	return shape.lines.map((line) => line.map((p) => ({ x: x + p.x * scale, y: y + p.y * scale })));
+	const { x, y, scale, rotation = 0 } = placement;
+	return shape.lines.map((line) =>
+		line.map((p) => {
+			const q = turn(p, shape, rotation);
+			return { x: x + q.x * scale, y: y + q.y * scale };
+		})
+	);
+}
+
+export function rotated(shape: Shape, placement: Placement): Placement {
+	const rotation = (((placement.rotation ?? 0) + 90) % 360) as Rotation;
+	const before = extent(shape, placement.rotation);
+	const after = extent(shape, rotation);
+	return {
+		...placement,
+		rotation,
+		x: placement.x + ((before.width - after.width) * placement.scale) / 2,
+		y: placement.y + ((before.height - after.height) * placement.scale) / 2
+	};
 }
 
 export function centred(
@@ -41,10 +73,11 @@ export function scaleFromCorner(
 	corner: { x: number; y: number },
 	minSize = 2
 ): Placement {
-	const largest = Math.max(shape.width, shape.height);
+	const { width, height } = extent(shape, placement.rotation);
+	const largest = Math.max(width, height);
 	if (largest === 0) return placement;
-	const scaleX = shape.width > 0 ? (corner.x - placement.x) / shape.width : 0;
-	const scaleY = shape.height > 0 ? (corner.y - placement.y) / shape.height : 0;
+	const scaleX = width > 0 ? (corner.x - placement.x) / width : 0;
+	const scaleY = height > 0 ? (corner.y - placement.y) / height : 0;
 	const scale = Math.max(scaleX, scaleY, minSize / largest);
 	return { ...placement, scale };
 }

@@ -6,6 +6,7 @@
 		ImagePlus,
 		LibraryBig,
 		RotateCcw,
+		RotateCw,
 		Sparkles,
 		Trash2,
 		Type
@@ -280,6 +281,10 @@
 						onvalue={(value) => design.move(selected.id, { ...selected, scale: value / 100 })}
 					/>
 				</div>
+				<Button onclick={() => design.rotate(selected.id)}>
+					<RotateCw size={16} />
+					{t('design.rotate')}
+				</Button>
 
 				{#if selected.kind === 'text'}
 					<div>

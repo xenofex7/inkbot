@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { centred, normalize, place, scaleFromCorner } from './model';
+import { centred, extent, normalize, place, rotated, scaleFromCorner } from './model';
 
 const square = normalize([
 	[
@@ -55,5 +55,43 @@ describe('scaleFromCorner', () => {
 	it('does not shrink below the minimum size', () => {
 		const placement = scaleFromCorner(square, { x: 0, y: 0, scale: 1 }, { x: -5, y: -5 }, 4);
 		expect(placement.scale).toBeCloseTo(0.2, 5);
+	});
+});
+
+describe('rotation', () => {
+	const wide = normalize([
+		[
+			{ x: 0, y: 0 },
+			{ x: 40, y: 0 },
+			{ x: 40, y: 10 }
+		]
+	]);
+
+	it('swaps width and height for quarter turns', () => {
+		expect(extent(wide, 90)).toEqual({ width: 10, height: 40 });
+		expect(extent(wide, 180)).toEqual({ width: 40, height: 10 });
+	});
+
+	it('turns the drawing clockwise inside its box', () => {
+		const [line] = place(wide, { x: 0, y: 0, scale: 1, rotation: 90 });
+		expect(line).toEqual([
+			{ x: 10, y: 0 },
+			{ x: 10, y: 40 },
+			{ x: 0, y: 40 }
+		]);
+	});
+
+	it('keeps the centre when rotating and returns after four turns', () => {
+		let placement = { x: 100, y: 50, scale: 2 };
+		const centre = (p: typeof placement & { rotation?: 0 | 90 | 180 | 270 }) => {
+			const size = extent(wide, p.rotation);
+			return { x: p.x + (size.width * p.scale) / 2, y: p.y + (size.height * p.scale) / 2 };
+		};
+		const start = centre(placement);
+		for (let i = 0; i < 4; i++) {
+			placement = rotated(wide, placement);
+			expect(centre(placement)).toEqual(start);
+		}
+		expect(placement).toEqual({ x: 100, y: 50, scale: 2, rotation: 0 });
 	});
 });
