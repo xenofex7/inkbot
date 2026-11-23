@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Download, OctagonX, Pause, PenLine, Play } from '@lucide/svelte';
+	import { BookmarkPlus, Download, OctagonX, Pause, PenLine, Play } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Button from './Button.svelte';
 	import SheetPreview from './SheetPreview.svelte';
@@ -10,20 +10,50 @@
 	import { toSvg } from '../geometry/svg';
 	import { plotter } from '../serial/plotter.svelte';
 	import { settings } from '../settings.svelte';
+	import { gallery, type GallerySource } from '../gallery/store.svelte';
 
 	let {
 		polylines,
 		sheet,
 		name = 'inkbot',
+		source,
+		saveable = true,
 		emptyHint = 'Nothing to draw yet.'
 	}: {
 		polylines: Polyline[];
 		sheet: { width: number; height: number };
 		name?: string;
+		source?: GallerySource;
+		saveable?: boolean;
 		emptyHint?: string;
 	} = $props();
 
 	let drawError = $state('');
+	let saveState = $state<'idle' | 'saving' | 'saved'>('idle');
+
+	$effect(() => {
+		void polylines;
+		saveState = 'idle';
+	});
+
+	async function saveToGallery() {
+		saveState = 'saving';
+		try {
+			await gallery.add({
+				name: name.trim() || 'Untitled',
+				formatId: settings.formatId,
+				orientation: settings.orientation,
+				margin: settings.margin,
+				sheet: { width: sheet.width, height: sheet.height },
+				polylines,
+				source
+			});
+			saveState = 'saved';
+		} catch (error) {
+			saveState = 'idle';
+			drawError = error instanceof Error ? error.message : String(error);
+		}
+	}
 
 	const outsideSheet = $derived(outsideArea(polylines, sheet.width, sheet.height));
 	const outsideMachine = $derived(outsideArea(polylines, VGX4.areaWidth, VGX4.areaHeight));
@@ -84,6 +114,12 @@
 	<Button onclick={saveSvg} disabled={polylines.length === 0}>
 		<Download size={16} /> Save SVG
 	</Button>
+	{#if saveable}
+		<Button onclick={saveToGallery} disabled={polylines.length === 0 || saveState !== 'idle'}>
+			<BookmarkPlus size={16} />
+			{saveState === 'saved' ? 'Saved' : 'Save to gallery'}
+		</Button>
+	{/if}
 	<span class="text-sm text-ink-mute">
 		{sheet.width} × {sheet.height} mm · {polylines.length} strokes · approx. {minutes} min
 	</span>

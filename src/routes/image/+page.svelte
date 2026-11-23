@@ -378,6 +378,9 @@
 			{polylines}
 			{sheet}
 			name={imageSource.name}
+			source={imageSource.blob
+				? { kind: isVector ? 'svg' : 'image', blob: imageSource.blob, name: imageSource.name }
+				: undefined}
 			emptyHint="Choose an image or SVG, or drop it on the preview."
 		/>
 	</section>

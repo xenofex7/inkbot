@@ -14,6 +14,7 @@
 		{ href: resolve('/'), label: 'Machine' },
 		{ href: resolve('/text'), label: 'Text' },
 		{ href: resolve('/image'), label: 'Image' },
+		{ href: resolve('/gallery'), label: 'Gallery' },
 		{ href: resolve('/settings'), label: 'Settings' }
 	];
 </script>
