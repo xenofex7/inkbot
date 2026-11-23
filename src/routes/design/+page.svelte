@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Copy, ImagePlus, LibraryBig, RotateCcw, Sparkles, Trash2, Type } from '@lucide/svelte';
-	import { resolve } from '$app/paths';
-	import { generateSvg, svgPrompt } from '#lib/ai/drawings.ts';
-	import { buildPrompt, generateImage } from '#lib/ai/images.ts';
-	import { aiSettings } from '#lib/ai/settings.svelte.ts';
+	import type { AiResult } from '#lib/ai/result.ts';
+	import AiGenerator from '#lib/components/AiGenerator.svelte';
 	import Button from '#lib/components/Button.svelte';
 	import DesignCanvas from '#lib/components/DesignCanvas.svelte';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
@@ -20,9 +18,6 @@
 	import { fonts, type Align } from '#lib/text/layout.ts';
 
 	let panel = $state<'none' | 'ai' | 'gallery'>('none');
-	let aiKind = $state<'image' | 'drawing'>('drawing');
-	let idea = $state('');
-	let busy = $state(false);
 	let error = $state('');
 	let fileInput = $state<HTMLInputElement>();
 
@@ -35,7 +30,6 @@
 	});
 	const selected = $derived(design.selected);
 	const running = $derived(plotter.busy || plotter.status?.state === 'Hold');
-	const aiReady = $derived(aiKind === 'drawing' ? aiSettings.drawingReady : aiSettings.ready);
 
 	onMount(() => {
 		void gallery.load();
@@ -67,29 +61,14 @@
 		}
 	}
 
-	async function generate() {
-		const text = idea.trim();
-		if (!text) return;
-		busy = true;
+	async function useAi(result: AiResult) {
 		error = '';
 		try {
-			if (aiKind === 'drawing') {
-				const system = svgPrompt(aiSettings.svgTemplate, area.width, area.height);
-				const svg = await generateSvg(aiSettings.drawingConfig, system, text);
-				design.addVector(parseSvg(svg), text, area);
-			} else {
-				const blob = await generateImage(
-					aiSettings.config,
-					buildPrompt(aiSettings.promptTemplate, text)
-				);
-				await design.addRaster(blob, text, area);
-			}
-			idea = '';
+			if (result.kind === 'svg') design.addVector(parseSvg(result.svg), result.name, area);
+			else await design.addRaster(result.blob, result.name, area);
 			panel = 'none';
 		} catch (e) {
 			fail(e);
-		} finally {
-			busy = false;
 		}
 	}
 
@@ -164,40 +143,8 @@
 			</div>
 
 			{#if panel === 'ai'}
-				<div class="space-y-3 rounded-lg bg-surface-card p-4">
-					<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-						{#each [['drawing', 'image.aiDrawing'], ['image', 'image.aiImage']] as const as [value, key] (value)}
-							<button
-								role="radio"
-								aria-checked={aiKind === value}
-								class={pill(aiKind === value)}
-								onclick={() => (aiKind = value)}
-							>
-								{t(key)}
-							</button>
-						{/each}
-					</div>
-					{#if !aiReady}
-						<p class="text-sm text-ink">
-							{aiKind === 'drawing' ? t('image.setupDrawingBefore') : t('image.setupBefore')}
-							<a class="text-link underline" href={resolve('/settings')}>
-								{t('image.setupLink')}
-							</a>{t('image.setupAfter')}
-						</p>
-					{:else}
-						<label class="sr-only" for="design-idea">{t('image.imageIdea')}</label>
-						<textarea
-							id="design-idea"
-							bind:value={idea}
-							rows="2"
-							placeholder={t('image.ideaPlaceholder')}
-							class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"
-						></textarea>
-						<Button variant="primary" onclick={generate} disabled={busy || !idea.trim()}>
-							<Sparkles size={16} />
-							{busy ? t('image.generating') : t('image.generate')}
-						</Button>
-					{/if}
+				<div class="rounded-lg bg-surface-card p-4">
+					<AiGenerator {area} onuse={useAi} />
 				</div>
 			{/if}
 

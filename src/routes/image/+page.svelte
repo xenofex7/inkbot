@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { t, type MessageKey } from '#lib/i18n.svelte.ts';
-	import { Download, ImageUp, RotateCcw, Sparkles } from '@lucide/svelte';
+	import { Download, ImageUp, RotateCcw } from '@lucide/svelte';
 	import { download, filenameFrom } from '#lib/download.ts';
-	import { resolve } from '$app/paths';
-	import { generateSvg, svgPrompt } from '#lib/ai/drawings.ts';
-	import { buildPrompt, generateImage } from '#lib/ai/images.ts';
-	import { aiSettings } from '#lib/ai/settings.svelte.ts';
+	import type { AiResult } from '#lib/ai/result.ts';
+	import AiGenerator from '#lib/components/AiGenerator.svelte';
 	import Button from '#lib/components/Button.svelte';
 	import DrawPanel from '#lib/components/DrawPanel.svelte';
 	import { bounds, type Polyline } from '#lib/geometry/types.ts';
@@ -31,16 +29,17 @@
 	let gray = $state<Gray | undefined>();
 	let loadError = $state('');
 	let fileInput = $state<HTMLInputElement>();
-	type Source = 'file' | 'ai-image' | 'ai-drawing';
-	const sources: [Source, MessageKey, MessageKey][] = [
-		['file', 'image.file', 'image.fileHint'],
-		['ai-image', 'image.aiImage', 'image.aiImageHint'],
-		['ai-drawing', 'image.aiDrawing', 'image.aiDrawingHint']
+	type Source = 'file' | 'ai';
+	const sources: [Source, MessageKey][] = [
+		['file', 'image.file'],
+		['ai', 'image.ai']
 	];
 	let source = $state<Source>('file');
-	let prompt = $state('');
-	let generating = $state(false);
-	let generateError = $state('');
+
+	function useAi(result: AiResult) {
+		if (result.kind === 'svg') imageSource.setSvg(result.svg, result.name);
+		else imageSource.set(result.blob, result.name);
+	}
 
 	function startOver() {
 		imageSource.clear();
@@ -51,41 +50,8 @@
 		sizePercent = 100;
 		hatchSpacing = 1.2;
 		fillHatch = false;
-		prompt = '';
 		loadError = '';
-		generateError = '';
 		if (fileInput) fileInput.value = '';
-	}
-
-	async function generate() {
-		const idea = prompt.trim();
-		if (!idea) return;
-		generating = true;
-		generateError = '';
-		try {
-			if (source === 'ai-drawing') {
-				const system = svgPrompt(aiSettings.svgTemplate, printable.width, printable.height);
-				imageSource.setSvg(
-					await generateSvg(aiSettings.drawingConfig, system, idea),
-					`AI: ${idea}`
-				);
-			} else {
-				const blob = await generateImage(
-					aiSettings.config,
-					buildPrompt(aiSettings.promptTemplate, idea)
-				);
-				imageSource.set(blob, `AI: ${idea}`);
-			}
-		} catch (error) {
-			generateError =
-				error instanceof TypeError
-					? t('image.noResponse')
-					: error instanceof Error
-						? error.message
-						: String(error);
-		} finally {
-			generating = false;
-		}
 	}
 
 	const sheet = $derived(settings.sheet);
@@ -95,9 +61,6 @@
 	});
 
 	const isVector = $derived(imageSource.svg !== undefined);
-	const aiReady = $derived(
-		source === 'ai-drawing' ? aiSettings.drawingReady : source === 'ai-image' && aiSettings.ready
-	);
 
 	const vector = $derived.by((): { lines: Polyline[]; error: string } => {
 		if (imageSource.svg === undefined) return { lines: [], error: '' };
@@ -205,9 +168,9 @@
 					</button>
 				{/each}
 			</div>
-			<p class="mt-2 text-[13px] text-ink-mute">
-				{t(sources.find(([value]) => value === source)?.[2] ?? 'image.fileHint')}
-			</p>
+			{#if source === 'file'}
+				<p class="mt-2 text-[13px] text-ink-mute">{t('image.fileHint')}</p>
+			{/if}
 		</div>
 
 		<div>
@@ -228,36 +191,8 @@
 						{imageSource.name || t('image.noFile')}
 					</span>
 				</div>
-			{:else if !aiReady}
-				<p class="rounded-md bg-surface-card p-3 text-sm text-ink">
-					{source === 'ai-drawing' ? t('image.setupDrawingBefore') : t('image.setupBefore')}
-					<a class="text-link underline" href={resolve('/settings')}>{t('image.setupLink')}</a>{t(
-						'image.setupAfter'
-					)}
-				</p>
 			{:else}
-				<label class={label} for="prompt">
-					{source === 'ai-drawing' ? t('image.drawingIdea') : t('image.imageIdea')}
-				</label>
-				<textarea
-					id="prompt"
-					bind:value={prompt}
-					rows="3"
-					placeholder={t('image.ideaPlaceholder')}
-					class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"
-				></textarea>
-				<div class="mt-2 flex items-center gap-3">
-					<Button variant="primary" onclick={generate} disabled={generating || !prompt.trim()}>
-						<Sparkles size={16} />
-						{generating ? t('image.generating') : t('image.generate')}
-					</Button>
-					<span class="text-[13px] text-ink-mute">
-						{source === 'ai-drawing' ? aiSettings.drawingModel : aiSettings.model}
-					</span>
-				</div>
-				{#if generateError}
-					<p class="mt-2 text-[13px] text-danger" role="alert">{generateError}</p>
-				{/if}
+				<AiGenerator area={printable} onuse={useAi} />
 			{/if}
 			{#if imageSource.url}
 				<img
