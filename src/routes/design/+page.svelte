@@ -123,159 +123,163 @@
 <main
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]"
 >
-	<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
-		<div class="flex items-center justify-between gap-3">
-			<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
-				{t('design.title')}
-			</h1>
-			{#if design.elements.length}
-				<Button class="h-8! px-3!" onclick={() => design.clear()}>
-					<RotateCcw size={14} />
-					{t('design.clear')}
-				</Button>
-			{/if}
-		</div>
-
-		<div>
-			<span class={label}>{t('design.add')}</span>
-			<input
-				bind:this={fileInput}
-				type="file"
-				accept="image/*,.svg"
-				class="hidden"
-				onchange={(event) => void addFile(event.currentTarget.files)}
-			/>
-			<div class="flex flex-wrap gap-2">
-				<Button onclick={addText}><Type size={16} /> {t('design.addText')}</Button>
-				<Button onclick={() => fileInput?.click()}>
-					<ImagePlus size={16} />
-					{t('design.addFile')}
-				</Button>
-				<Button onclick={() => (panel = panel === 'ai' ? 'none' : 'ai')}>
-					<Sparkles size={16} />
-					{t('design.addAi')}
-				</Button>
-				<Button onclick={() => (panel = panel === 'gallery' ? 'none' : 'gallery')}>
-					<LibraryBig size={16} />
-					{t('design.addGallery')}
-				</Button>
-			</div>
-		</div>
-
-		{#if panel === 'ai'}
-			<div class="space-y-3 rounded-lg bg-surface-card p-4">
-				<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
-					{#each [['drawing', 'image.aiDrawing'], ['image', 'image.aiImage']] as const as [value, key] (value)}
-						<button
-							role="radio"
-							aria-checked={aiKind === value}
-							class={pill(aiKind === value)}
-							onclick={() => (aiKind = value)}
-						>
-							{t(key)}
-						</button>
-					{/each}
-				</div>
-				{#if !aiReady}
-					<p class="text-sm text-ink">
-						{aiKind === 'drawing' ? t('image.setupDrawingBefore') : t('image.setupBefore')}
-						<a class="text-link underline" href={resolve('/settings')}>{t('image.setupLink')}</a>{t(
-							'image.setupAfter'
-						)}
-					</p>
-				{:else}
-					<label class="sr-only" for="design-idea">{t('image.imageIdea')}</label>
-					<textarea
-						id="design-idea"
-						bind:value={idea}
-						rows="2"
-						placeholder={t('image.ideaPlaceholder')}
-						class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"
-					></textarea>
-					<Button variant="primary" onclick={generate} disabled={busy || !idea.trim()}>
-						<Sparkles size={16} />
-						{busy ? t('image.generating') : t('image.generate')}
+	<div class="flex flex-col gap-6">
+		<section class="space-y-5 rounded-lg border border-hairline bg-canvas p-6">
+			<div class="flex items-center justify-between gap-3">
+				<h1 class="font-display text-2xl font-semibold tracking-[-0.5px] text-ink">
+					{t('design.title')}
+				</h1>
+				{#if design.elements.length}
+					<Button class="h-8! px-3!" onclick={() => design.clear()}>
+						<RotateCcw size={14} />
+						{t('design.clear')}
 					</Button>
 				{/if}
 			</div>
-		{/if}
 
-		{#if panel === 'gallery'}
-			<div class="rounded-lg bg-surface-card p-4">
-				{#if gallery.items.length === 0}
-					<p class="text-sm text-ink-mute">{t('design.galleryEmpty')}</p>
+			<div>
+				<span class={label}>{t('design.add')}</span>
+				<input
+					bind:this={fileInput}
+					type="file"
+					accept="image/*,.svg"
+					class="hidden"
+					onchange={(event) => void addFile(event.currentTarget.files)}
+				/>
+				<div class="flex flex-wrap gap-2">
+					<Button onclick={addText}><Type size={16} /> {t('design.addText')}</Button>
+					<Button onclick={() => fileInput?.click()}>
+						<ImagePlus size={16} />
+						{t('design.addFile')}
+					</Button>
+					<Button onclick={() => (panel = panel === 'ai' ? 'none' : 'ai')}>
+						<Sparkles size={16} />
+						{t('design.addAi')}
+					</Button>
+					<Button onclick={() => (panel = panel === 'gallery' ? 'none' : 'gallery')}>
+						<LibraryBig size={16} />
+						{t('design.addGallery')}
+					</Button>
+				</div>
+			</div>
+
+			{#if panel === 'ai'}
+				<div class="space-y-3 rounded-lg bg-surface-card p-4">
+					<div class="inline-flex rounded-pill bg-surface-soft p-1.5" role="radiogroup">
+						{#each [['drawing', 'image.aiDrawing'], ['image', 'image.aiImage']] as const as [value, key] (value)}
+							<button
+								role="radio"
+								aria-checked={aiKind === value}
+								class={pill(aiKind === value)}
+								onclick={() => (aiKind = value)}
+							>
+								{t(key)}
+							</button>
+						{/each}
+					</div>
+					{#if !aiReady}
+						<p class="text-sm text-ink">
+							{aiKind === 'drawing' ? t('image.setupDrawingBefore') : t('image.setupBefore')}
+							<a class="text-link underline" href={resolve('/settings')}>
+								{t('image.setupLink')}
+							</a>{t('image.setupAfter')}
+						</p>
+					{:else}
+						<label class="sr-only" for="design-idea">{t('image.imageIdea')}</label>
+						<textarea
+							id="design-idea"
+							bind:value={idea}
+							rows="2"
+							placeholder={t('image.ideaPlaceholder')}
+							class="w-full rounded-md border border-hairline bg-canvas px-3.5 py-2.5 text-ink"
+						></textarea>
+						<Button variant="primary" onclick={generate} disabled={busy || !idea.trim()}>
+							<Sparkles size={16} />
+							{busy ? t('image.generating') : t('image.generate')}
+						</Button>
+					{/if}
+				</div>
+			{/if}
+
+			{#if panel === 'gallery'}
+				<div class="rounded-lg bg-surface-card p-4">
+					{#if gallery.items.length === 0}
+						<p class="text-sm text-ink-mute">{t('design.galleryEmpty')}</p>
+					{:else}
+						<ul class="grid max-h-72 grid-cols-3 gap-2 overflow-y-auto">
+							{#each gallery.items as item (item.id)}
+								<li>
+									<button
+										class="w-full rounded-md border border-hairline bg-canvas p-1 text-left"
+										onclick={() => {
+											design.addVector(item.polylines, item.name, area);
+											panel = 'none';
+										}}
+									>
+										<SheetPreview
+											width={item.sheet.width}
+											height={item.sheet.height}
+											margin={item.margin}
+											polylines={item.polylines}
+										/>
+										<span class="block truncate px-1 text-[12px] text-ink">{item.name}</span>
+									</button>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+			{/if}
+
+			{#if error}
+				<p class="text-[13px] text-danger" role="alert">{error}</p>
+			{/if}
+		</section>
+
+		<section class="space-y-3 rounded-lg border border-hairline bg-canvas p-6">
+			<div>
+				<h2 class="font-semibold text-ink">{t('design.elements')}</h2>
+				{#if design.elements.length === 0}
+					<p class="text-sm text-ink-mute">{t('design.empty')}</p>
 				{:else}
-					<ul class="grid max-h-72 grid-cols-3 gap-2 overflow-y-auto">
-						{#each gallery.items as item (item.id)}
-							<li>
+					<ul class="divide-y divide-hairline-soft">
+						{#each design.elements as element (element.id)}
+							<li class="flex items-center gap-2 py-1.5">
 								<button
-									class="w-full rounded-md border border-hairline bg-canvas p-1 text-left"
-									onclick={() => {
-										design.addVector(item.polylines, item.name, area);
-										panel = 'none';
-									}}
+									class="min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-sm {design.selectedId ===
+									element.id
+										? 'bg-surface-soft text-ink'
+										: 'text-ink-soft'}"
+									onclick={() => (design.selectedId = element.id)}
 								>
-									<SheetPreview
-										width={item.sheet.width}
-										height={item.sheet.height}
-										margin={item.margin}
-										polylines={item.polylines}
-									/>
-									<span class="block truncate px-1 text-[12px] text-ink">{item.name}</span>
+									<span class="text-ink-mute">{t(kinds[element.kind])}</span> · {element.name}
 								</button>
+								<Button
+									variant="icon"
+									class="size-8!"
+									aria-label={t('design.duplicate')}
+									onclick={() => design.duplicate(element.id)}
+								>
+									<Copy size={14} />
+								</Button>
+								<Button
+									variant="icon"
+									class="size-8!"
+									aria-label={t('design.remove')}
+									onclick={() => design.remove(element.id)}
+								>
+									<Trash2 size={14} />
+								</Button>
 							</li>
 						{/each}
 					</ul>
 				{/if}
 			</div>
-		{/if}
-
-		{#if error}
-			<p class="text-[13px] text-danger" role="alert">{error}</p>
-		{/if}
-
-		<div>
-			<span class={label}>{t('design.elements')}</span>
-			{#if design.elements.length === 0}
-				<p class="text-sm text-ink-mute">{t('design.empty')}</p>
-			{:else}
-				<ul class="divide-y divide-hairline-soft">
-					{#each design.elements as element (element.id)}
-						<li class="flex items-center gap-2 py-1.5">
-							<button
-								class="min-w-0 flex-1 truncate rounded-md px-2 py-1 text-left text-sm {design.selectedId ===
-								element.id
-									? 'bg-surface-soft text-ink'
-									: 'text-ink-soft'}"
-								onclick={() => (design.selectedId = element.id)}
-							>
-								<span class="text-ink-mute">{t(kinds[element.kind])}</span> · {element.name}
-							</button>
-							<Button
-								variant="icon"
-								class="size-8!"
-								aria-label={t('design.duplicate')}
-								onclick={() => design.duplicate(element.id)}
-							>
-								<Copy size={14} />
-							</Button>
-							<Button
-								variant="icon"
-								class="size-8!"
-								aria-label={t('design.remove')}
-								onclick={() => design.remove(element.id)}
-							>
-								<Trash2 size={14} />
-							</Button>
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</div>
+		</section>
 
 		{#if selected}
-			<div class="space-y-4 border-t border-hairline-soft pt-5">
-				<span class={label}>{t('design.selected')}</span>
+			<section class="space-y-4 rounded-lg border border-hairline bg-canvas p-6">
+				<h2 class="font-semibold text-ink">{t('design.selected')}</h2>
 				<div>
 					<label class={label} for="design-scale">
 						{t('design.scale', { value: Math.round(selected.scale * 100) })}
@@ -408,9 +412,9 @@
 						</label>
 					{/if}
 				{/if}
-			</div>
+			</section>
 		{/if}
-	</section>
+	</div>
 
 	<section class="flex flex-col gap-4">
 		<div class="rounded-lg border border-hairline bg-canvas p-6">
