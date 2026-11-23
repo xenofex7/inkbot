@@ -4,6 +4,7 @@ import { loadGray } from '../image/load';
 import { traceImage, type Gray, type TraceMode } from '../image/trace';
 import { orderPaths } from '../optimize/order';
 import { parseSvg } from '../svg/parse';
+import { handwriting } from '../handwriting/store.svelte';
 import { fonts, layoutText, type Align } from '../text/layout';
 import { centred, normalize, place, type Placement, type Shape } from './model';
 
@@ -42,7 +43,7 @@ const RASTER_WIDTH_MM = 60;
 const CURVE_STEP_MM = 0.2;
 
 export function textShape(options: TextOptions): Shape {
-	const font = fonts.find((f) => f.id === options.fontId) ?? fonts[0];
+	const font = handwriting.allFonts.find((f) => f.id === options.fontId) ?? fonts[0];
 	const base = { font, size: options.size, lineHeight: options.lineHeight };
 	const natural = bounds(layoutText(options.text, { ...base, align: 'left', width: 10_000 }));
 	const width = natural ? natural.maxX : 0;

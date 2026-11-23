@@ -34,6 +34,7 @@
 	import { settings } from '#lib/settings.svelte.ts';
 	import { parseSvg } from '#lib/svg/parse.ts';
 	import { fonts, type Align } from '#lib/text/layout.ts';
+	import { handwriting } from '#lib/handwriting/store.svelte.ts';
 
 	let panel = $state<'none' | 'ai' | 'gallery'>('none');
 	let error = $state('');
@@ -51,6 +52,7 @@
 
 	onMount(() => {
 		void gallery.load();
+		void handwriting.load();
 	});
 
 	function fail(e: unknown) {
@@ -299,7 +301,7 @@
 								onchange={(event) => updateText(selected, { fontId: event.currentTarget.value })}
 								class={field}
 							>
-								{#each fonts as option (option.id)}
+								{#each handwriting.allFonts as option (option.id)}
 									<option value={option.id}>{option.name}</option>
 								{/each}
 							</select>
