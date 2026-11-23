@@ -45,6 +45,8 @@ As of 23.11.2026. Done items are marked [x].
 - [x] Envelopes from an address list (CSV): placeholders like {Name} in any text, step
   through the rows
 - [x] **Several pens:** up to four pens per card, drawn pen by pen with a prompt to swap
+- [x] **Path preview and resume:** play the pen path stroke by stroke, continue an
+  interrupted drawing from any stroke
 
 ## Version 4 - Data
 - [x] **Backup:** export and import settings, prompts, gallery and handwriting in one file
