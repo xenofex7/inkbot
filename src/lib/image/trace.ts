@@ -145,7 +145,7 @@ function perpendicular(p: Point, a: Point, b: Point) {
 	const dx = b.x - a.x;
 	const dy = b.y - a.y;
 	const length = Math.hypot(dx, dy);
-	if (length === 0) return Math.hypot(p.x - a.x, p.y - a.y);
+	if (length < 1e-6) return Math.hypot(p.x - a.x, p.y - a.y);
 	return Math.abs(dy * p.x - dx * p.y + b.x * a.y - b.y * a.x) / length;
 }
 

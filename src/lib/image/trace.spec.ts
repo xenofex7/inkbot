@@ -60,6 +60,18 @@ describe('simplify', () => {
 	});
 });
 
+describe('simplify closed loops', () => {
+	it('keeps loops that start and end on the same point', () => {
+		for (const radius of [100, 150, 170, 180, 130]) {
+			const loop = Array.from({ length: 41 }, (_, i) => {
+				const t = Math.PI * 0.15 + (i / 40) * Math.PI * 2;
+				return { x: 480 + Math.cos(t) * radius, y: 620 + Math.sin(t) * 170 };
+			});
+			expect(simplify(loop, 3).length).toBeGreaterThan(8);
+		}
+	});
+});
+
 describe('smooth', () => {
 	it('turns a pixel staircase into a straight diagonal', () => {
 		const stairs = Array.from({ length: 20 }, (_, i) => ({
