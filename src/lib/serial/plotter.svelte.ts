@@ -13,6 +13,7 @@ const GREETING_TIMEOUT_MS = 5000;
 export class Plotter {
 	connection = $state<ConnectionState>('disconnected');
 	greeting = $state('');
+	resets = $state(0);
 	version = $state('');
 	status = $state<StatusReport | undefined>();
 	wco = $state<Position>({ x: 0, y: 0, z: 0 });
@@ -201,6 +202,7 @@ export class Plotter {
 				break;
 			case 'greeting':
 				this.greeting = message.text;
+				this.resets++;
 				this.alarm = undefined;
 				this.penDown = false;
 				this.feedOverride = 100;

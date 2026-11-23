@@ -23,6 +23,7 @@
 	import { settings } from '../settings.svelte';
 	import { gallery } from '../gallery/store.svelte';
 	import { penColor } from '../design/pens';
+	import { positions } from '../machine/positions.svelte';
 
 	let {
 		polylines,
@@ -73,10 +74,15 @@
 
 	const outsideSheet = $derived(outsideArea(polylines, sheet.width, sheet.height));
 	const outsideMachine = $derived(outsideArea(polylines, VGX4.areaWidth, VGX4.areaHeight));
+	const outsideWorkArea = $derived(positions.outside(polylines, settings.invertY));
 	const minutes = $derived(Math.ceil(estimateSeconds(polylines) / 60));
 	const running = $derived(plotter.busy || plotter.status?.state === 'Hold');
 	const canDraw = $derived(
-		plotter.connection === 'connected' && !running && polylines.length > 0 && !outsideMachine
+		plotter.connection === 'connected' &&
+			!running &&
+			polylines.length > 0 &&
+			!outsideMachine &&
+			!outsideWorkArea
 	);
 
 	function saveSvg() {
@@ -205,6 +211,8 @@
 			<p class="text-ink-mute">{emptyHint || t('job.empty')}</p>
 		{:else if outsideMachine}
 			<p class="text-danger" role="alert">{t('job.outsideMachine')}</p>
+		{:else if outsideWorkArea}
+			<p class="text-danger" role="alert">{t('job.outsideArea')}</p>
 		{:else}
 			{#if outsideSheet}
 				<p class="mb-2 flex items-center gap-2 text-ink">

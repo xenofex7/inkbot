@@ -12,6 +12,16 @@ export const penDown = (s: number = VGX4.penDownS) => [`M3 S${Math.round(s)}`, d
 
 export const setOrigin = () => ['G92 X0 Y0'];
 
+export const jogTo = (target: { x: number; y: number }, feed: number = VGX4.jogFeed) => [
+	`$J=G53 G21 X${mm(target.x)} Y${mm(target.y)} F${feed}`
+];
+
+export const moveToMachine = (target: { x: number; y: number }) => [
+	...penUp(),
+	'G21',
+	`G53 G0 X${mm(target.x)} Y${mm(target.y)}`
+];
+
 export const goToOrigin = () => [...penUp(), 'G21', 'G90', 'G0 X0 Y0'];
 
 export function jog(dx: number, dy: number, invertY = false, feed: number = VGX4.jogFeed) {

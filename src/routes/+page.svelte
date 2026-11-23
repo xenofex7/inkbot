@@ -8,17 +8,32 @@
 		ArrowUp,
 		Crosshair,
 		House,
-		Square
+		MapPin,
+		SquareParking,
+		Square,
+		SquareDashed,
+		Trash2
 	} from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
-	import { goToOrigin, jog, setOrigin, testSquare } from '#lib/grbl/commands.ts';
+	import {
+		goToOrigin,
+		jog,
+		jogTo,
+		moveToMachine,
+		setOrigin,
+		testSquare
+	} from '#lib/grbl/commands.ts';
+	import { orient } from '#lib/geometry/types.ts';
+	import { positions } from '#lib/machine/positions.svelte.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { settings } from '#lib/settings.svelte.ts';
 
-	const steps = [1, 5, 10] as const;
+	const steps = [1, 5, 10, 20, 50] as const;
 	let step = $state<(typeof steps)[number]>(5);
 	let consoleLine = $state('');
 	let actionError = $state('');
+	let notice = $state('');
+	let positionName = $state('');
 	let logView = $state<HTMLElement>();
 
 	const connected = $derived(plotter.connection === 'connected');
@@ -37,6 +52,33 @@
 			actionError = error instanceof Error ? error.message : String(error);
 		}
 	}
+
+	function jogBy(dx: number, dy: number) {
+		const base = positions.machine();
+		const target = positions.jogTarget(orient({ x: dx, y: dy }, settings.invertY));
+		if (!base || !target) return run(jog(dx, dy, settings.invertY));
+		if (!plotter.busy && Math.hypot(target.x - base.x, target.y - base.y) < 0.01) {
+			notice = t('positions.atEdge');
+			return;
+		}
+		notice = '';
+		return run(jogTo(target));
+	}
+
+	function goTo(point: { x: number; y: number }) {
+		const target = positions.toMachine(point);
+		if (target) void run(moveToMachine(target));
+	}
+
+	function savePosition(event: SubmitEvent) {
+		event.preventDefault();
+		positions.save(
+			positionName.trim() || t('positions.defaultName', { number: positions.positions.length + 1 })
+		);
+		positionName = '';
+	}
+
+	const mm = (value: number) => value.toFixed(1);
 
 	async function sendConsole(event: SubmitEvent) {
 		event.preventDefault();
@@ -147,7 +189,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.up')}
-						onclick={() => run(jog(0, -step, settings.invertY))}
+						onclick={() => jogBy(0, -step)}
 						disabled={!canAct}
 					>
 						<ArrowUp size={18} />
@@ -156,7 +198,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.left')}
-						onclick={() => run(jog(-step, 0, settings.invertY))}
+						onclick={() => jogBy(-step, 0)}
 						disabled={!canAct}
 					>
 						<ArrowLeft size={18} />
@@ -172,7 +214,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.right')}
-						onclick={() => run(jog(step, 0, settings.invertY))}
+						onclick={() => jogBy(step, 0)}
 						disabled={!canAct}
 					>
 						<ArrowRight size={18} />
@@ -181,7 +223,7 @@
 					<Button
 						variant="icon"
 						aria-label={t('machine.downMove')}
-						onclick={() => run(jog(0, step, settings.invertY))}
+						onclick={() => jogBy(0, step)}
 						disabled={!canAct}
 					>
 						<ArrowDown size={18} />
@@ -198,6 +240,9 @@
 						{t('machine.goOrigin')}
 					</Button>
 				</div>
+				{#if notice}
+					<p class="mt-4 text-sm text-seal" role="status">{notice}</p>
+				{/if}
 				<p class="mt-4 text-sm text-ink-mute">
 					{t('machine.originHint')}
 				</p>
@@ -215,6 +260,100 @@
 						</span>
 					</span>
 				</label>
+			</section>
+
+			<section class="rounded-lg border border-hairline bg-canvas p-6">
+				<h2 class="font-semibold text-ink">{t('positions.title')}</h2>
+				<p class="mt-2 text-sm text-ink-mute">{t('positions.intro')}</p>
+
+				{#if !positions.parkDefined}
+					<div class="mt-4 space-y-3 rounded-md bg-surface-card p-4">
+						<p class="text-sm text-ink">{t('positions.noPark')}</p>
+						<Button onclick={() => positions.setPark()} disabled={!canAct}>
+							<SquareParking size={16} />
+							{t('positions.setPark')}
+						</Button>
+					</div>
+				{:else if !positions.ready}
+					<div class="mt-4 space-y-3 rounded-md border border-seal/40 bg-surface-card p-4">
+						<p class="text-sm text-ink">{t('positions.confirmQuestion')}</p>
+						<Button variant="primary" onclick={() => positions.confirmPark()} disabled={!canAct}>
+							<SquareParking size={16} />
+							{t('positions.confirm')}
+						</Button>
+					</div>
+				{:else}
+					<div class="mt-4 flex flex-wrap gap-2">
+						<Button onclick={() => goTo({ x: 0, y: 0 })} disabled={!canAct}>
+							<SquareParking size={16} />
+							{t('positions.park')}
+						</Button>
+						<Button onclick={() => positions.setPark()} disabled={!canAct}>
+							{t('positions.setParkHere')}
+						</Button>
+					</div>
+
+					<div class="mt-5 border-t border-hairline-soft pt-4">
+						<h3 class="text-sm font-semibold text-ink">{t('positions.area')}</h3>
+						<p class="mt-1 text-sm text-ink-mute">
+							{positions.area
+								? t('positions.areaSet', {
+										width: mm(positions.area.maxX - positions.area.minX),
+										height: mm(positions.area.maxY - positions.area.minY)
+									})
+								: t('positions.areaNone')}
+						</p>
+						<div class="mt-3 flex flex-wrap gap-2">
+							<Button onclick={() => positions.setCorner()} disabled={!canAct}>
+								<SquareDashed size={16} />
+								{positions.corner ? t('positions.secondCorner') : t('positions.firstCorner')}
+							</Button>
+							{#if positions.area || positions.corner}
+								<Button onclick={() => positions.clearArea()}>{t('positions.clearArea')}</Button>
+							{/if}
+						</div>
+					</div>
+
+					<div class="mt-5 border-t border-hairline-soft pt-4">
+						<h3 class="text-sm font-semibold text-ink">{t('positions.saved')}</h3>
+						<form class="mt-3 flex gap-2" onsubmit={savePosition} novalidate>
+							<label class="sr-only" for="position-name">{t('positions.name')}</label>
+							<input
+								id="position-name"
+								bind:value={positionName}
+								placeholder={t('positions.namePlaceholder')}
+								class="h-10 min-w-0 flex-1 rounded-md border border-hairline bg-canvas px-3.5 text-sm text-ink"
+							/>
+							<Button type="submit" disabled={!connected}>
+								<MapPin size={16} />
+								{t('positions.save')}
+							</Button>
+						</form>
+						{#if positions.positions.length > 0}
+							<ul class="mt-3 divide-y divide-hairline-soft">
+								{#each positions.positions as position (position.id)}
+									<li class="flex items-center gap-2 py-1.5 text-sm">
+										<span class="min-w-0 flex-1 truncate text-ink">{position.name}</span>
+										<span class="font-mono text-[12px] text-ink-mute">
+											{mm(position.x)} · {mm(position.y)}
+										</span>
+										<Button class="h-8! px-3!" onclick={() => goTo(position)} disabled={!canAct}>
+											{t('positions.goTo')}
+										</Button>
+										<Button
+											variant="icon"
+											class="size-8!"
+											aria-label={t('positions.remove')}
+											onclick={() => positions.remove(position.id)}
+										>
+											<Trash2 size={14} />
+										</Button>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
+				{/if}
 			</section>
 
 			<section class="flex min-h-80 flex-col rounded-lg border border-hairline bg-canvas p-6">

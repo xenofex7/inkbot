@@ -214,6 +214,35 @@ const en = {
 	'machine.right': 'Move right',
 	'machine.downMove': 'Move down',
 	'machine.goOrigin': 'Go to origin',
+	'positions.title': 'Park position, work area and positions',
+	'positions.intro':
+		'The plotter has no limit switches and takes its current spot as zero after every connect. The park position is the fixed reference: park the plotter there before you switch it off.',
+	'positions.noPark':
+		'No park position yet. Drive the pen to where the plotter should rest when you switch it off.',
+	'positions.setPark': 'Set park position here',
+	'positions.confirmQuestion':
+		'Is the plotter standing in its park position? Only then do the work area and saved positions match.',
+	'positions.confirm': 'Yes, it is parked',
+	'positions.park': 'Park',
+	'positions.setParkHere': 'Make this the park position',
+	'positions.area': 'Work area',
+	'positions.areaNone':
+		'Not set. Drive to one corner, set it, then to the opposite corner. After that the arrows stop at the edge.',
+	'positions.areaSet':
+		'{width} × {height} mm. The arrows stop at the edge, drawings outside are blocked.',
+	'positions.firstCorner': 'Set first corner here',
+	'positions.secondCorner': 'Set opposite corner here',
+	'positions.clearArea': 'Remove work area',
+	'positions.saved': 'Saved positions',
+	'positions.name': 'Name of the position',
+	'positions.namePlaceholder': 'e.g. Paper corner',
+	'positions.defaultName': 'Position {number}',
+	'positions.save': 'Save position',
+	'positions.goTo': 'Go',
+	'positions.remove': 'Remove position',
+	'positions.atEdge': 'Edge of the work area reached.',
+	'job.outsideArea':
+		'The drawing reaches beyond the work area. Move the origin or make the drawing smaller.',
 	'machine.originHint':
 		'"Set origin here" makes the current pen position the origin, "Go to origin" lifts the pen and drives back to it. Reconnecting restarts the plotter and forgets the origin, so drive back to it before you disconnect. There are no limit switches, so do not drive past the frame.',
 	'machine.invertY': 'Invert Y axis',
@@ -555,6 +584,35 @@ const de: Record<Key, string> = {
 	'machine.right': 'Nach rechts',
 	'machine.downMove': 'Nach unten',
 	'machine.goOrigin': 'Zum Nullpunkt fahren',
+	'positions.title': 'Parkposition, Arbeitsfläche und Positionen',
+	'positions.intro':
+		'Der Plotter hat keine Endschalter und nimmt nach jedem Verbinden seine aktuelle Stelle als Null. Die Parkposition ist der feste Bezugspunkt: Park den Plotter dort, bevor Du ihn ausschaltest.',
+	'positions.noPark':
+		'Noch keine Parkposition. Fahr den Stift dorthin, wo der Plotter beim Ausschalten stehen soll.',
+	'positions.setPark': 'Parkposition hier festlegen',
+	'positions.confirmQuestion':
+		'Steht der Plotter in der Parkposition? Erst dann stimmen Arbeitsfläche und gespeicherte Positionen.',
+	'positions.confirm': 'Ja, er steht dort',
+	'positions.park': 'Parken',
+	'positions.setParkHere': 'Hier als Parkposition festlegen',
+	'positions.area': 'Arbeitsfläche',
+	'positions.areaNone':
+		'Nicht festgelegt. Fahr in eine Ecke, setz sie, dann in die gegenüberliegende Ecke. Danach stoppen die Pfeile an der Kante.',
+	'positions.areaSet':
+		'{width} × {height} mm. Die Pfeile stoppen an der Kante, Zeichnungen ausserhalb werden blockiert.',
+	'positions.firstCorner': 'Erste Ecke hier setzen',
+	'positions.secondCorner': 'Gegenüberliegende Ecke hier setzen',
+	'positions.clearArea': 'Arbeitsfläche entfernen',
+	'positions.saved': 'Gespeicherte Positionen',
+	'positions.name': 'Name der Position',
+	'positions.namePlaceholder': 'z.B. Papierecke',
+	'positions.defaultName': 'Position {number}',
+	'positions.save': 'Position speichern',
+	'positions.goTo': 'Anfahren',
+	'positions.remove': 'Position entfernen',
+	'positions.atEdge': 'Rand der Arbeitsfläche erreicht.',
+	'job.outsideArea':
+		'Die Zeichnung reicht über die Arbeitsfläche hinaus. Nullpunkt verschieben oder Zeichnung verkleinern.',
 	'machine.originHint':
 		'"Nullpunkt hier setzen" macht die aktuelle Stiftposition zum Nullpunkt, "Zum Nullpunkt fahren" hebt den Stift und fährt dorthin zurück. Beim Neuverbinden startet der Plotter neu und vergisst den Nullpunkt, darum vor dem Trennen zurückfahren. Es gibt keine Endschalter, also nicht über den Rahmen hinausfahren.',
 	'machine.invertY': 'Y-Achse umkehren',
