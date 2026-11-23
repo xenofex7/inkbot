@@ -9,7 +9,7 @@ As of 23.11.2026. Done items are marked [x].
   restarts, travel area limit, saved positions
 - [x] **Control bar:** pen, depth, position and paper on every page
 - [x] **Text:** single-line fonts (Hershey, EMS), size, line height, margins, paper format
-  (A4, A5, A6, envelopes C6/DL), alignment
+  (A4, A5, A6, envelopes C5, C6 and C6/5), alignment
 - [x] **Preview & run:** sheet preview, run time, start / pause / stop
 - [x] **Save:** drawing as SVG, source image as file
 - [x] **Languages:** English and German, switchable in the settings, follows the browser

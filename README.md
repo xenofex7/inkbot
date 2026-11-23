@@ -21,7 +21,7 @@ Browser app to drive the VigoTec VG-X4 pen plotter (writing robot) straight from
 
 - Connect via USB, see live machine status, use a G-code console
 - Pen up/down with adjustable depth, jogging, set the origin, always visible control bar
-- Write text in single-line fonts (Hershey, EMS) with size, line height, alignment and paper formats (A4, A5, A6, C6/DL envelopes)
+- Write text in single-line fonts (Hershey, EMS) with size, line height, alignment and paper formats (A4, A5, A6, C5, C6 and C6/5 envelopes)
 - Turn images into lines: centre lines, outlines, hatching, hatched fills
 - Import SVG files and draw their paths exactly
 - AI image or AI drawing (SVG) from a prompt, with OpenAI or any OpenAI-compatible server such as LiteLLM, editable prompts, your key stays in the browser

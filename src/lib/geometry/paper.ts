@@ -5,7 +5,8 @@ export const PAPER_FORMATS: PaperFormat[] = [
 	{ id: 'a5', name: 'A5', width: 148, height: 210 },
 	{ id: 'a6', name: 'A6', width: 105, height: 148 },
 	{ id: 'c6', name: 'Envelope C6', width: 162, height: 114 },
-	{ id: 'dl', name: 'Envelope DL', width: 220, height: 110 }
+	{ id: 'c65', name: 'Envelope C6/5', width: 229, height: 114 },
+	{ id: 'c5', name: 'Envelope C5', width: 162, height: 229 }
 ];
 
 export type Orientation = 'portrait' | 'landscape';
