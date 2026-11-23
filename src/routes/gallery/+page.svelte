@@ -98,7 +98,7 @@
 			</p>
 		{/if}
 
-		<ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+		<ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-2">
 			{#each gallery.items as item (item.id)}
 				<li
 					class="flex flex-col rounded-lg border bg-canvas p-3 {selectedId === item.id
