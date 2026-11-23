@@ -149,6 +149,30 @@ function perpendicular(p: Point, a: Point, b: Point) {
 	return Math.abs(dy * p.x - dx * p.y + b.x * a.y - b.y * a.x) / length;
 }
 
+export function smooth(line: Polyline, radius: number): Polyline {
+	if (line.length < 3 || radius <= 0) return line;
+	const last = line.length - 1;
+	const closed = Math.hypot(line[0].x - line[last].x, line[0].y - line[last].y) <= 1.5;
+	const ring = closed && line[0].x === line[last].x && line[0].y === line[last].y;
+	const points = ring ? line.slice(0, -1) : line;
+	const n = points.length;
+	const result = points.map((point, i) => {
+		if (!closed && (i === 0 || i === n - 1)) return point;
+		let x = 0;
+		let y = 0;
+		let count = 0;
+		for (let d = -radius; d <= radius; d++) {
+			const j = closed ? (i + d + n) % n : i + d;
+			if (j < 0 || j >= n) continue;
+			x += points[j].x;
+			y += points[j].y;
+			count++;
+		}
+		return { x: x / count, y: y / count };
+	});
+	return ring ? [...result, result[0]] : result;
+}
+
 export function simplify(line: Polyline, epsilon: number): Polyline {
 	if (line.length < 3 || epsilon <= 0) return line;
 	let maxDistance = 0;
@@ -165,6 +189,8 @@ export function simplify(line: Polyline, epsilon: number): Polyline {
 	const right = simplify(line.slice(index), epsilon);
 	return [...left.slice(0, -1), ...right];
 }
+
+const SMOOTH_RADIUS = 2;
 
 const HATCH_LAYERS = [
 	{ angle: 0, level: 0.82 },
@@ -266,7 +292,9 @@ function length(line: Polyline) {
 export function traceImage(gray: Gray, options: TraceOptions): Polyline[] {
 	const { width, height } = gray;
 	const trace = (pixels: Uint8Array) =>
-		tracePixels(pixels, width, height).map((line) => simplify(line, options.simplify));
+		tracePixels(pixels, width, height).map((line) =>
+			simplify(smooth(line, SMOOTH_RADIUS), options.simplify)
+		);
 	let lines: Polyline[];
 	if (options.mode === 'hatch') {
 		lines = hatch(gray, options.hatchSpacing, options.threshold);

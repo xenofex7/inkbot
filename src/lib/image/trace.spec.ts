@@ -5,6 +5,7 @@ import {
 	binarize,
 	grayFromRgba,
 	simplify,
+	smooth,
 	thin,
 	traceImage,
 	tracePixels,
@@ -59,6 +60,20 @@ describe('simplify', () => {
 	});
 });
 
+describe('smooth', () => {
+	it('turns a pixel staircase into a straight diagonal', () => {
+		const stairs = Array.from({ length: 20 }, (_, i) => ({
+			x: Math.ceil(i / 2),
+			y: Math.floor(i / 2)
+		}));
+		const smoothed = smooth(stairs, 2);
+		const offsets = smoothed.slice(2, -2).map((p) => p.x - p.y);
+		expect(Math.max(...offsets) - Math.min(...offsets)).toBeLessThan(0.3);
+		expect(smoothed[0]).toEqual(stairs[0]);
+		expect(smoothed.at(-1)).toEqual(stairs.at(-1));
+	});
+});
+
 describe('traceImage', () => {
 	it('draws a thick stroke as a single centre line in lines mode', () => {
 		const gray = canvas(40, 12, (x, y) => x >= 5 && x < 35 && y >= 5 && y <= 7);
@@ -72,7 +87,10 @@ describe('traceImage', () => {
 	it('draws the border of a filled square in outline mode', () => {
 		const gray = canvas(20, 20, (x, y) => x >= 5 && x < 15 && y >= 5 && y < 15);
 		const box = bounds(traceImage(gray, { ...base, mode: 'outline' }))!;
-		expect(box).toEqual({ minX: 5, minY: 5, maxX: 14, maxY: 14 });
+		const expected = { minX: 5, minY: 5, maxX: 14, maxY: 14 };
+		for (const key of Object.keys(expected) as (keyof typeof expected)[]) {
+			expect(Math.abs(box[key] - expected[key])).toBeLessThan(1);
+		}
 	});
 
 	it('hatches dark areas and leaves white paper empty', () => {
