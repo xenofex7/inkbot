@@ -136,7 +136,8 @@
 	const modes: [TraceMode, MessageKey, MessageKey][] = [
 		['lines', 'image.lines', 'image.linesHint'],
 		['outline', 'image.outline', 'image.outlineHint'],
-		['hatch', 'image.hatch', 'image.hatchHint']
+		['hatch', 'image.hatch', 'image.hatchHint'],
+		['tsp', 'image.tsp', 'image.tspHint']
 	];
 	const aligns: [Align, MessageKey][] = [
 		['left', 'text.left'],
@@ -423,16 +424,18 @@
 					<p class="text-[13px] text-ink-mute">
 						{t(modes.find(([value]) => value === raster.trace.mode)?.[2] ?? 'image.linesHint')}
 					</p>
-					<RangeField
-						id="design-threshold"
-						label={t('image.threshold', { value: raster.trace.threshold })}
-						value={raster.trace.threshold}
-						min={20}
-						max={240}
-						buttonStep={5}
-						live={false}
-						onvalue={(value: number) => retrace(raster, { threshold: value })}
-					/>
+					{#if raster.trace.mode !== 'tsp'}
+						<RangeField
+							id="design-threshold"
+							label={t('image.threshold', { value: raster.trace.threshold })}
+							value={raster.trace.threshold}
+							min={20}
+							max={240}
+							buttonStep={5}
+							live={false}
+							onvalue={(value: number) => retrace(raster, { threshold: value })}
+						/>
+					{/if}
 					<RangeField
 						id="design-detail"
 						label={t('image.detail', { value: raster.trace.detail })}
@@ -443,7 +446,7 @@
 						live={false}
 						onvalue={(value: number) => retrace(raster, { detail: value })}
 					/>
-					{#if raster.trace.mode !== 'hatch'}
+					{#if raster.trace.mode !== 'hatch' && raster.trace.mode !== 'tsp'}
 						<label class="flex items-start gap-2.5 text-sm text-ink">
 							<input
 								type="checkbox"
@@ -457,10 +460,12 @@
 							</span>
 						</label>
 					{/if}
-					{#if raster.trace.mode === 'hatch' || raster.trace.fill}
+					{#if raster.trace.mode === 'hatch' || raster.trace.mode === 'tsp' || raster.trace.fill}
 						<RangeField
 							id="design-spacing"
-							label={t('image.spacing', { value: raster.trace.spacing })}
+							label={t(raster.trace.mode === 'tsp' ? 'image.pointSpacing' : 'image.spacing', {
+								value: raster.trace.spacing
+							})}
 							value={raster.trace.spacing}
 							min={0.5}
 							max={4}

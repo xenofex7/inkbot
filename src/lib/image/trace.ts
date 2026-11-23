@@ -1,8 +1,9 @@
 import type { Point, Polyline } from '../geometry/types';
+import { singleLine } from './tsp';
 
 export type Gray = { width: number; height: number; data: Uint8ClampedArray };
 
-export type TraceMode = 'lines' | 'outline' | 'hatch';
+export type TraceMode = 'lines' | 'outline' | 'hatch' | 'tsp';
 
 export type TraceOptions = {
 	mode: TraceMode;
@@ -298,6 +299,8 @@ export function traceImage(gray: Gray, options: TraceOptions): Polyline[] {
 	let lines: Polyline[];
 	if (options.mode === 'hatch') {
 		lines = hatch(gray, options.hatchSpacing, options.threshold);
+	} else if (options.mode === 'tsp') {
+		lines = singleLine(gray, options.hatchSpacing);
 	} else if (!options.fill) {
 		const mask = binarize(gray, options.threshold);
 		lines = trace(

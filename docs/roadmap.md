@@ -30,7 +30,8 @@ As of 23.11.2026. Done items are marked [x].
 - [x] **AI draws directly:** a language model returns an SVG of single lines, no
   conversion needed (cards, patterns, decorations)
 - [ ] **AI redraws:** photo to simplified line drawing (image to image)
-- [ ] **One continuous line** (TSP art)
+- [x] **One continuous line** (TSP art): stippling by brightness, nearest neighbour route
+  improved with 2-opt
 
 ## Version 3 - Design
 - [x] **Card designer:** place text, images, AI results and gallery drawings freely on a
