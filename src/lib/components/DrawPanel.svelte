@@ -85,8 +85,10 @@
 	}
 
 	async function untilIdle() {
-		while (plotter.connection === 'connected' && plotter.status?.state !== 'Idle') {
+		let calm = 0;
+		while (plotter.connection === 'connected' && calm < 3) {
 			await new Promise((resolve) => setTimeout(resolve, 200));
+			calm = plotter.busy || plotter.status?.state !== 'Idle' ? 0 : calm + 1;
 		}
 	}
 

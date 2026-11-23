@@ -23,7 +23,8 @@ export class Plotter {
 	position = $derived(this.status ? workPosition(this.status, this.wco) : undefined);
 	penDown = $state(false);
 	feedOverride = $state(100);
-	busy = $derived(this.status?.state === 'Run' || this.status?.state === 'Jog');
+	queued = $state(0);
+	busy = $derived(this.queued > 0 || this.status?.state === 'Run' || this.status?.state === 'Jog');
 
 	#port: SerialPort | undefined;
 	#reader: ReadableStreamDefaultReader<string> | undefined;
@@ -113,6 +114,7 @@ export class Plotter {
 		const ack = new Promise<void>((resolve, reject) =>
 			this.#pending.push({ length: data.length, resolve, reject })
 		);
+		this.queued = this.#pending.length;
 		ack.catch(() => undefined);
 		const pen = /^M([35])\b/i.exec(line.trim());
 		if (pen) void ack.then(() => (this.penDown = pen[1] === '3'));
@@ -214,6 +216,7 @@ export class Plotter {
 
 	#resolveNext(error?: Error) {
 		const entry = this.#pending.shift();
+		this.queued = this.#pending.length;
 		if (entry) {
 			if (error) entry.reject(error);
 			else entry.resolve();
@@ -223,6 +226,7 @@ export class Plotter {
 
 	#rejectPending(error: Error) {
 		this.#pending.splice(0).forEach((entry) => entry.reject(error));
+		this.queued = 0;
 		this.#spaceWaiters.splice(0).forEach((wake) => wake());
 	}
 
