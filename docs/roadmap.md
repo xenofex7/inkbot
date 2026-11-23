@@ -1,11 +1,11 @@
 # Roadmap
 
-As of 22.11.2026. Done items are marked [x].
+As of 23.11.2026. Done items are marked [x].
 
 ## Version 1 - Basics
 - [x] **Connect:** choose port, check firmware, show status, console
 - [x] **Machine:** jogging (1/5/10 mm), pen up/down with adjustable depth, set origin,
-  invert Y axis
+  go to origin, invert Y axis
 - [x] **Control bar:** pen, depth, position and paper on every page
 - [x] **Text:** single-line fonts (Hershey, EMS), size, line height, margins, paper format
   (A4, A5, A6, envelopes C6/DL), alignment
@@ -17,7 +17,8 @@ As of 22.11.2026. Done items are marked [x].
   plot again, reopen in the editor, delete
 - [x] **SVG:** import, scale, position
 - [ ] **Live speed** via feed override
-- [ ] **GitHub Pages:** put inkbot online, usable without a local server
+- [x] **GitHub Pages:** put inkbot online, usable without a local server, version and build
+  shown in the footer
 
 ## Version 2 - Images & AI
 - [x] **Image to lines:** centre lines, outline, hatching by brightness, hatched fills,
@@ -38,12 +39,15 @@ As of 22.11.2026. Done items are marked [x].
   vector drawing and a traced image from one idea
 - [ ] **Card templates:** folded greeting card, envelope with address field, place card
 - [ ] Rotate elements by 90°
-- [ ] **Own handwriting:** print a template, fill it in by hand, take a photo; inkbot
-  extracts the centre lines of each letter and stores them as a font
+- [x] **Own handwriting:** draw each character in the browser or on an iPhone (QR code,
+  share via AirDrop), or print or plot a template, fill it in and scan a photo; up to three
+  variants per character, natural variation from letter to letter
 - [ ] Envelopes from an address list (CSV)
 
+## Version 4 - Data
+- [x] **Backup:** export and import settings, prompts, gallery and handwriting in one file
+  (without the API key)
+
 ## Later
-- Random variation so writing looks real (jitter, spacing, letter variants)
 - Several pens / colours with a pause to swap
-- Gallery export and import (backup or move to another browser)
 - Dark mode
