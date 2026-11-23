@@ -7,11 +7,13 @@
 		Pause,
 		PenLine,
 		Play,
+		Route,
 		TriangleAlert
 	} from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Button from './Button.svelte';
 	import SheetPreview from './SheetPreview.svelte';
+	import PathPlayer from './PathPlayer.svelte';
 	import { estimateSeconds, outsideArea, toGcode } from '../gcode/fromPolylines';
 	import { orient, type Polyline } from '../geometry/types';
 	import { REALTIME, VGX4 } from '../grbl/vgx4';
@@ -41,6 +43,7 @@
 	} = $props();
 
 	let nextGroup = $state<number | undefined>();
+	let showPlayer = $state(false);
 
 	let drawError = $state('');
 	let saveState = $state<'idle' | 'saving' | 'saved'>('idle');
@@ -96,6 +99,15 @@
 				await untilIdle();
 				if (plotter.connection === 'connected') nextGroup = index + 1;
 			}
+		} catch (error) {
+			drawError = error instanceof Error ? error.message : String(error);
+		}
+	}
+
+	async function resumeFrom(from: number) {
+		drawError = '';
+		try {
+			await plotter.sendAll(toGcode(polylines.slice(from), settings));
 		} catch (error) {
 			drawError = error instanceof Error ? error.message : String(error);
 		}
@@ -171,6 +183,17 @@
 			<BookmarkPlus size={16} />
 			{saveState === 'saved' ? t('job.saved') : t('job.saveGallery')}
 		</Button>
+	{/if}
+	<Button
+		onclick={() => (showPlayer = !showPlayer)}
+		disabled={polylines.length === 0}
+		aria-expanded={showPlayer}
+	>
+		<Route size={16} />
+		{t('player.toggle')}
+	</Button>
+	{#if showPlayer && polylines.length > 0}
+		<PathPlayer {polylines} {sheet} {canDraw} onresume={resumeFrom} />
 	{/if}
 	<span class="text-sm text-ink-mute">
 		{sheet.width} × {sheet.height} mm · {strokes(polylines.length)} · {t('job.approx', { minutes })}
