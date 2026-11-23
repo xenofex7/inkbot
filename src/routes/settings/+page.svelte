@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { i18n, LOCALES, t } from '#lib/i18n.svelte.ts';
+	import { Eye, EyeOff } from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
 	import { listModels, type ProviderId } from '#lib/ai/images.ts';
 	import { aiSettings } from '#lib/ai/settings.svelte.ts';
@@ -7,6 +8,7 @@
 	let models = $state<string[]>([]);
 	let testState = $state<'idle' | 'testing' | 'ok' | 'error'>('idle');
 	let testMessage = $state('');
+	let showKeyStart = $state(false);
 
 	const providers: [ProviderId, string][] = [
 		['openai', 'OpenAI'],
@@ -94,13 +96,30 @@
 
 		<div>
 			<label class={label} for="api-key">{t('settings.apiKey')}</label>
-			<input
-				id="api-key"
-				type="password"
-				bind:value={aiSettings.apiKey}
-				class={field}
-				autocomplete="off"
-			/>
+			<div class="relative">
+				<input
+					id="api-key"
+					type="password"
+					bind:value={aiSettings.apiKey}
+					class="{field} pr-11"
+					autocomplete="off"
+				/>
+				<button
+					type="button"
+					class="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-ink-mute hover:text-ink"
+					aria-label={t('settings.showKeyStart')}
+					aria-pressed={showKeyStart}
+					onclick={() => (showKeyStart = !showKeyStart)}
+				>
+					{#if showKeyStart}<EyeOff size={18} />{:else}<Eye size={18} />{/if}
+				</button>
+			</div>
+			{#if showKeyStart && aiSettings.apiKey}
+				<p class="mt-1.5 text-[13px] text-ink-mute">
+					{t('settings.keyStart')}
+					<code class="font-mono text-ink">{aiSettings.apiKey.slice(0, 10)}…</code>
+				</p>
+			{/if}
 		</div>
 
 		<div class="grid grid-cols-2 gap-4">

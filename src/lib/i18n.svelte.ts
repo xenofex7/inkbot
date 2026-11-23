@@ -176,6 +176,8 @@ const en = {
 	'settings.baseUrlHint':
 		'The server must allow requests from the browser (CORS). LiteLLM can also route to other providers such as Higgsfield.',
 	'settings.apiKey': 'API key',
+	'settings.showKeyStart': 'Show the start of the key',
+	'settings.keyStart': 'Starts with',
 	'settings.imageModel': 'Image model',
 	'settings.imageSize': 'Image size',
 	'settings.landscape': 'landscape',
@@ -378,6 +380,8 @@ const de: Record<Key, string> = {
 	'settings.baseUrlHint':
 		'Der Server muss Anfragen aus dem Browser erlauben (CORS). Über LiteLLM lassen sich auch andere Anbieter wie Higgsfield einbinden.',
 	'settings.apiKey': 'API-Schlüssel',
+	'settings.showKeyStart': 'Anfang des Schlüssels zeigen',
+	'settings.keyStart': 'Beginnt mit',
 	'settings.imageModel': 'Bildmodell',
 	'settings.imageSize': 'Bildgrösse',
 	'settings.landscape': 'quer',
