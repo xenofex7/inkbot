@@ -3,6 +3,7 @@
 	import './layout.css';
 	import { page } from '$app/state';
 	import { asset, resolve } from '$app/paths';
+	import { MonitorPlay } from '@lucide/svelte';
 	import Button from '#lib/components/Button.svelte';
 	import ControlBar from '#lib/components/ControlBar.svelte';
 	import JobBar from '#lib/components/JobBar.svelte';
@@ -90,6 +91,10 @@
 							disabled={!plotter.supported}
 						>
 							{t('connect.button')}
+						</Button>
+						<Button onclick={() => plotter.connectSimulator()} title={t('connect.simulatorHint')}>
+							<MonitorPlay size={16} />
+							{t('connect.simulator')}
 						</Button>
 					{:else}
 						<Button onclick={disconnect}>{t('connect.disconnect')}</Button>

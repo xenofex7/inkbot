@@ -142,6 +142,9 @@ const en = {
 	'connect.parkFirst':
 		'Drive to the start stop before disconnecting? OK lifts the pen, drives there and then disconnects. Cancel disconnects right away.',
 	'connect.disconnect': 'Disconnect plotter',
+	'connect.simulator': 'Simulator',
+	'connect.simulatorTry': 'Try without a plotter',
+	'connect.simulatorHint': 'Try inkbot without a plotter: a virtual machine answers like the VG-X4',
 
 	'status.connecting': 'Connecting …',
 	'status.disconnected': 'Disconnected',
@@ -150,6 +153,7 @@ const en = {
 	'status.paused': 'Paused',
 	'job.running': 'Drawing',
 	'status.connected': 'Connected',
+	'status.simulated': 'Simulator',
 
 	'bar.up': 'Up',
 	'bar.down': 'Down',
@@ -527,6 +531,10 @@ const de: Record<Key, string> = {
 	'connect.parkFirst':
 		'Vor dem Trennen zum Anschlag fahren? OK hebt den Stift, fährt hin und trennt danach. Abbrechen trennt sofort.',
 	'connect.disconnect': 'Plotter trennen',
+	'connect.simulator': 'Simulator',
+	'connect.simulatorTry': 'Ohne Plotter ausprobieren',
+	'connect.simulatorHint':
+		'inkbot ohne Plotter ausprobieren: eine virtuelle Maschine antwortet wie der VG-X4',
 
 	'status.connecting': 'Verbinde …',
 	'status.disconnected': 'Getrennt',
@@ -535,6 +543,7 @@ const de: Record<Key, string> = {
 	'status.paused': 'Pausiert',
 	'job.running': 'Zeichnet',
 	'status.connected': 'Verbunden',
+	'status.simulated': 'Simulator',
 
 	'bar.up': 'Hoch',
 	'bar.down': 'Runter',

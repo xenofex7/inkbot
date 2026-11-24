@@ -10,6 +10,7 @@
 		House,
 		Compass,
 		MapPin,
+		MonitorPlay,
 		SquareArrowUpLeft,
 		Square,
 		Trash2
@@ -193,6 +194,12 @@
 				<p class="mt-4 max-w-prose text-lg">
 					{t('machine.lede')}
 				</p>
+				{#if plotter.connection === 'disconnected'}
+					<Button class="mt-6 sm:hidden" onclick={() => plotter.connectSimulator()}>
+						<MonitorPlay size={16} />
+						{t('connect.simulatorTry')}
+					</Button>
+				{/if}
 				{#if !plotter.supported}
 					<p class="mt-6 rounded-lg bg-surface-card p-4 text-ink">
 						{t('machine.unsupported')}

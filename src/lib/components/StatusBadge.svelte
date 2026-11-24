@@ -10,7 +10,7 @@
 		if (plotter.alarm !== undefined) return { text: t('status.alarm'), tone: 'danger' };
 		const running = plotter.busy || plotter.status?.state === 'Hold';
 		if (plotter.penDown && !running) return { text: t('status.penDown'), tone: 'seal' };
-		return { text: t('status.connected'), tone: 'online' };
+		return { text: t(plotter.simulated ? 'status.simulated' : 'status.connected'), tone: 'online' };
 	});
 
 	const tones: Record<string, string> = {

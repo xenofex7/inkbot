@@ -20,6 +20,7 @@ Browser app to drive the VigoTec VG-X4 pen plotter (writing robot) straight from
 ## Features
 
 - Connect via USB, see live machine status, use a G-code console
+- Simulator: try everything without a plotter, a virtual GRBL answers like the VG-X4 and moves in real time
 - Pen up/down with adjustable depth, jogging, set the origin, always visible control bar
 - Write text in single-line fonts (Hershey, EMS) with size, line height, alignment and paper formats (A4, A5, A6, C5, C6 and C6/5 envelopes)
 - Turn images into lines: centre lines, outlines, hatching, hatched fills

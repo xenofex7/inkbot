@@ -1,9 +1,14 @@
 import { parseLine, workPosition, type Position, type StatusReport } from '../grbl/parse';
 import { REALTIME, VGX4 } from '../grbl/vgx4';
 import { t } from '../i18n.svelte';
+import { simulatedPort } from './simulator';
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
 export type LogEntry = { id: number; direction: 'tx' | 'rx'; text: string };
+
+type Port = Pick<SerialPort, 'readable' | 'writable' | 'close'> & {
+	open(options: SerialOptions): Promise<void>;
+};
 
 type Pending = { length: number; resolve: () => void; reject: (error: Error) => void };
 
@@ -19,6 +24,7 @@ export class Plotter {
 	wco = $state<Position>({ x: 0, y: 0, z: 0 });
 	alarm = $state<number | undefined>();
 	lastError = $state('');
+	simulated = $state(false);
 	log = $state<LogEntry[]>([]);
 
 	position = $derived(this.status ? workPosition(this.status, this.wco) : undefined);
@@ -29,7 +35,7 @@ export class Plotter {
 	jobDone = $state(0);
 	busy = $derived(this.queued > 0 || this.status?.state === 'Run' || this.status?.state === 'Jog');
 
-	#port: SerialPort | undefined;
+	#port: Port | undefined;
 	#reader: ReadableStreamDefaultReader<string> | undefined;
 	#readDone: Promise<void> | undefined;
 	#writer: WritableStreamDefaultWriter<Uint8Array> | undefined;
@@ -40,6 +46,7 @@ export class Plotter {
 	#poll: ReturnType<typeof setInterval> | undefined;
 	#queue: Promise<void> = Promise.resolve();
 	#logId = 0;
+	#attempt = 0;
 
 	get supported() {
 		return typeof navigator !== 'undefined' && 'serial' in navigator;
@@ -57,7 +64,19 @@ export class Plotter {
 			}
 			return;
 		}
+		await this.#open(port, false);
+	}
+
+	async connectSimulator() {
+		if (this.connection !== 'disconnected') return;
+		this.lastError = '';
+		await this.#open(simulatedPort(), true);
+	}
+
+	async #open(port: Port, simulated: boolean) {
+		const attempt = ++this.#attempt;
 		this.connection = 'connecting';
+		this.simulated = simulated;
 		try {
 			await port.open({ baudRate: VGX4.baudRate });
 			this.#port = port;
@@ -74,6 +93,7 @@ export class Plotter {
 			this.#poll = setInterval(() => void this.realtime(REALTIME.status), VGX4.pollIntervalMs);
 			await this.send('$I');
 		} catch (error) {
+			if (attempt !== this.#attempt) return;
 			this.lastError = error instanceof Error ? error.message : String(error);
 			await this.disconnect();
 		}
@@ -88,6 +108,7 @@ export class Plotter {
 	}
 
 	async disconnect() {
+		this.#attempt++;
 		clearInterval(this.#poll);
 		this.#poll = undefined;
 		this.#rejectPending(new Error(t('error.disconnected')));
@@ -98,6 +119,7 @@ export class Plotter {
 		this.connection = 'disconnected';
 		this.status = undefined;
 		this.penDown = false;
+		this.simulated = false;
 	}
 
 	async send(line: string) {
