@@ -244,6 +244,7 @@ const en = {
 	'travel.width': 'Width (mm)',
 	'travel.height': 'Height (mm)',
 	'travel.reset': 'Back to maximum',
+	'travel.resetConfirm': 'Really reset the travel area to the maximum?',
 	'anchor.question':
 		'Is the carriage at the start stop (top left)? Every connect restarts the plotter, so inkbot asks once per session. Only then the sheet corner and travel area are restored.',
 	'anchor.confirm': 'Yes, it is at the stop',
@@ -634,6 +635,7 @@ const de: Record<Key, string> = {
 	'travel.width': 'Breite (mm)',
 	'travel.height': 'Höhe (mm)',
 	'travel.reset': 'Zurück auf Maximum',
+	'travel.resetConfirm': 'Fahrbereich wirklich auf das Maximum zurücksetzen?',
 	'anchor.question':
 		'Steht der Schlitten am Anschlag oben links? Jedes Verbinden startet den Plotter neu, darum fragt inkbot einmal pro Sitzung. Erst dann werden Blattecke und Fahrbereich wiederhergestellt.',
 	'anchor.confirm': 'Ja, er steht am Anschlag',

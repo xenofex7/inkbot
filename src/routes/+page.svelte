@@ -298,7 +298,13 @@
 							/>
 						</label>
 						{#if settings.travel}
-							<Button onclick={() => (settings.travel = null)}>{t('travel.reset')}</Button>
+							<Button
+								onclick={() => {
+									if (confirm(t('travel.resetConfirm'))) settings.travel = null;
+								}}
+							>
+								{t('travel.reset')}
+							</Button>
 						{/if}
 					</div>
 				</div>
