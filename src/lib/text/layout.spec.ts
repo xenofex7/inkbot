@@ -6,8 +6,8 @@ const font = fonts.find((f) => f.id === 'hershey-sans')!;
 const options = { font, size: 10, lineHeight: 1.5, align: 'left' as const, width: 100 };
 
 describe('fonts', () => {
-	it('ships four fonts with umlauts and sharp s', () => {
-		expect(fonts).toHaveLength(4);
+	it('ships twelve fonts with umlauts and sharp s', () => {
+		expect(fonts).toHaveLength(12);
 		for (const f of fonts) {
 			for (const char of 'äöüÄÖÜß') expect(f.glyphs[char], `${f.id} ${char}`).toBeDefined();
 		}

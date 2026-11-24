@@ -8,7 +8,15 @@ const FONTS = [
 	{ id: 'ems-readability', file: 'EMSReadability.svg', license: 'OFL-1.1' },
 	{ id: 'ems-allure', file: 'EMSAllure.svg', license: 'OFL-1.1' },
 	{ id: 'hershey-script', file: 'HersheyScript1.svg', license: 'Hershey' },
-	{ id: 'hershey-sans', file: 'HersheySans1.svg', license: 'Hershey' }
+	{ id: 'hershey-sans', file: 'HersheySans1.svg', license: 'Hershey' },
+	{ id: 'ems-swiss', file: 'EMSSwiss.svg', license: 'OFL-1.1' },
+	{ id: 'ems-society', file: 'EMSSociety.svg', license: 'OFL-1.1' },
+	{ id: 'hershey-script-med', file: 'HersheyScriptMed.svg', license: 'Hershey' },
+	{ id: 'ems-pepita', file: 'EMSPepita.svg', license: 'OFL-1.1' },
+	{ id: 'ems-casual-hand', file: 'EMSCasualHand.svg', license: 'OFL-1.1' },
+	{ id: 'hershey-serif-italic', file: 'HersheySerifMedItalic.svg', license: 'Hershey' },
+	{ id: 'hershey-gothic-german', file: 'HersheyGothGerman.svg', license: 'Hershey' },
+	{ id: 'hershey-gothic-english', file: 'HersheyGothEnglish.svg', license: 'Hershey' }
 ];
 
 const decodeEntities = (value) =>
