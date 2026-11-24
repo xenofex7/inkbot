@@ -9,6 +9,7 @@
 		Crosshair,
 		House,
 		Compass,
+		Equal,
 		MapPin,
 		MonitorPlay,
 		SquareArrowUpLeft,
@@ -28,6 +29,8 @@
 	import { positions } from '#lib/machine/positions.svelte.ts';
 	import { plotter } from '#lib/serial/plotter.svelte.ts';
 	import { settings } from '#lib/settings.svelte.ts';
+	import { depthTest, depthTestGcode, depthValues, maxDepthRows } from '#lib/gcode/depthTest.ts';
+	import { estimateSeconds } from '#lib/gcode/fromPolylines.ts';
 
 	const steps = [1, 5, 10, 20, 50] as const;
 	const ALIGN_MM = 10;
@@ -38,6 +41,18 @@
 	let notice = $state('');
 	let positionName = $state('');
 	let logView = $state<HTMLElement>();
+
+	let depthFrom = $state(settings.penDownS - 80);
+	let depthTo = $state(settings.penDownS);
+	let depthStep = $state(10);
+
+	const depthRows = $derived(
+		depthTest(depthValues(depthFrom, depthTo, depthStep), settings.sheet, settings.margin)
+	);
+	const depthPolylines = $derived(depthRows.flatMap((row) => row.polylines));
+	const depthTooMany = $derived(depthRows.length > maxDepthRows(settings.sheet, settings.margin));
+	const depthOutside = $derived(positions.outside(depthPolylines));
+	const depthMinutes = $derived(Math.ceil(estimateSeconds(depthPolylines) / 60));
 
 	const connected = $derived(plotter.connection === 'connected');
 	const canAct = $derived(connected && !plotter.busy);
@@ -81,6 +96,10 @@
 	function confirmAnchor() {
 		const lines = positions.confirmAnchor();
 		if (lines.length) void run(lines);
+	}
+
+	function drawDepthTest() {
+		void run(depthTestGcode(depthRows, settings));
 	}
 
 	async function setCorner() {
@@ -470,6 +489,74 @@
 				<p class="mt-4 text-sm text-ink-mute">
 					{t('machine.barHint')}
 				</p>
+
+				<div class="mt-5 border-t border-hairline-soft pt-4">
+					<h3 class="text-sm font-semibold text-ink">{t('depth.title')}</h3>
+					<p class="mt-1 text-sm text-ink-mute">{t('depth.hint')}</p>
+					<div class="mt-3 flex flex-wrap items-end gap-3">
+						<label class="text-[13px] text-ink-mute">
+							{t('depth.from')}
+							<input
+								type="number"
+								min="0"
+								max="1000"
+								step="5"
+								bind:value={depthFrom}
+								class="mt-1 block h-10 w-24 rounded-md border border-hairline bg-canvas px-3 text-sm text-ink"
+							/>
+						</label>
+						<label class="text-[13px] text-ink-mute">
+							{t('depth.to')}
+							<input
+								type="number"
+								min="0"
+								max="1000"
+								step="5"
+								bind:value={depthTo}
+								class="mt-1 block h-10 w-24 rounded-md border border-hairline bg-canvas px-3 text-sm text-ink"
+							/>
+						</label>
+						<label class="text-[13px] text-ink-mute">
+							{t('depth.step')}
+							<input
+								type="number"
+								min="1"
+								max="200"
+								bind:value={depthStep}
+								class="mt-1 block h-10 w-24 rounded-md border border-hairline bg-canvas px-3 text-sm text-ink"
+							/>
+						</label>
+						<Button
+							onclick={drawDepthTest}
+							disabled={!canAct ||
+								plotter.status?.state === 'Hold' ||
+								!positions.originKnown ||
+								depthOutside ||
+								depthTooMany ||
+								depthRows.length === 0}
+						>
+							<Equal size={16} />
+							{t('depth.draw')}
+						</Button>
+					</div>
+					<p class="mt-2 text-sm text-ink-mute">
+						{t('depth.summary', {
+							count: depthRows.length,
+							width: settings.sheet.width,
+							height: settings.sheet.height,
+							minutes: depthMinutes
+						})}
+					</p>
+					{#if depthTooMany}
+						<p class="mt-2 text-sm text-danger" role="alert">
+							{t('depth.tooMany', { max: maxDepthRows(settings.sheet, settings.margin) })}
+						</p>
+					{:else if connected && !positions.originKnown}
+						<p class="mt-2 text-sm text-danger" role="alert">{t('job.needsSetup')}</p>
+					{:else if depthOutside}
+						<p class="mt-2 text-sm text-danger" role="alert">{t('job.outsideArea')}</p>
+					{/if}
+				</div>
 			</section>
 
 			<section

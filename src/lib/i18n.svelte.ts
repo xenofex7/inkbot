@@ -215,6 +215,15 @@ const en = {
 	'machine.unlock': 'Unlock',
 	'machine.test': 'Test',
 	'machine.square': '20 mm square',
+	'depth.title': 'Depth test',
+	'depth.hint':
+		'Draws lines across the sheet, each with a different depth S written next to it. Pick the value with the cleanest line and enter it as Depth S in the bar at the top.',
+	'depth.from': 'From S',
+	'depth.to': 'To S',
+	'depth.step': 'Step',
+	'depth.draw': 'Draw depth test',
+	'depth.summary': '{count} lines on {width} × {height} mm, approx. {minutes} min',
+	'depth.tooMany': 'Too many lines for this sheet, at most {max}. Use a larger step.',
 	'machine.barHint':
 		'Pen, depth and position live in the bar at the top, the paper is set in the designer. While a job runs, speed, pause and stop appear in a bar at the bottom.',
 	'machine.move': 'Move',
@@ -606,6 +615,16 @@ const de: Record<Key, string> = {
 	'machine.unlock': 'Entsperren',
 	'machine.test': 'Test',
 	'machine.square': 'Quadrat 20 mm',
+	'depth.title': 'Tiefentest',
+	'depth.hint':
+		'Zieht Linien übers Blatt, jede mit einer anderen Tiefe S, die daneben steht. Nimm den Wert mit dem saubersten Strich und trag ihn oben in der Leiste bei Tiefe S ein.',
+	'depth.from': 'Von S',
+	'depth.to': 'Bis S',
+	'depth.step': 'Schritt',
+	'depth.draw': 'Tiefentest zeichnen',
+	'depth.summary': '{count} Linien auf {width} × {height} mm, ca. {minutes} min',
+	'depth.tooMany':
+		'Zu viele Linien für dieses Blatt, höchstens {max}. Nimm einen grösseren Schritt.',
 	'machine.barHint':
 		'Stift, Tiefe und Position sind oben in der Leiste, das Papier wählst Du im Gestalter. Während einer Fahrt erscheinen Tempo, Pause und Stopp in einer Leiste unten.',
 	'machine.move': 'Bewegen',
