@@ -1,5 +1,10 @@
 import { DEFAULT_SVG_PROMPT } from './drawings';
-import { DEFAULT_PROMPT_TEMPLATE, type ProviderConfig, type ProviderId } from './images';
+import {
+	DEFAULT_PROMPT_TEMPLATE,
+	PREVIOUS_PROMPT_TEMPLATE,
+	type ProviderConfig,
+	type ProviderId
+} from './images';
 
 const STORAGE_KEY = 'inkbot.ai';
 
@@ -7,6 +12,7 @@ type Stored = ProviderConfig & {
 	promptTemplate: string;
 	drawingModel: string;
 	svgTemplate: string;
+	imageCount: number;
 };
 
 const DEFAULTS: Stored = {
@@ -17,13 +23,19 @@ const DEFAULTS: Stored = {
 	size: '1024x1024',
 	promptTemplate: DEFAULT_PROMPT_TEMPLATE,
 	drawingModel: '',
-	svgTemplate: DEFAULT_SVG_PROMPT
+	svgTemplate: DEFAULT_SVG_PROMPT,
+	imageCount: 4
 };
 
 function load(): Stored {
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
-		return raw ? { ...DEFAULTS, ...(JSON.parse(raw) as Partial<Stored>) } : DEFAULTS;
+		if (!raw) return DEFAULTS;
+		const stored = { ...DEFAULTS, ...(JSON.parse(raw) as Partial<Stored>) };
+		if (stored.promptTemplate === PREVIOUS_PROMPT_TEMPLATE) {
+			stored.promptTemplate = DEFAULT_PROMPT_TEMPLATE;
+		}
+		return stored;
 	} catch {
 		return DEFAULTS;
 	}
@@ -38,6 +50,7 @@ class AiSettings {
 	promptTemplate = $state(DEFAULTS.promptTemplate);
 	drawingModel = $state(DEFAULTS.drawingModel);
 	svgTemplate = $state(DEFAULTS.svgTemplate);
+	imageCount = $state(DEFAULTS.imageCount);
 
 	config = $derived<ProviderConfig>({
 		provider: this.provider,
@@ -66,7 +79,8 @@ class AiSettings {
 					...this.config,
 					promptTemplate: this.promptTemplate,
 					drawingModel: this.drawingModel,
-					svgTemplate: this.svgTemplate
+					svgTemplate: this.svgTemplate,
+					imageCount: this.imageCount
 				};
 				try {
 					localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));

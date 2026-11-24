@@ -30,6 +30,7 @@
 	import RangeField from '#lib/components/RangeField.svelte';
 	import SheetPreview from '#lib/components/SheetPreview.svelte';
 	import {
+		AI_TRACE,
 		design,
 		type DesignElement,
 		type Tool,
@@ -126,7 +127,7 @@
 		error = '';
 		try {
 			if (result.kind === 'svg') design.addStrokes(parseSvgStrokes(result.svg), result.name, area);
-			else await design.addRaster(result.blob, result.name, area);
+			else await design.addRaster(result.blob, result.name, area, AI_TRACE);
 			panel = 'none';
 		} catch (e) {
 			fail(e);
@@ -236,7 +237,9 @@
 				<span class={label}>{t('bar.paper')}</span>
 				<PaperFields idPrefix="design" />
 			</div>
+		</Panel>
 
+		<Panel id="design-elements" title={t('design.elements')} bodyClass="space-y-3">
 			<div>
 				<span class={label}>{t('design.add')}</span>
 				<input
@@ -302,9 +305,6 @@
 			{#if error}
 				<p class="text-[13px] text-danger" role="alert">{error}</p>
 			{/if}
-		</Panel>
-
-		<Panel id="design-elements" title={t('design.elements')} bodyClass="space-y-3">
 			<div>
 				{#if design.elements.length === 0}
 					<p class="text-sm text-ink-mute">{t('design.empty')}</p>
@@ -482,18 +482,16 @@
 					<p class="text-[13px] text-ink-mute">
 						{t(modes.find(([value]) => value === raster.trace.mode)?.[2] ?? 'image.linesHint')}
 					</p>
-					{#if raster.trace.mode !== 'tsp'}
-						<RangeField
-							id="design-threshold"
-							label={t('image.threshold', { value: raster.trace.threshold })}
-							value={raster.trace.threshold}
-							min={20}
-							max={240}
-							buttonStep={5}
-							live={false}
-							onvalue={(value: number) => retrace(raster, { threshold: value })}
-						/>
-					{/if}
+					<RangeField
+						id="design-threshold"
+						label={t('image.threshold', { value: raster.trace.threshold })}
+						value={raster.trace.threshold}
+						min={20}
+						max={240}
+						buttonStep={5}
+						live={false}
+						onvalue={(value: number) => retrace(raster, { threshold: value })}
+					/>
 					<RangeField
 						id="design-detail"
 						label={t('image.detail', { value: raster.trace.detail })}
@@ -504,7 +502,7 @@
 						live={false}
 						onvalue={(value: number) => retrace(raster, { detail: value })}
 					/>
-					{#if raster.trace.mode !== 'hatch' && raster.trace.mode !== 'tsp'}
+					{#if raster.trace.mode !== 'hatch'}
 						<label class="flex items-start gap-2.5 text-sm text-ink">
 							<input
 								type="checkbox"
@@ -518,12 +516,10 @@
 							</span>
 						</label>
 					{/if}
-					{#if raster.trace.mode === 'hatch' || raster.trace.mode === 'tsp' || raster.trace.fill}
+					{#if raster.trace.mode === 'hatch' || raster.trace.fill}
 						<RangeField
 							id="design-spacing"
-							label={t(raster.trace.mode === 'tsp' ? 'image.pointSpacing' : 'image.spacing', {
-								value: raster.trace.spacing
-							})}
+							label={t('image.spacing', { value: raster.trace.spacing })}
 							value={raster.trace.spacing}
 							min={0.5}
 							max={4}

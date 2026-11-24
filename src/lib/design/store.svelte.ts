@@ -34,6 +34,8 @@ export type TextOptions = {
 	align: Align;
 };
 
+export const AI_TRACE = { threshold: 240, detail: 800 } as const;
+
 export type TraceOptions = {
 	mode: TraceMode;
 	threshold: number;
@@ -439,13 +441,14 @@ class Design {
 		}
 	}
 
-	async addRaster(blob: Blob, name: string, area: Area) {
+	async addRaster(blob: Blob, name: string, area: Area, options: Partial<TraceOptions> = {}) {
 		const trace: TraceOptions = {
 			mode: 'lines',
 			threshold: 140,
 			fill: false,
 			spacing: 1.2,
-			detail: 400
+			detail: 400,
+			...options
 		};
 		const gray = await loadGray(blob, trace.detail);
 		const unit = RASTER_WIDTH_MM / gray.width;

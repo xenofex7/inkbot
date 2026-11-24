@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { BookmarkPlus, Check, Sparkles } from '@lucide/svelte';
+	import { BookmarkPlus, Check, Sparkles, X } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Button from './Button.svelte';
 	import { colourPrompt, generateSvg, svgPrompt } from '../ai/drawings';
 	import { PENS } from '../design/pens';
 	import type { AiResult } from '../ai/result';
+	import { aiHistory, type HistoryEntry } from '../ai/history.svelte';
 	import { buildPrompt, generateImage } from '../ai/images';
 	import { aiSettings } from '../ai/settings.svelte';
 	import { normalize, type Shape } from '../design/model';
+	import { AI_TRACE } from '../design/store.svelte';
 	import { gallery, type GallerySource } from '../gallery/store.svelte';
 	import type { Polyline } from '../geometry/types';
-	import { t, type MessageKey } from '../i18n.svelte';
+	import { t } from '../i18n.svelte';
 	import { loadGray } from '../image/load';
 	import { traceImage } from '../image/trace';
 	import { orderPaths } from '../optimize/order';
@@ -27,17 +29,23 @@
 	let idea = $state('');
 	let multicolour = $state(false);
 	let drawing = $state<Slot>({ busy: false });
-	let image = $state<Slot>({ busy: false });
+	let images = $state<Slot[]>([]);
 	let saved = $state(false);
 
-	const slots = $derived(
-		[
-			aiSettings.drawingReady && { id: 'drawing', label: 'ai.drawing', slot: drawing },
-			aiSettings.ready && { id: 'image', label: 'ai.image', slot: image }
-		].filter(Boolean) as { id: 'drawing' | 'image'; label: MessageKey; slot: Slot }[]
-	);
-	const busy = $derived(drawing.busy || image.busy);
+	const slots = $derived([
+		...(aiSettings.drawingReady ? [{ id: 'drawing', label: t('ai.drawing'), slot: drawing }] : []),
+		...images.map((slot, index) => ({
+			id: `image-${index}`,
+			label: images.length > 1 ? t('ai.imageNumber', { number: index + 1 }) : t('ai.image'),
+			slot
+		}))
+	]);
+	const busy = $derived(drawing.busy || images.some((slot) => slot.busy));
 	const results = $derived(slots.map((s) => s.slot.result).filter((r) => r !== undefined));
+
+	$effect(() => {
+		aiHistory.load().catch(() => undefined);
+	});
 
 	function message(error: unknown) {
 		if (error instanceof TypeError) return t('image.noResponse');
@@ -48,7 +56,24 @@
 		const base = svgPrompt(aiSettings.svgTemplate, area.width, area.height);
 		const system = multicolour ? `${base} ${colourPrompt(PENS.map((pen) => pen.hex))}` : base;
 		const svg = await generateSvg(aiSettings.drawingConfig, system, text);
-		return { kind: 'svg', name: text, svg, shape: normalize(parseSvg(svg)) };
+		await remember({ kind: 'svg', name: text, svg });
+		return svgResult(text, svg);
+	}
+
+	function svgResult(name: string, svg: string): AiResult {
+		return { kind: 'svg', name, svg, shape: normalize(parseSvg(svg)) };
+	}
+
+	async function imageResult(name: string, blob: Blob): Promise<AiResult> {
+		const gray = await loadGray(blob, AI_TRACE.detail);
+		const lines = traceImage(gray, {
+			mode: 'lines',
+			threshold: AI_TRACE.threshold,
+			hatchSpacing: 3,
+			simplify: 0.8,
+			minLength: 4
+		});
+		return { kind: 'image', name, blob, shape: normalize(lines) };
 	}
 
 	async function makeImage(text: string): Promise<AiResult> {
@@ -56,15 +81,24 @@
 			aiSettings.config,
 			buildPrompt(aiSettings.promptTemplate, text)
 		);
-		const gray = await loadGray(blob, 400);
-		const lines = traceImage(gray, {
-			mode: 'lines',
-			threshold: 140,
-			hatchSpacing: 3,
-			simplify: 0.8,
-			minLength: 2
-		});
-		return { kind: 'image', name: text, blob, shape: normalize(lines) };
+		await remember({ kind: 'image', name: text, blob });
+		return imageResult(text, blob);
+	}
+
+	async function remember(entry: Parameters<typeof aiHistory.add>[0]) {
+		try {
+			await aiHistory.add(entry);
+		} catch {
+			return;
+		}
+	}
+
+	async function useEntry(entry: HistoryEntry) {
+		onuse(
+			entry.kind === 'svg'
+				? svgResult(entry.name, entry.svg)
+				: await imageResult(entry.name, entry.blob)
+		);
 	}
 
 	async function run(slot: Slot, make: () => Promise<AiResult>) {
@@ -84,9 +118,15 @@
 		const text = idea.trim();
 		if (!text) return;
 		saved = false;
+		drawing = { busy: false };
+		images = aiSettings.ready
+			? Array.from({ length: Math.min(4, Math.max(1, aiSettings.imageCount)) }, () => ({
+					busy: false
+				}))
+			: [];
 		await Promise.all([
 			aiSettings.drawingReady ? run(drawing, () => makeDrawing(text)) : undefined,
-			aiSettings.ready ? run(image, () => makeImage(text)) : undefined
+			...images.map((slot) => run(slot, () => makeImage(text)))
 		]);
 	}
 
@@ -127,9 +167,15 @@
 	}
 
 	const points = (line: Polyline) => line.map((p) => `${p.x},${p.y}`).join(' ');
+
+	function thumbnail(node: HTMLImageElement, blob: Blob) {
+		const url = URL.createObjectURL(blob);
+		node.src = url;
+		return { destroy: () => URL.revokeObjectURL(url) };
+	}
 </script>
 
-{#if slots.length === 0}
+{#if !aiSettings.ready && !aiSettings.drawingReady}
 	<p class="rounded-md bg-surface-card p-3 text-sm text-ink">
 		{t('image.setupBefore')}
 		<a class="text-link underline" href={resolve('/settings')}>{t('image.setupLink')}</a>{t(
@@ -163,7 +209,7 @@
 		<div class="grid grid-cols-2 gap-3">
 			{#each slots as { id, label, slot } (id)}
 				<div class="flex flex-col rounded-lg border border-hairline bg-canvas p-2.5">
-					<span class="text-[13px] font-semibold text-ink">{t(label)}</span>
+					<span class="text-[13px] font-semibold text-ink">{label}</span>
 					<div
 						class="mt-2 flex aspect-square items-center justify-center rounded-md bg-surface-card"
 					>
@@ -207,8 +253,46 @@
 		{#if results.length > 0}
 			<Button onclick={saveAll} disabled={saved}>
 				<BookmarkPlus size={16} />
-				{saved ? t('job.saved') : results.length > 1 ? t('ai.saveBoth') : t('job.saveGallery')}
+				{saved ? t('job.saved') : results.length > 1 ? t('ai.saveAll') : t('job.saveGallery')}
 			</Button>
+		{/if}
+
+		{#if aiHistory.entries.length > 0}
+			<details class="rounded-lg border border-hairline bg-canvas p-2.5">
+				<summary class="cursor-pointer text-[13px] font-semibold text-ink">
+					{t('ai.history', { count: aiHistory.entries.length })}
+				</summary>
+				<p class="mt-2 text-[12px] text-ink-mute">{t('ai.historyHint')}</p>
+				<ul class="mt-2 grid max-h-80 grid-cols-3 gap-2 overflow-y-auto">
+					{#each aiHistory.entries as entry (entry.id)}
+						<li class="relative">
+							<button
+								class="flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border border-hairline bg-white p-1"
+								title={entry.name}
+								aria-label={t('ai.useEntry', { name: entry.name })}
+								onclick={() => void useEntry(entry)}
+							>
+								{#if entry.kind === 'image'}
+									<img use:thumbnail={entry.blob} alt="" class="h-full w-full object-contain" />
+								{:else}
+									<img
+										src="data:image/svg+xml;charset=utf-8,{encodeURIComponent(entry.svg)}"
+										alt=""
+										class="h-full w-full object-contain"
+									/>
+								{/if}
+							</button>
+							<button
+								class="absolute top-1 right-1 rounded-full bg-canvas/90 p-0.5 text-ink-mute hover:text-danger"
+								aria-label={t('ai.removeEntry')}
+								onclick={() => void aiHistory.remove(entry.id)}
+							>
+								<X size={12} />
+							</button>
+						</li>
+					{/each}
+				</ul>
+			</details>
 		{/if}
 	</div>
 {/if}

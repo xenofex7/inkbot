@@ -175,6 +175,14 @@
 					<option value="1024x1536">1024 × 1536 ({t('settings.portrait')})</option>
 				</select>
 			</div>
+			<div>
+				<label class={label} for="image-count">{t('settings.imageCount')}</label>
+				<select id="image-count" bind:value={aiSettings.imageCount} class={field}>
+					{#each [1, 2, 3, 4] as count (count)}
+						<option value={count}>{count}</option>
+					{/each}
+				</select>
+			</div>
 		</div>
 
 		<div>
