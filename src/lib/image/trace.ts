@@ -1,5 +1,5 @@
 import type { Point, Polyline } from '../geometry/types';
-import { singleLine } from './tsp';
+import { orderPaths } from '../optimize/order';
 
 export type Gray = { width: number; height: number; data: Uint8ClampedArray };
 
@@ -72,21 +72,6 @@ export function thin(input: Uint8Array, width: number, height: number): Uint8Arr
 	return mask;
 }
 
-export function outline(mask: Uint8Array, width: number, height: number): Uint8Array {
-	const edge = new Uint8Array(mask.length);
-	const at = (x: number, y: number) =>
-		x < 0 || y < 0 || x >= width || y >= height ? 0 : mask[y * width + x];
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			if (!at(x, y)) continue;
-			if (!at(x - 1, y) || !at(x + 1, y) || !at(x, y - 1) || !at(x, y + 1)) {
-				edge[y * width + x] = 1;
-			}
-		}
-	}
-	return edge;
-}
-
 const NEIGHBOURS = [
 	[1, 0],
 	[0, 1],
@@ -140,6 +125,74 @@ export function tracePixels(mask: Uint8Array, width: number, height: number): Po
 		}
 	}
 	return lines;
+}
+
+const CLOCKWISE = [
+	[0, 0, 1, 0],
+	[1, 0, 1, 1],
+	[1, 1, 0, 1],
+	[0, 1, 0, 0]
+];
+
+export function contours(field: Float32Array, width: number, height: number): Polyline[] {
+	const gridWidth = width + 2;
+	const gridHeight = height + 2;
+	const value = (gx: number, gy: number) => {
+		const x = gx - 1;
+		const y = gy - 1;
+		return x < 0 || y < 0 || x >= width || y >= height ? -1 : field[y * width + x];
+	};
+	const edgeId = (ax: number, ay: number, bx: number, by: number) =>
+		ay === by
+			? 2 * (ay * gridWidth + Math.min(ax, bx))
+			: 2 * (Math.min(ay, by) * gridWidth + ax) + 1;
+	const next = new Int32Array(2 * gridWidth * gridHeight).fill(-1);
+	const px = new Float64Array(next.length);
+	const py = new Float64Array(next.length);
+	const ids: number[] = [];
+	const entering: boolean[] = [];
+	for (let gy = 0; gy < gridHeight - 1; gy++) {
+		for (let gx = 0; gx < gridWidth - 1; gx++) {
+			const corners = [value(gx, gy), value(gx + 1, gy), value(gx + 1, gy + 1), value(gx, gy + 1)];
+			const inside = corners.map((v) => v > 0);
+			if (inside.every((v) => v) || inside.every((v) => !v)) continue;
+			ids.length = 0;
+			entering.length = 0;
+			for (let side = 0; side < 4; side++) {
+				const a = side;
+				const b = (side + 1) % 4;
+				if (inside[a] === inside[b]) continue;
+				const [ax, ay, bx, by] = CLOCKWISE[side];
+				const id = edgeId(gx + ax, gy + ay, gx + bx, gy + by);
+				const t = corners[a] / (corners[a] - corners[b]);
+				px[id] = gx + ax + t * (bx - ax) - 1;
+				py[id] = gy + ay + t * (by - ay) - 1;
+				ids.push(id);
+				entering.push(inside[b]);
+			}
+			const centre = corners.reduce((sum, v) => sum + v, 0) / 4 > 0;
+			for (let i = 0; i < ids.length; i++) {
+				if (!entering[i]) continue;
+				const step = ids.length === 4 && centre ? ids.length - 1 : 1;
+				next[ids[i]] = ids[(i + step) % ids.length];
+			}
+		}
+	}
+	const loops: Polyline[] = [];
+	for (let start = 0; start < next.length; start++) {
+		if (next[start] < 0) continue;
+		const loop: Point[] = [];
+		let id = start;
+		while (next[id] >= 0) {
+			loop.push({ x: px[id], y: py[id] });
+			const following = next[id];
+			next[id] = -1;
+			id = following;
+		}
+		loop.push(loop[0]);
+		loops.push(loop);
+	}
+	return loops;
 }
 
 function perpendicular(p: Point, a: Point, b: Point) {
@@ -290,22 +343,32 @@ function length(line: Polyline) {
 	return total;
 }
 
+function joinLines(lines: Polyline[]): Polyline[] {
+	return lines.length ? [orderPaths(lines).flat()] : [];
+}
+
 export function traceImage(gray: Gray, options: TraceOptions): Polyline[] {
 	const { width, height } = gray;
-	const trace = (pixels: Uint8Array) =>
-		tracePixels(pixels, width, height).map((line) =>
-			simplify(smooth(line, SMOOTH_RADIUS), options.simplify)
-		);
+	const finish = (line: Polyline) => simplify(smooth(line, SMOOTH_RADIUS), options.simplify);
+	const trace = (pixels: Uint8Array) => tracePixels(pixels, width, height).map(finish);
+	const contour = (pixels: Uint8Array) =>
+		contours(
+			Float32Array.from(pixels, (v) => v - 0.5),
+			width,
+			height
+		).map(finish);
+	const outlineMode = options.mode === 'outline';
 	let lines: Polyline[];
 	if (options.mode === 'hatch') {
 		lines = hatch(gray, options.hatchSpacing, options.threshold);
-	} else if (options.mode === 'tsp') {
-		lines = singleLine(gray, options.hatchSpacing);
 	} else if (!options.fill) {
-		const mask = binarize(gray, options.threshold);
-		lines = trace(
-			options.mode === 'lines' ? thin(mask, width, height) : outline(mask, width, height)
-		);
+		lines = outlineMode
+			? contours(
+					Float32Array.from(gray.data, (v) => options.threshold - v),
+					width,
+					height
+				).map(finish)
+			: trace(thin(binarize(gray, options.threshold), width, height));
 	} else {
 		const mask = binarize(gray, options.threshold);
 		const radius = Math.max(1, Math.round(options.fill.minWidth / 2));
@@ -313,12 +376,11 @@ export function traceImage(gray: Gray, options: TraceOptions): Polyline[] {
 		const strokes = mask.map((v, i) => (v && !fills[i] ? 1 : 0));
 		const inner = erode(fills, width, height, 1);
 		lines = [
-			...trace(
-				options.mode === 'lines' ? thin(strokes, width, height) : outline(strokes, width, height)
-			),
-			...trace(outline(fills, width, height)),
+			...(outlineMode ? contour(strokes) : trace(thin(strokes, width, height))),
+			...contour(fills),
 			...scanLines(width, height, options.fill.spacing, 45, (x, y) => inner[y * width + x] === 1)
 		];
 	}
-	return lines.filter((line) => line.length > 1 && length(line) >= options.minLength);
+	const kept = lines.filter((line) => line.length > 1 && length(line) >= options.minLength);
+	return options.mode === 'tsp' ? joinLines(kept) : kept;
 }
