@@ -237,6 +237,18 @@
 				<span class={label}>{t('bar.paper')}</span>
 				<PaperFields idPrefix="design" />
 			</div>
+
+			<div>
+				<label class={label} for="design-margin">{t('bar.margin')}</label>
+				<input
+					id="design-margin"
+					type="number"
+					min="0"
+					max="60"
+					bind:value={settings.margin}
+					class="{field} max-w-24"
+				/>
+			</div>
 		</Panel>
 
 		<Panel id="design-elements" title={t('design.elements')} bodyClass="space-y-3">

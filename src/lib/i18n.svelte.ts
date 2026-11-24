@@ -170,7 +170,7 @@ const en = {
 	'bar.orientation': 'Orientation',
 	'bar.portrait': 'Portrait',
 	'bar.landscape': 'Landscape',
-	'bar.margin': 'Margin',
+	'bar.margin': 'Margin (mm)',
 	'paper.envelope': 'Envelope',
 
 	'job.resume': 'Resume',
@@ -575,7 +575,7 @@ const de: Record<Key, string> = {
 	'bar.orientation': 'Lage',
 	'bar.portrait': 'Hoch',
 	'bar.landscape': 'Quer',
-	'bar.margin': 'Rand',
+	'bar.margin': 'Rand (mm)',
 	'paper.envelope': 'Couvert',
 
 	'job.resume': 'Weiter',

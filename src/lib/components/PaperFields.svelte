@@ -5,10 +5,10 @@
 
 	let { idPrefix }: { idPrefix: string } = $props();
 
-	const field = 'h-9 rounded-md border border-hairline bg-canvas px-2.5 text-sm text-ink';
+	const field = 'h-10 w-full rounded-md border border-hairline bg-canvas px-3.5 text-ink';
 </script>
 
-<div class="flex flex-wrap items-center gap-2">
+<div class="grid grid-cols-2 gap-2">
 	<select
 		id="{idPrefix}-format"
 		aria-label={t('bar.paper')}
@@ -29,15 +29,4 @@
 		<option value="portrait">{t('bar.portrait')}</option>
 		<option value="landscape">{t('bar.landscape')}</option>
 	</select>
-	<label class="flex items-center gap-1.5 text-ink-mute" for="{idPrefix}-margin">
-		{t('bar.margin')}
-		<input
-			id="{idPrefix}-margin"
-			type="number"
-			min="0"
-			max="60"
-			bind:value={settings.margin}
-			class="{field} w-16"
-		/>
-	</label>
 </div>
