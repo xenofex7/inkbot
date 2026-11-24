@@ -1,5 +1,6 @@
 import type { Orientation } from '../geometry/paper';
 import type { Polyline } from '../geometry/types';
+import { fonts } from '../text/layout';
 import type { Rotation } from './model';
 
 export type Area = { x: number; y: number; width: number; height: number };
@@ -15,6 +16,7 @@ export type Guides = {
 
 export type TemplateText = {
 	key: string;
+	text?: string;
 	fontId: string;
 	size: number;
 	align: 'left' | 'center';
@@ -24,7 +26,7 @@ export type TemplateText = {
 };
 
 export type CardTemplate = {
-	id: 'greeting' | 'envelope' | 'placeCard';
+	id: 'greeting' | 'envelope' | 'placeCard' | 'fontSample';
 	formatId: string;
 	orientation: Orientation;
 	margin: number;
@@ -40,6 +42,33 @@ const rect = ({ x, y, width, height }: Area): Polyline => [
 	{ x, y: y + height },
 	{ x, y }
 ];
+
+const SAMPLE_TOP = 12;
+const SAMPLE_ROW = (297 - 2 * SAMPLE_TOP) / fonts.length;
+
+const fontSample = (): TemplateText[] =>
+	fonts.flatMap((font, index) => {
+		const y = SAMPLE_TOP + index * SAMPLE_ROW;
+		return [
+			{
+				key: '',
+				text: font.name,
+				fontId: 'ems-readability',
+				size: 3,
+				align: 'left',
+				area: { x: 12, y, width: 186, height: 4 },
+				anchor: 'start'
+			},
+			{
+				key: 'template.fontSampleText',
+				fontId: font.id,
+				size: 8,
+				align: 'left',
+				area: { x: 12, y: y + 5, width: 186, height: 12 },
+				anchor: 'start'
+			}
+		];
+	});
 
 const ADDRESS: Area = { x: 78, y: 54, width: 76, height: 50 };
 const STAMP: Area = { x: 132, y: 8, width: 22, height: 26 };
@@ -134,5 +163,14 @@ export const CARD_TEMPLATES: CardTemplate[] = [
 				rotation: 180
 			}
 		]
+	},
+	{
+		id: 'fontSample',
+		formatId: 'a4',
+		orientation: 'portrait',
+		margin: 10,
+		lines: [],
+		labels: [],
+		texts: fontSample()
 	}
 ];

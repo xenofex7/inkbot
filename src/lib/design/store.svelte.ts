@@ -367,7 +367,7 @@ class Design {
 		for (const item of template.texts) {
 			this.addText(
 				{
-					text: text(item.key),
+					text: item.text ?? text(item.key),
 					fontId: item.fontId,
 					size: item.size,
 					lineHeight: 1.4,
