@@ -79,6 +79,10 @@ const en = {
 	'design.show': 'Show element',
 	'design.hide': 'Hide element',
 	'design.clearErasures': 'Undo erasing',
+	'history.undo': 'Undo',
+	'history.redo': 'Redo',
+	'history.undoKey': 'Undo ({keys})',
+	'history.redoKey': 'Redo ({keys})',
 	'tool.label': 'Tool',
 	'tool.select': 'Select',
 	'tool.draw': 'Pen',
@@ -208,7 +212,7 @@ const en = {
 	'machine.test': 'Test',
 	'machine.square': '20 mm square',
 	'machine.barHint':
-		'Pen, depth, position and paper live in the bar at the top. While a job runs, speed, pause and stop appear in a bar at the bottom.',
+		'Pen, depth and position live in the bar at the top, the paper is set in the designer. While a job runs, speed, pause and stop appear in a bar at the bottom.',
 	'machine.move': 'Move',
 	'machine.up': 'Move up',
 	'machine.left': 'Move left',
@@ -322,7 +326,7 @@ const en = {
 	'gallery.cancel': 'Cancel',
 	'gallery.open': 'Open in designer',
 	'gallery.pick':
-		'Pick a drawing to preview and plot it. The paper in the bar switches to the one it was made for.',
+		'Pick a drawing to preview and plot it. The paper switches to the one it was made for.',
 
 	'settings.language': 'Language',
 	'settings.languageHint': 'Interface language of inkbot.',
@@ -460,6 +464,10 @@ const de: Record<Key, string> = {
 	'design.show': 'Element einblenden',
 	'design.hide': 'Element ausblenden',
 	'design.clearErasures': 'Radierung zurücksetzen',
+	'history.undo': 'Rückgängig',
+	'history.redo': 'Wiederholen',
+	'history.undoKey': 'Rückgängig ({keys})',
+	'history.redoKey': 'Wiederholen ({keys})',
 	'tool.label': 'Werkzeug',
 	'tool.select': 'Auswählen',
 	'tool.draw': 'Stift',
@@ -589,7 +597,7 @@ const de: Record<Key, string> = {
 	'machine.test': 'Test',
 	'machine.square': 'Quadrat 20 mm',
 	'machine.barHint':
-		'Stift, Tiefe, Position und Papier sind oben in der Leiste. Während einer Fahrt erscheinen Tempo, Pause und Stopp in einer Leiste unten.',
+		'Stift, Tiefe und Position sind oben in der Leiste, das Papier wählst Du im Gestalter. Während einer Fahrt erscheinen Tempo, Pause und Stopp in einer Leiste unten.',
 	'machine.move': 'Bewegen',
 	'machine.up': 'Nach oben',
 	'machine.left': 'Nach links',
@@ -704,7 +712,7 @@ const de: Record<Key, string> = {
 	'gallery.cancel': 'Abbrechen',
 	'gallery.open': 'Im Gestalter öffnen',
 	'gallery.pick':
-		'Wähle eine Zeichnung, um sie anzusehen und zu zeichnen. Das Papier in der Leiste wechselt auf das, für das sie gemacht wurde.',
+		'Wähle eine Zeichnung, um sie anzusehen und zu zeichnen. Das Papier wechselt automatisch auf das, für das sie gemacht wurde.',
 
 	'settings.language': 'Sprache',
 	'settings.languageHint': 'Sprache der inkbot-Oberfläche.',

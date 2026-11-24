@@ -16,7 +16,11 @@
 	}: { width: number; height: number; margin: number; pen?: Point } = $props();
 
 	let svg = $state<SVGSVGElement>();
-	let drag: { id: string; mode: 'move' | 'scale'; start: Point; origin: Placement } | undefined;
+	let drag:
+		| { id: string; mode: 'move' | 'scale'; start: Point; origin: Placement; active: boolean }
+		| undefined;
+
+	const DRAG_THRESHOLD = 0.5;
 	let stroke = $state<Point[] | undefined>();
 	let hover = $state<Point | undefined>();
 	let lastErase: Point | undefined;
@@ -44,9 +48,11 @@
 		event.stopPropagation();
 		event.preventDefault();
 		design.selectedId = element.id;
+		design.endGesture();
 		drag = {
 			id: element.id,
 			mode,
+			active: false,
 			start: toSheet(event),
 			origin: { x: element.x, y: element.y, scale: element.scale, rotation: element.rotation }
 		};
@@ -59,6 +65,7 @@
 			return;
 		}
 		event.preventDefault();
+		design.endGesture();
 		svg?.setPointerCapture(event.pointerId);
 		const point = toSheet(event);
 		if (design.tool === 'draw') stroke = [point];
@@ -85,6 +92,10 @@
 		if (!drag) return;
 		const element = design.view.find((e) => e.id === drag?.id);
 		if (!element) return;
+		if (!drag.active) {
+			if (Math.hypot(current.x - drag.start.x, current.y - drag.start.y) < DRAG_THRESHOLD) return;
+			drag.active = true;
+		}
 		if (drag.mode === 'move') {
 			design.move(drag.id, {
 				...drag.origin,
@@ -102,6 +113,7 @@
 		stroke = undefined;
 		lastErase = undefined;
 		drag = undefined;
+		design.endGesture();
 	}
 
 	const points = (line: Point[]) => line.map((p) => `${p.x},${p.y}`).join(' ');

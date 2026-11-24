@@ -2,7 +2,6 @@
 	import { t } from '../i18n.svelte';
 	import { ArrowDownToLine, ArrowUpFromLine } from '@lucide/svelte';
 	import Button from './Button.svelte';
-	import PaperFields from './PaperFields.svelte';
 	import StatusBadge from './StatusBadge.svelte';
 	import { penDown, penUp } from '../grbl/commands';
 	import { toSheet } from '../geometry/types';
@@ -74,8 +73,6 @@
 		<div class="font-mono text-ink" aria-label={t('bar.position')}>
 			X {format(position?.x)} · Y {format(position?.y)} mm
 		</div>
-
-		<PaperFields idPrefix="bar" />
 
 		<div class="ml-auto flex items-center gap-2">
 			<StatusBadge />

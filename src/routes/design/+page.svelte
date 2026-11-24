@@ -10,6 +10,7 @@
 		LibraryBig,
 		MousePointer2,
 		Pencil,
+		Redo2,
 		RotateCcw,
 		RotateCw,
 		Sparkles,
@@ -64,6 +65,25 @@
 	});
 	const selected = $derived(design.selected);
 
+	const NON_TEXT_INPUTS = new Set(['range', 'checkbox', 'radio', 'button', 'color', 'file']);
+	const mac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
+	const undoKeys = mac ? '⌘Z' : 'Ctrl+Z';
+	const redoKeys = mac ? '⇧⌘Z' : 'Ctrl+Shift+Z';
+
+	function historyKeys(event: KeyboardEvent) {
+		if (!(event.metaKey || event.ctrlKey) || event.altKey) return;
+		const target = event.target instanceof Element ? event.target : null;
+		const typing =
+			target?.closest('textarea, [contenteditable="true"]') ||
+			(target instanceof HTMLInputElement && !NON_TEXT_INPUTS.has(target.type));
+		if (typing) return;
+		const key = event.key.toLowerCase();
+		if (key === 'z' && !event.shiftKey) design.undo();
+		else if ((key === 'z' && event.shiftKey) || key === 'y') design.redo();
+		else return;
+		event.preventDefault();
+	}
+
 	onMount(() => {
 		void gallery.load();
 		void handwriting.load();
@@ -78,9 +98,6 @@
 		const template = CARD_TEMPLATES.find((item) => item.id === id);
 		if (!template) return;
 		if (design.elements.length > 0 && !confirm(t('template.replace'))) return;
-		settings.formatId = template.formatId;
-		settings.orientation = template.orientation;
-		settings.margin = template.margin;
 		design.applyTemplate(template, (key) => t(key as MessageKey));
 	}
 
@@ -180,6 +197,8 @@
 	const pill = (active: boolean) =>
 		`rounded-pill px-3.5 py-1.5 text-sm ${active ? 'bg-canvas text-ink shadow-sm' : 'text-ink-mute'}`;
 </script>
+
+<svelte:window onkeydown={historyKeys} />
 
 <main
 	class="mx-auto grid max-w-[1200px] gap-6 px-4 py-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]"
@@ -561,6 +580,26 @@
 							{t(key)}
 						</button>
 					{/each}
+				</div>
+				<div class="flex items-center gap-1">
+					<Button
+						variant="icon"
+						onclick={() => design.undo()}
+						disabled={!design.canUndo}
+						aria-label={t('history.undo')}
+						title={t('history.undoKey', { keys: undoKeys })}
+					>
+						<Undo2 size={16} />
+					</Button>
+					<Button
+						variant="icon"
+						onclick={() => design.redo()}
+						disabled={!design.canRedo}
+						aria-label={t('history.redo')}
+						title={t('history.redoKey', { keys: redoKeys })}
+					>
+						<Redo2 size={16} />
+					</Button>
 				</div>
 				{#if design.tool === 'erase'}
 					<label class="flex items-center gap-2 text-sm text-ink-mute">

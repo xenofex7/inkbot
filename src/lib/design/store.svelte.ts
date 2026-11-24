@@ -21,6 +21,9 @@ import {
 	type Shape
 } from './model';
 import { fillPlaceholders, hasPlaceholders, type MergeList } from './merge';
+import { History } from './history';
+import type { Orientation } from '../geometry/paper';
+import { settings } from '../settings.svelte';
 import type { Area, CardTemplate, Guides } from './templates';
 
 export type TextOptions = {
@@ -123,10 +126,43 @@ function erased(element: DesignElement): DesignElement {
 	};
 }
 
+type Paper = { formatId: string; orientation: Orientation; margin: number };
+type Snapshot = { elements: DesignElement[]; guides: Guides | undefined; paper: Paper };
+
+const paperNow = (): Paper => ({
+	formatId: settings.formatId,
+	orientation: settings.orientation,
+	margin: settings.margin
+});
+const samePaper = (a: Paper, b: Paper) =>
+	a.formatId === b.formatId && a.orientation === b.orientation && a.margin === b.margin;
+
 class Design {
 	elements = $state.raw<DesignElement[]>([]);
 	selectedId = $state<string | undefined>();
 	guides = $state.raw<Guides | undefined>();
+	canUndo = $state(false);
+	canRedo = $state(false);
+
+	#history = new History<Snapshot>();
+	#batching = false;
+	#paper: Paper = paperNow();
+
+	constructor() {
+		$effect.root(() => {
+			$effect(() => {
+				const paper = paperNow();
+				if (samePaper(paper, this.#paper)) return;
+				this.#history.record({ ...this.#current(), paper: this.#paper }, 'paper');
+				this.#paper = paper;
+				this.#sync();
+			});
+		});
+	}
+
+	#current(): Snapshot {
+		return { elements: this.elements, guides: this.guides, paper: this.#paper };
+	}
 
 	selected = $derived(this.elements.find((element) => element.id === this.selectedId));
 
@@ -177,6 +213,7 @@ class Design {
 			hits[element.id] = { ...local, r: radius / element.scale };
 		}
 		if (Object.keys(hits).length === 0) return;
+		this.#remember('erase');
 		this.elements = this.elements.map((element) => {
 			const hit = hits[element.id];
 			return hit ? { ...element, erasures: [...(element.erasures ?? []), hit] } : element;
@@ -234,12 +271,63 @@ class Design {
 		if (count > 0) this.mergeIndex = (this.mergeIndex + offset + count) % count;
 	}
 
+	#remember(key?: string) {
+		if (this.#batching) return;
+		this.#history.record(this.#current(), key);
+		this.#sync();
+	}
+
+	#batch(run: () => void) {
+		this.#remember();
+		this.#batching = true;
+		try {
+			run();
+		} finally {
+			this.#batching = false;
+			this.#paper = paperNow();
+		}
+	}
+
+	#sync() {
+		this.canUndo = this.#history.canUndo;
+		this.canRedo = this.#history.canRedo;
+	}
+
+	#restore(snapshot: Snapshot | undefined) {
+		if (snapshot) {
+			this.elements = snapshot.elements;
+			this.guides = snapshot.guides;
+			this.#paper = snapshot.paper;
+			settings.formatId = snapshot.paper.formatId;
+			settings.orientation = snapshot.paper.orientation;
+			settings.margin = snapshot.paper.margin;
+			if (!this.elements.some((element) => element.id === this.selectedId)) {
+				this.selectedId = undefined;
+			}
+		}
+		this.#sync();
+	}
+
+	undo() {
+		this.#restore(this.#history.undo(this.#current()));
+	}
+
+	redo() {
+		this.#restore(this.#history.redo(this.#current()));
+	}
+
+	endGesture() {
+		this.#history.seal();
+	}
+
 	#add(element: DesignElement) {
+		this.#remember();
 		this.elements = [...this.elements, element];
 		this.selectedId = element.id;
 	}
 
-	#update(id: string, change: (element: DesignElement) => DesignElement) {
+	#update(id: string, change: (element: DesignElement) => DesignElement, key?: string) {
+		this.#remember(key);
 		this.elements = this.elements.map((element) => (element.id === id ? change(element) : element));
 	}
 
@@ -264,7 +352,14 @@ class Design {
 	}
 
 	applyTemplate(template: CardTemplate, text: (key: string) => string) {
+		this.#batch(() => this.#applyTemplate(template, text));
+	}
+
+	#applyTemplate(template: CardTemplate, text: (key: string) => string) {
 		this.clear();
+		settings.formatId = template.formatId;
+		settings.orientation = template.orientation;
+		settings.margin = template.margin;
 		const { formatId, orientation, lines, labels } = template;
 		this.guides = { formatId, orientation, lines, labels };
 		for (const item of template.texts) {
@@ -305,6 +400,10 @@ class Design {
 	}
 
 	addStrokes(strokes: Stroke[], name: string, area: Area, source?: Blob) {
+		this.#batch(() => this.#addStrokes(strokes, name, area, source));
+	}
+
+	#addStrokes(strokes: Stroke[], name: string, area: Area, source?: Blob) {
 		const byPen: Record<number, Polyline[]> = {};
 		for (const stroke of strokes) (byPen[penForColor(stroke.color)] ??= []).push(stroke.line);
 		const pens = Object.keys(byPen)
@@ -373,15 +472,18 @@ class Design {
 	}
 
 	updateText(id: string, options: TextOptions) {
-		this.#update(id, (element) =>
-			element.kind === 'text'
-				? {
-						...element,
-						options,
-						shape: textShape(options),
-						name: options.text.split('\n')[0] || 'Text'
-					}
-				: element
+		this.#update(
+			id,
+			(element) =>
+				element.kind === 'text'
+					? {
+							...element,
+							options,
+							shape: textShape(options),
+							name: options.text.split('\n')[0] || 'Text'
+						}
+					: element,
+			`text:${id}`
 		);
 	}
 
@@ -392,11 +494,15 @@ class Design {
 		if (trace.detail !== element.trace.detail) {
 			gray = await loadGray(element.blob, trace.detail);
 			unit = (element.unit * element.gray.width) / gray.width;
+			if (this.elements.find((e) => e.id === id) !== element) return;
 		}
-		this.#update(id, (current) =>
-			current.kind === 'raster'
-				? { ...current, trace, gray, unit, shape: rasterShape(gray, trace, unit) }
-				: current
+		this.#update(
+			id,
+			(current) =>
+				current.kind === 'raster'
+					? { ...current, trace, gray, unit, shape: rasterShape(gray, trace, unit) }
+					: current,
+			`trace:${id}`
 		);
 	}
 
@@ -405,6 +511,7 @@ class Design {
 		if (element?.kind !== 'raster') return;
 		const gray = await loadGray(blob, element.trace.detail);
 		const unit = (element.unit * element.gray.width) / gray.width;
+		if (this.elements.find((e) => e.id === id) !== element) return;
 		this.#update(id, (current) =>
 			current.kind === 'raster'
 				? { ...current, blob, gray, unit, shape: rasterShape(gray, current.trace, unit) }
@@ -413,7 +520,15 @@ class Design {
 	}
 
 	move(id: string, placement: Placement) {
-		this.#update(id, (element) => ({ ...element, ...placement }));
+		const element = this.elements.find((e) => e.id === id);
+		const same =
+			element &&
+			element.x === placement.x &&
+			element.y === placement.y &&
+			element.scale === placement.scale &&
+			(element.rotation ?? 0) === (placement.rotation ?? element.rotation ?? 0);
+		if (same) return;
+		this.#update(id, (element) => ({ ...element, ...placement }), `move:${id}`);
 	}
 
 	rotate(id: string) {
@@ -421,6 +536,7 @@ class Design {
 	}
 
 	remove(id: string) {
+		this.#remember();
 		this.elements = this.elements.filter((e) => e.id !== id);
 		if (this.selectedId === id) this.selectedId = undefined;
 	}
@@ -432,6 +548,8 @@ class Design {
 	}
 
 	clear() {
+		if (this.elements.length === 0 && !this.guides) return;
+		this.#remember();
 		this.elements = [];
 		this.selectedId = undefined;
 		this.guides = undefined;
